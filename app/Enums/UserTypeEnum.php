@@ -33,22 +33,13 @@ enum UserTypeEnum: string
         return [self::Donor, self::Volunteer];
     }
 
-    /**
-     * The stored values of appTypes(), e.g. for an `in:` rule or a whereIn.
-     *
-     * @return array<int, string>
-     */
+  
     public static function appValues(): array
     {
         return array_map(fn (self $type) => $type->value, self::appTypes());
     }
 
-    /**
-     * The stored values a request's `type` scopes a lookup to: just admins
-     * when it asks for admin, otherwise every app user.
-     *
-     * @return array<int, string>
-     */
+   
     public static function audienceValues(?string $type): array
     {
         return $type === self::Admin->value ? [self::Admin->value] : self::appValues();

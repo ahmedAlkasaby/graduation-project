@@ -78,7 +78,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.lastactive.admin' => \App\Http\Middleware\CheckLastActiveAdmin::class,
             'locale' => \App\Http\Middleware\Locale::class,
             'locale.admin' => \App\Http\Middleware\LocaleAdmin::class,
-            'app.open' => \App\Http\Middleware\AppOpen::class,
+            'site.open' => \App\Http\Middleware\SiteOpen::class,
             'auto-check-permission' => \App\Http\Middleware\AutoCheckPermission::class,
             'cors' => \App\Http\Middleware\Cors::class,
             'json.response' => \App\Http\Middleware\ForceJsonResponse::class,

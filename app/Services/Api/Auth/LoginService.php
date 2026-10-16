@@ -4,7 +4,6 @@ namespace App\Services\Api\Auth;
 
 use App\DTOs\AuthenticatedUserDTO;
 use App\Enums\LoginMethodEnum;
-use App\Enums\UserTypeEnum;
 use App\Models\Device;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -16,13 +15,7 @@ use Illuminate\Support\Str;
  */
 class LoginService
 {
-    /**
-     * Which column an identifier should be matched against.
-     *
-     * Read from the identifier itself, not from the request: registration by
-     * phone has no email in the payload, and deciding from `request('email')`
-     * there produced credentials with a null phone that could never match.
-     */
+    
     public function methodFor(?string $identifier): LoginMethodEnum
     {
         return filter_var((string) $identifier, FILTER_VALIDATE_EMAIL)
@@ -30,14 +23,8 @@ class LoginService
             : LoginMethodEnum::Phone;
     }
 
-    /**
-     * Credentials are scoped to an audience — admins, or app users (donors and
-     * volunteers) — so an admin signing in on the app fails at the same point
-     * a wrong password does; the response never says which.
-     *
-     * @return array<string, mixed>
-     */
-    public function getCredentials(?string $identifier, string $password, ?string $type = null): array
+   
+    public function getCredentials(?string $identifier, string $password): array
     {
         $credentials = ['password' => $password];
 
@@ -47,27 +34,18 @@ class LoginService
             $credentials['phone'] = (string) $identifier;
         }
 
-        // An array value is matched with whereIn by the user provider.
-        $credentials['type'] = UserTypeEnum::audienceValues($type);
-
         return $credentials;
     }
 
-    /**
-     * Attempt a sign in and issue a token, or return null.
-     *
-     * @param  array<string, mixed>  $credentials
-     */
+   
     public function attemptLogin(array $credentials, string $imei, string $token, string $deviceType): ?AuthenticatedUserDTO
     {
         if (! Auth::attempt($credentials)) {
             return null;
         }
 
-        /** @var User $user */
         $user = Auth::user();
 
-        // Remember the device so notifications can reach it.
         Device::updateDevice($user->id, $imei, $token, $deviceType);
 
         return new AuthenticatedUserDTO(

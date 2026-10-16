@@ -99,10 +99,7 @@ trait ApiResponseTrait
         return $this->successResponse($data, 'Success', $statusCode);
     }
 
-    /**
-     * $data_with adds scalars alongside the collection; $data_with_array adds
-     * further named collections (e.g. filters shown next to a list).
-     */
+   
     protected function collectionResponse(
         ResourceCollection $collection,
         $data_with = null,

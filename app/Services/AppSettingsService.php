@@ -78,11 +78,6 @@ class AppSettingsService
         return $this->get('site_open') !== 'no';
     }
 
-    public function isAppOpen(): bool
-    {
-        return $this->get('app_open') !== 'no';
-    }
-
 
     protected function load(): array
     {

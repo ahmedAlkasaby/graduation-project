@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::group([
-    'middleware' => ['locale', 'cors', 'json.response'],
+    'middleware' => ['locale', 'cors', 'json.response','site.open'],
     'as' => 'api.',
 ], function () {
 
@@ -22,7 +22,7 @@ Route::group([
     });
 
     Route::post('login', [AuthController::class, 'login'])->name('login')->middleware('throttle:login');
-    Route::get('settings', [ApiController::class, 'settings'])->name('settings');
+    Route::get('settings', [ApiController::class, 'settings'])->name('settings')->withoutMiddleware('site.open');
 
     Route::group(['prefix' => 'register', 'as' => 'register.'], function () {
         Route::post('', [AuthController::class, 'register'])->name('store')->middleware('throttle:register');

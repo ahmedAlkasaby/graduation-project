@@ -5,15 +5,7 @@ namespace App\Traits;
 use App\Enums\DeviceTypeEnum;
 use App\Enums\UserTypeEnum;
 
-/**
- * The vocabulary the admin panel is built on: which modules exist, which user
- * types exist, and the small lists the forms and filters read from.
- *
- * A new project adds its modules to $admin_models (and, if the module is soft
- * deletable, to $admin_delete_models / $admin_restore_models). PermissionSeeder
- * reads $admin_models to generate the permission set, so adding a module here
- * and re-seeding is all that is needed to make it appear in the role form.
- */
+
 trait AdminHelperTrait
 {
     protected $phone_code_default = '20';
@@ -59,11 +51,9 @@ trait AdminHelperTrait
         'default_country',
     ];
 
-    protected $setting_options_array = [
-        'social_login', 'primary_login', 'app_open',
-    ];
+ 
 
-    protected $setting_array_api = ['site_email', 'site_phone', 'address', 'social_login', 'primary_login'];
+    protected $setting_array_api = ['site_email', 'site_phone', 'address', 'social_login', 'site_open'];
 
     protected $limit_array = [25, 50, 100, 250];
 
@@ -80,8 +70,7 @@ trait AdminHelperTrait
     protected $device_type_array = [DeviceTypeEnum::Apple->value, DeviceTypeEnum::Android->value, DeviceTypeEnum::Huawei->value, DeviceTypeEnum::Website->value];
 
 
-    // User types, see UserTypeEnum. Admin is the only type that reaches the
-    // dashboard, and an admin has access to all of it.
+
 
     protected $type_array = [UserTypeEnum::Admin->value];
 

@@ -21,7 +21,6 @@ class ApiController extends ApiHomeController
         return $this->successResponse($data);
     }
 
-    /** The site's uploaded images (logo, share image, …) keyed by setting. */
     public function images(Request $request)
     {
         return $this->successResponse(

@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Api\Auth;
 
 use App\Enums\DeviceTypeEnum;
-use App\Enums\UserTypeEnum;
 use App\Http\Requests\Api\BaseRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,7 +22,6 @@ class LoginRequest extends BaseRequest
             'imei' => 'required|string',
             'token' => 'required|string',
             'device_type' => ['required', Rule::enum(DeviceTypeEnum::class)],
-            'type' => ['nullable', Rule::enum(UserTypeEnum::class)],
         ];
     }
 }

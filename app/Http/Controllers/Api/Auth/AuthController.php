@@ -73,7 +73,6 @@ class AuthController extends ApiHomeController
         $credentials = $this->loginService->getCredentials(
             $input['email'] ?? $input['phone'] ?? null,
             $input['password'],
-            $input['type'] ?? null,
         );
 
         $result = $this->loginService->attemptLogin(
