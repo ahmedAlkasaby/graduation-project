@@ -83,7 +83,7 @@
 
                         <span class="hidden-xs">
                             @if (isset($user_account))
-                                {{ $user_account->name }}
+                                {{ $user_account->full_name }}
                             @endif
                         </span>
                     </a>
@@ -98,7 +98,7 @@
 
                             <p>
                                 @if (isset($user_account))
-                                    {{ $user_account->name }}
+                                    {{ $user_account->full_name }}
                                 @endif
                             </p>
                         </li>

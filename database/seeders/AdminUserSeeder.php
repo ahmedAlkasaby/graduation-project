@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Country;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -14,21 +13,14 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $countryId = Country::query()->value('id');
-
         $user = User::firstOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@example.com')],
             [
-                'name_first' => 'Super',
-                'name_last' => 'Admin',
-                'name' => 'Super Admin',
-                'username' => 'superadmin',
+                'full_name' => 'Super Admin',
                 'phone' => '01000000000',
                 'password' => env('ADMIN_PASSWORD', 'password'),
                 'type' => 'super_admin',
                 'locale' => 'en',
-                'country_id' => $countryId,
-                'active' => 1,
                 'is_admin' => 1,
             ]
         );

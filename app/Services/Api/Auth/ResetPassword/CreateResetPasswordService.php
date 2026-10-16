@@ -2,19 +2,15 @@
 
 namespace App\Services\Api\Auth\ResetPassword;
 
-use App\Http\Controllers\Api\ApiHomeController;
 use App\Models\PasswordReset;
-use App\Models\User;
 use App\Notifications\PasswordResetRequestNotification;
-use App\Traits\SmsTrait;
-use Carbon\Carbon;
+use App\Services\Api\Auth\UserCodeService;
 use Illuminate\Support\Facades\Notification;
 
 class CreateResetPasswordService extends ResetPasswordMainService
 {
     public function handle($request)
     {
-        $country_id  =  1;
         $type = $request->type ?? "client";
         $sms_type = $request->sms_type ?? 'email';
         $field = $this->checkValidateEmailOrPhoneAndGetField($request->email);
@@ -28,7 +24,7 @@ class CreateResetPasswordService extends ResetPasswordMainService
         $token = PasswordReset::createToken($request->email);
 
         if ($sms_type != "firebase") {
-            $otp = $this->createOtpInUsers($user);
+            $otp = $this->createOtp($user);
             $this->sendOtp($request->email, $otp, $sms_type);
         }
         return [
@@ -49,19 +45,15 @@ class CreateResetPasswordService extends ResetPasswordMainService
             }
     }
 
-    public function createOtpInUsers($user)
+    /**
+     * The reset code lives in user_codes, tied to the account by user_id.
+     */
+    public function createOtp($user): string
     {
-         $otp = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
-         
-         $user->update([
-             'sms_code' => $otp,
-             'sms_code_expire' => Carbon::now()->addMinutes(
-                 $this->sms_minutes
-             )
-         ]);
-         return $otp;
+        return app(UserCodeService::class)->issueForUser(
+            $user,
+            UserCodeService::TYPE_PASSWORD_RESET,
+            (int) $this->sms_minutes,
+        );
     }
-
-   
-     
 }

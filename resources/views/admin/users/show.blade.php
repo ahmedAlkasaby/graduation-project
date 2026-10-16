@@ -13,17 +13,9 @@
 
             <div class="form-group">
 
-                <label>{{ __('Login name') }}</label>
-
-                {{ $user->username }}
-
-            </div>
-
-            <div class="form-group">
-
                 <label>{{ __('Name') }}</label>
 
-                {{ $user->name }}
+                {{ $user->full_name }}
 
             </div>
 

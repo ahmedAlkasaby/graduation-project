@@ -5,9 +5,10 @@ namespace App\Services\Api\Auth\ResetPassword;
 use App\Http\Controllers\Api\ApiHomeController;
 use App\Models\PasswordReset;
 use App\Models\User;
+use App\Services\Api\Auth\UserCodeService;
 use Carbon\Carbon;
 
-class ResetPasswordMainService extends ApiHomeController 
+class ResetPasswordMainService extends ApiHomeController
 {
 
 
@@ -30,9 +31,10 @@ class ResetPasswordMainService extends ApiHomeController
                 'field' => $field
             ];
         }
+        $userCode = null;
         if($sms_type != "firebase"){
-            $user = $this->checkExpirationOfCodeInUsers($field, $passwordReset->email, $type);
-            if (!$user) {
+            $userCode = app(UserCodeService::class)->pendingForUser($user, UserCodeService::TYPE_PASSWORD_RESET);
+            if (!$userCode) {
                 return [
                     'error' => true,
                     'field' => $field
@@ -40,6 +42,10 @@ class ResetPasswordMainService extends ApiHomeController
             }
         }
         $this->changePassword($user, $request->password);
+
+        // The code has done its job; burn it so it cannot reset the password again.
+        $userCode?->update(['code_expire' => now()]);
+
         return[
             'error'=>false,
             'user'=>$user
@@ -63,13 +69,12 @@ class ResetPasswordMainService extends ApiHomeController
     }
     public function checkEmailInUsersAndGetUser($field, $email, $type = "client")
     {
-        $is_field = "is_" . $type;
-        $user = User::where($is_field, 1)->where($field, $email)->first();
+        $user = User::where('is_admin', $type === 'admin' ? 1 : 0)->where($field, $email)->first();
         if (!$user) {
             return false;
         }
         return $user;
-    } 
+    }
     public function checkTimeOfResetPassword($passwordReset)
     {
         if (Carbon::parse($passwordReset->updated_at)->addMinutes($this->sms_minutes)->isPast()) {
@@ -77,15 +82,5 @@ class ResetPasswordMainService extends ApiHomeController
             return false;
         }
         return true;
-    }
-    public function checkExpirationOfCodeInUsers($field,$passwordResetEmail,$type="client")
-    {
-        $is_field = "is_" . $type;
-        $user_code = User::where($is_field, 1)->where('sms_code_expire', '>=', Carbon::now())->where($field, $passwordResetEmail)->first();
-
-        if (!$user_code) {
-            return false;
-        }
-        return $user_code;
     }
 }

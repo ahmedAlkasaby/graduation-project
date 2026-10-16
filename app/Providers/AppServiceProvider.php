@@ -79,11 +79,11 @@ class AppServiceProvider extends ServiceProvider
     protected function registerUserValidators(): void
     {
         $adminOnly = fn ($query) => $query->where('is_admin', 1);
-        $clientOnly = fn ($query) => $query->where('is_client', 1);
+        $clientOnly = fn ($query) => $query->where('is_admin', 0);
 
         $rules = [
-            'uniqueUserName' => ['name', $adminOnly, false],
-            'uniqueUserNameUpdate' => ['name', $adminOnly, true],
+            'uniqueUserName' => ['full_name', $adminOnly, false],
+            'uniqueUserNameUpdate' => ['full_name', $adminOnly, true],
             'uniqueUserPhone' => ['phone', $adminOnly, false],
             'uniqueUserPhoneUpdate' => ['phone', $adminOnly, true],
             'uniqueUserEmail' => ['email', $adminOnly, false],

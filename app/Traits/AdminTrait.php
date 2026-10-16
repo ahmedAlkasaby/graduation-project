@@ -27,7 +27,7 @@ trait AdminTrait
     {
         return $this->withNoneOption(
             User::active()
-                ->select('id', 'name', 'name_first', 'name_last', 'phone')
+                ->select('id', 'full_name', 'phone')
                 ->get()
                 ->mapWithKeys(fn ($u) => [$u->id => trim($u->full_name.' - '.$u->phone)])
                 ->toArray(),
@@ -41,7 +41,7 @@ trait AdminTrait
         return $this->withNoneOption(
             User::withTrashed()
                 ->latest()
-                ->select('id', 'name', 'name_first', 'name_last', 'phone')
+                ->select('id', 'full_name', 'phone')
                 ->get()
                 ->mapWithKeys(fn ($u) => [$u->id => trim($u->full_name.' - '.$u->phone)])
                 ->toArray(),

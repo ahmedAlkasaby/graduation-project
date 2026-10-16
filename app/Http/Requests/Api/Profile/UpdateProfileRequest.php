@@ -33,8 +33,7 @@ class UpdateProfileRequest extends BaseRequest
         }
 
         $rules = [
-            'name_first' => 'required|string',
-            'name_last' => 'required|string',
+            'full_name' => 'required|string|max:255',
             'gender' => 'nullable|in:male,female',
             'date_of_birth' => 'nullable|date_format:Y-m-d|before_or_equal:'.now()->subYears(15)->toDateString(),
             'address_id' => 'nullable|integer|exists:addresses,id',
@@ -56,8 +55,7 @@ class UpdateProfileRequest extends BaseRequest
     public function messages(): array
     {
         return [
-            'name_first.required' => __('The first name field is required'),
-            'name_last.required' => __('The last name field is required'),
+            'full_name.required' => __('The full name field is required'),
 
             'gender.in' => __('The gender must be male or female'),
 

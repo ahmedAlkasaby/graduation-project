@@ -15,7 +15,7 @@
     @foreach ($data as $model)
         <tr>
             <td>{{ $model->id }}</td>
-            <td>{{ optional($model->user)->name ?? '-' }}</td>
+            <td>{{ optional($model->user)->full_name ?? '-' }}</td>
             <td>{{ getModuleTableModelName($model->loggable_type) }}</td>
             <td>{{ $model->loggable_id }}</td>
             <td><code>{{ $model->key }}</code></td>

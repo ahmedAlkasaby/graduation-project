@@ -6,13 +6,12 @@
         <th>{{ __('Phone') }}</th>
         <th>{{ __('Image') }}</th>
         <th>{{ __('Type') }}</th>
-        <th>{{ __('Status') }}</th>
         <th>{{ __('Setting') }}</th>
     </tr>
 </thead>
 @foreach ($data as $key => $model)
     <tr class="odd">
-        <td>{{ $model->name }}</td>
+        <td>{{ $model->full_name }}</td>
         <td>{{ $model->email }}</td>
         <td>{{ $model->phone }}</td>
         <td>
@@ -28,13 +27,6 @@
             @endif
         </td>
         <td>{{ userName($model->type) }}</td>
-        <td>
-            @include('admin.layouts.tables.status', [
-                'active' => $model->active,
-                'ajax_class' => $model->getTable() . '-status',
-                'id' => $model->id,
-            ])
-        </td>
         <td>
             @include('admin.layouts.forms.dropdowns.dropdown', [
                 'showEdit' => true,

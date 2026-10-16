@@ -39,8 +39,8 @@ class AdminLogicService
     }
 
     /**
-     * `type` is the single source of truth; the is_* columns exist so lists can
-     * be filtered without a join. Everyone created in the panel is an admin —
+     * `type` is the single source of truth; is_admin exists so lists can be
+     * filtered without a join. Everyone created in the panel is an admin —
      * the API is what creates the app's own users.
      */
     public function mapTypeFlags(array &$data): void
@@ -49,9 +49,6 @@ class AdminLogicService
             return;
         }
 
-        $data = array_merge($data, [
-            'is_client' => 0,
-            'is_admin' => 1,
-        ]);
+        $data['is_admin'] = 1;
     }
 }

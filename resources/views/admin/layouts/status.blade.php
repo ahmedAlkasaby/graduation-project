@@ -4,7 +4,6 @@
         // One entry per module whose list view renders a status toggle. The key
         // is the table name, which is what tables.status uses for the class.
         var statusRoutes = {
-            'users': "{{ route('admin.users.status') }}",
             'cities': "{{ route('admin.cities.status') }}",
         };
 

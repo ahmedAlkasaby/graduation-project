@@ -9,14 +9,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
 
-    protected array $searchable = ['name', 'name_first', 'name_last', 'email', 'phone', 'username'];
+    protected array $searchable = ['full_name', 'email', 'phone'];
 
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
             $table->index('email');
             $table->index('phone');
-            $table->index('username');
             $table->index('deleted_at');
             $table->index('created_at');
 
@@ -41,7 +40,6 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropIndex(['email']);
             $table->dropIndex(['phone']);
-            $table->dropIndex(['username']);
             $table->dropIndex(['deleted_at']);
             $table->dropIndex(['created_at']);
             $table->dropIndex(['provider', 'provider_id']);

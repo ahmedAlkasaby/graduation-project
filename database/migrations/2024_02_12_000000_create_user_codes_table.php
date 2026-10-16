@@ -13,7 +13,6 @@ class CreateUsercodesTable extends Migration
      */
     public function up()
     {
-        //         'name', 'username', 'name_first', 'name_last', 'code_expire',
         Schema::create('user_codes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
@@ -22,10 +21,7 @@ class CreateUsercodesTable extends Migration
             $table->string('country_code')->nullable();
             $table->string('code')->nullable();
             $table->string('type')->nullable();
-            $table->string('username')->nullable();
-            $table->string('name_first')->nullable();
-            $table->string('name_last')->nullable();
-            $table->string('name')->nullable();
+            $table->string('full_name')->nullable();
             $table->timestamp('code_expire')->nullable();
             $table->timestamps();
         });

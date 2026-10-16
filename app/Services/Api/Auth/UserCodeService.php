@@ -2,6 +2,7 @@
 
 namespace App\Services\Api\Auth;
 
+use App\Models\User;
 use App\Models\UserCode;
 
 /**
@@ -11,12 +12,17 @@ use App\Models\UserCode;
  * Rows are keyed by contact detail rather than by user: the account is only
  * created once the code comes back, and attachToUser() then ties the code to
  * the account it produced and expires it so it cannot be replayed.
+     *
+ * Codes for an account that already exists (password reset) are keyed by
+ * user_id instead, under their own type so they never match a registration.
  */
 class UserCodeService
 {
     public const DEFAULT_LIFETIME_MINUTES = 10;
 
     public const DEFAULT_LENGTH = 4;
+
+    public const TYPE_PASSWORD_RESET = 'password_reset';
 
     /**
      * Issue a code, or hand back the one already outstanding.
@@ -69,6 +75,37 @@ class UserCodeService
     public function createCodeExpire(UserCode $userCode): void
     {
         $userCode->update(['code_expire' => now()]);
+    }
+
+    /**
+     * Issue a fresh code to an existing account. Any code it still holds is
+     * burned first, so only the newest one works.
+     */
+    public function issueForUser(User $user, string $type, int $minutes = self::DEFAULT_LIFETIME_MINUTES, int $length = self::DEFAULT_LENGTH): string
+    {
+        UserCode::query()->pendingForUser($user->id, $type)->update(['code_expire' => now()]);
+
+        return UserCode::create([
+            'user_id' => $user->id,
+            'type' => $type,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'code' => $this->randomCode($length),
+            'code_expire' => now()->addMinutes($minutes),
+        ])->code;
+    }
+
+    /**
+     * The account's unexpired code of this type, optionally matching what the
+     * caller typed, or null.
+     */
+    public function pendingForUser(User $user, string $type, ?string $code = null): ?UserCode
+    {
+        return UserCode::query()
+            ->pendingForUser($user->id, $type)
+            ->when(! is_null($code), fn ($query) => $query->where('code', $code))
+            ->latest()
+            ->first();
     }
 
     /**

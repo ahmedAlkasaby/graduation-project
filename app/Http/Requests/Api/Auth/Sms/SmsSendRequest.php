@@ -43,8 +43,7 @@ class SmsSendRequest extends BaseRequest
 
         return [
             'type' => ['nullable', 'in:client,admin'],
-            'name_first' => 'nullable|max:255',
-            'name_last' => 'nullable|max:255',
+            'full_name' => 'nullable|max:255',
             'country_id' => 'nullable|integer|exists:countries,id',
             'code_type' => ['required', 'in:phone,email'],
         ];

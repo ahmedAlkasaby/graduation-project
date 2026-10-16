@@ -30,15 +30,15 @@ class LoginService
     }
 
     /**
-     * Credentials include `active` and the audience flag, so a disabled account
-     * or an admin signing in on the client app fails at the same point a wrong
-     * password does — the response never says which.
+     * Credentials include the audience flag, so an admin signing in on the
+     * client app fails at the same point a wrong password does — the response
+     * never says which.
      *
      * @return array<string, mixed>
      */
     public function getCredentials(?string $identifier, string $password, string $type = 'client'): array
     {
-        $credentials = ['active' => 1, 'password' => $password];
+        $credentials = ['password' => $password];
 
         if ($this->methodFor($identifier) === LoginMethodEnum::Email) {
             $credentials['email'] = Str::lower((string) $identifier);
@@ -46,7 +46,7 @@ class LoginService
             $credentials['phone'] = (string) $identifier;
         }
 
-        $credentials[$type === 'admin' ? 'is_admin' : 'is_client'] = 1;
+        $credentials['is_admin'] = $type === 'admin' ? 1 : 0;
 
         return $credentials;
     }

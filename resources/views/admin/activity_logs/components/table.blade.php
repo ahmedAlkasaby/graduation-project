@@ -15,7 +15,7 @@
     @foreach ($data as $model)
         <tr>
             <td>{{ $model->id }}</td>
-            <td>{{ optional($model->user)->name ?? '-' }}</td>
+            <td>{{ optional($model->user)->full_name ?? '-' }}</td>
             <td>
                 <span class="badge bg-label-{{ logActionColor($model->action) }}">
                     {{ logAction($model->action) }}

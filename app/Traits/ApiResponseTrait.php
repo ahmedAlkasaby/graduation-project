@@ -44,11 +44,7 @@ trait ApiResponseTrait
             return '';
         }
 
-        return match (true) {
-            (int) $user->is_client === 1 => 'client',
-            (int) $user->is_admin === 1 => 'admin',
-            default => '',
-        };
+        return $user->isAdmin() ? 'admin' : 'client';
     }
 
 

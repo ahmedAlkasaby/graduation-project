@@ -51,7 +51,6 @@ Route::group([
                 Route::post('image', [ProfileController::class, 'changeImage'])->name('image');
                 Route::post('password', [ProfileController::class, 'changePassword'])->name('password');
                 Route::post('lang', [ProfileController::class, 'changeLang'])->name('lang');
-                Route::post('location', [ProfileController::class, 'changeLocation'])->name('location');
             });
 
             Route::post('logout', [AuthController::class, 'logout'])->name('logout.token');

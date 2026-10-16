@@ -9,7 +9,7 @@
         @if(!empty($users))
         @foreach($users as $client)
         <option value="{{ $client->id }}" @if(isset($user_id) && $user_id > 0 && $user_id == $client->id) selected @endif>
-            @if($client->phone != NULL){{ $client->phone }} @endif - {{ $client->name }} </option>
+            @if($client->phone != NULL){{ $client->phone }} @endif - {{ $client->full_name }} </option>
         @endforeach
         @endif
     </select>

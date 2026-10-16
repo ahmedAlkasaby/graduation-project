@@ -12,8 +12,8 @@
                     <div class="col-sm-6">
                         @include('admin.layouts.forms.fields.text', [
                             'label_req' => true,
-                            'label_name' => __('Name First'),
-                            'text_name' => 'name_first',
+                            'label_name' => __('Full Name'),
+                            'text_name' => 'full_name',
                         ])
                         @include('admin.layouts.forms.fields.text', [
                             'not_req' => true,
@@ -25,11 +25,6 @@
                         @include('admin.layouts.forms.fields.select')
                     </div>
                     <div class="col-sm-6">
-                        @include('admin.layouts.forms.fields.text', [
-                            'label_req' => true,
-                            'label_name' => __('Name Last'),
-                            'text_name' => 'name_last',
-                        ])
                         @include('admin.layouts.forms.fields.phone')
                         @include('admin.layouts.forms.users.password-confirm')
                         @include('admin.layouts.forms.selects.locale')

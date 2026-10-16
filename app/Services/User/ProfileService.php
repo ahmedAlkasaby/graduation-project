@@ -16,14 +16,6 @@ class ProfileService
             unset($input['phone']);
         }
 
-        if (isset($input['name_first']) || isset($input['name_last'])) {
-            $nameFirst = $input['name_first'] ?? $user->name_first;
-            $nameLast  = $input['name_last'] ?? $user->name_last;
-
-            $input['user_name'] = trim($nameFirst . ' ' . $nameLast);
-            $input['name'] = $input['user_name'];
-        }
-
         unset($input['is_phone']);
 
         $user->update($input);

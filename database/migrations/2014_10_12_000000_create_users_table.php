@@ -10,10 +10,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
-            $table->string('username')->nullable();
-            $table->string('name_first')->nullable();
-            $table->string('name_last')->nullable();
+            $table->string('full_name')->nullable();
             $table->string('email')->nullable();
             $table->string('password')->nullable();
 
@@ -26,33 +23,21 @@ return new class extends Migration
             $table->string('type', 50)->nullable();
             $table->string('image')->nullable();
             $table->string('phone')->nullable();
-            $table->string('phone_code', 50)->nullable();
             $table->timestamp('last_active')->nullable();
             $table->rememberToken();
 
-            // verification codes
-            $table->string('code', 50)->nullable();
-            $table->timestamp('code_expire')->nullable();
-            $table->string('sms_code', 50)->nullable();
-            $table->dateTime('sms_code_expire')->nullable();
-
-            $table->string('latitude')->nullable();
-            $table->string('longitude')->nullable();
             $table->date('birth_date')->nullable();
             $table->string('gender', 50)->nullable();
             $table->string('locale', 10)->default('en');
             $table->string('theme', 20)->default('light');
 
-            $table->tinyInteger('active')->default(1);
             $table->tinyInteger('is_notify')->default(1);
             $table->tinyInteger('is_admin')->default(0);
-            $table->tinyInteger('is_client')->default(0);
 
             $table->timestamps();
             $table->softDeletes();
 
             $table->index('type');
-            $table->index('active');
         });
     }
 

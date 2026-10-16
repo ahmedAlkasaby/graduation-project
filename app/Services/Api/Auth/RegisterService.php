@@ -18,9 +18,7 @@ class RegisterService
     /**
      * Payload keys that describe the registration, not the person.
      *
-     * `code` matters: User has its own fillable `code` column for account
-     * verification, so passing the registration OTP through to create() wrote
-     * the one-time code onto the new user.
+     * The registration OTP lives in user_codes, never on the user row.
      */
     private const NOT_USER_ATTRIBUTES = [
         'code', 'sms_type', 'confirm_password', 'imei', 'token', 'device_type',
@@ -38,7 +36,7 @@ class RegisterService
 
     /**
      * Fill in what registration decides rather than what the app sends: the
-     * audience flags, the default country, and the fact that a user who got
+     * audience flag and the fact that a user who got
      * here has already proved they own the address they signed up with.
      *
      * @param  array<string, mixed>  $input
@@ -47,15 +45,11 @@ class RegisterService
     public function getDataRegister(array $input): array
     {
         $input['locale'] = $this->getLocaleInRegister($input['locale'] ?? null);
-        $input['country_id'] = $input['country_id'] ?? $this->settings->get('default_country');
         $input['email_verified_at'] = new Carbon;
-        $input['active'] = 1;
         $input['type'] = $input['type'] ?? 'client';
 
         // Password is hashed by the model's `hashed` cast.
-        $isAdmin = $input['type'] === 'admin';
-        $input['is_admin'] = $isAdmin ? 1 : 0;
-        $input['is_client'] = $isAdmin ? 0 : 1;
+        $input['is_admin'] = $input['type'] === 'admin' ? 1 : 0;
 
         return $input;
     }
@@ -84,10 +78,9 @@ class RegisterService
 
             $user = User::create(Arr::except($input, self::NOT_USER_ATTRIBUTES));
 
-            $userCode?->update([
-                'user_id' => $user->id,
-                'code_expire' => now(),
-            ]);
+            if ($userCode) {
+                $this->userCodes->attachToUser($userCode, $user->id);
+            }
 
             return $user;
         });

@@ -58,7 +58,6 @@ Route::group([
     Route::delete('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
     Route::get('users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::patch('users/{id}/update', [UserController::class, 'update'])->name('users.update');
-    Route::post('users/status', [AjaxStatusController::class, 'userStatus'])->name('users.status');
     Route::resource('users', UserController::class)->except(['edit', 'update']);
 
     // Cities
