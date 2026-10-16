@@ -37,8 +37,6 @@ class ApiHomeController extends Controller
 
     protected string $phone_regex;
 
-    protected int $sms_minutes = 15;
-
     protected array $lang_array = ['ar', 'en'];
 
     public function __construct()
@@ -54,7 +52,6 @@ class ApiHomeController extends Controller
         $this->site_language = $settings->get('site_language', 'en');
         $this->phone_code = $settings->getPhoneCode();
         $this->phone_regex = $settings->getPhoneRegex();
-        $this->sms_minutes = (int) ($settings->get('sms_minutes') ?: 15);
     }
 
     /**

@@ -19,11 +19,6 @@ class RegisterService
 {
     use ResponseMessageTrait;
 
-    /**
-     * Payload keys that describe the registration, not the person.
-     *
-     * The registration OTP lives in user_codes, never on the user row.
-     */
     private const NOT_USER_ATTRIBUTES = [
         'code', 'sms_type', 'confirm_password', 'imei', 'token', 'device_type',
     ];
@@ -33,15 +28,9 @@ class RegisterService
         private UserCodeService $userCodes,
     ) {}
 
-    /**
-     * Email the code that proves the address belongs to whoever is signing up.
-     *
-     * An outstanding code is sent again rather than replaced, so an earlier
-     * email still holds a working code.
-     */
-    public function sendVerificationCode(string $email, ?string $phone, int $minutes): void
+    public function sendVerificationCode(string $email, ?string $phone): void
     {
-        $code = $this->userCodes->generate(UserCodeTypeEnum::VerifyRegister, $email, $phone, $minutes);
+        $code = $this->userCodes->generate(UserCodeTypeEnum::VerifyRegister, $email, $phone);
 
         Notification::route('mail', $email)->notify(new EmailVerification($code));
     }
@@ -51,7 +40,6 @@ class RegisterService
         return $locale ?: $this->settings->get('site_language', 'en');
     }
 
-    
     public function getDataRegister(array $input): array
     {
         $input['locale'] = $this->getLocaleInRegister($input['locale'] ?? null);
@@ -60,15 +48,13 @@ class RegisterService
         return $input;
     }
 
-    
     public function register(array $input): User
     {
         $input = $this->getDataRegister($input);
         $smsType = SmsTypeEnum::fromRequest($input['sms_type'] ?? null);
 
         return DB::transaction(function () use ($input, $smsType) {
-            // Firebase means the client proved the number before calling us, so
-            // there is no code of ours to check.
+           
             $userCode = $smsType->verifiedExternally() ? null : $this->consumableCode($input);
 
             $user = User::create(Arr::except($input, self::NOT_USER_ATTRIBUTES));

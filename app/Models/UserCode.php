@@ -10,8 +10,6 @@ class UserCode extends SiteModel
     protected $table = 'user_codes';
 
     protected $fillable = [
-        'country_code',
-        'full_name',
         'phone',
         'email',
         'code',

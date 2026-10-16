@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Setting;
+use Illuminate\Database\Seeder;
 
 class SettingSeeder extends Seeder
 {
@@ -37,7 +37,12 @@ class SettingSeeder extends Seeder
             ['type' => 'app_debug',       'key' => 'app_debug',       'value' => 'yes',               'group' => 'setting'],
         ];
 
-        foreach ([...$general, ...$social, ...$debug] as $setting) {
+        $userCode = [
+            ['type' => 'user_code_lifetime_minutes', 'key' => 'user_code_lifetime_minutes', 'value' => '10', 'group' => 'code'],
+            ['type' => 'user_code_length',           'key' => 'user_code_length',           'value' => '4',  'group' => 'code'],
+        ];
+
+        foreach ([...$general, ...$social, ...$debug, ...$userCode] as $setting) {
             Setting::create($setting);
         }
     }

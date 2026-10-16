@@ -9,19 +9,20 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
 
-
+/**
+ * Every login creates an access token and a refresh token with the same name,
+ * so the pair can be found and deleted together.
+ */
 class TokenService
 {
-    private const SESSION_PREFIX = 'session:';
-
     public function issue(User $user): AuthenticatedUserDTO
     {
-        $sessionName = self::SESSION_PREFIX.Str::uuid();
+        $pairName = (string) Str::uuid();
         $accessTokenExpiresAt = now()->addMinutes((int) config('sanctum.access_token_expiration'));
         $refreshTokenExpiresAt = now()->addMinutes((int) config('sanctum.refresh_token_expiration'));
 
-        $accessToken = $user->createToken($sessionName, [TokenAbilityEnum::AccessApi->value], $accessTokenExpiresAt);
-        $refreshToken = $user->createToken($sessionName, [TokenAbilityEnum::IssueAccessToken->value], $refreshTokenExpiresAt);
+        $accessToken = $user->createToken($pairName, [TokenAbilityEnum::AccessToken->value], $accessTokenExpiresAt);
+        $refreshToken = $user->createToken($pairName, [TokenAbilityEnum::RefreshToken->value], $refreshTokenExpiresAt);
 
         return new AuthenticatedUserDTO(
             user: $user,
@@ -32,10 +33,6 @@ class TokenService
         );
     }
 
-    /**
-     * Trade a refresh token for a new pair. The old pair is revoked, so each
-     * refresh token works exactly once.
-     */
     public function refresh(User $user, PersonalAccessToken $refreshToken): AuthenticatedUserDTO
     {
         return DB::transaction(function () use ($user, $refreshToken) {
@@ -45,22 +42,8 @@ class TokenService
         });
     }
 
-    /**
-     * Revoke the given token and its pair. Tokens issued before pairing existed
-     * share a generic name across sessions, so only the token itself goes.
-     */
     public function revoke(PersonalAccessToken $token): void
     {
-        if (! Str::startsWith($token->name, self::SESSION_PREFIX)) {
-            $token->delete();
-
-            return;
-        }
-
-        PersonalAccessToken::query()
-            ->where('tokenable_type', $token->tokenable_type)
-            ->where('tokenable_id', $token->tokenable_id)
-            ->where('name', $token->name)
-            ->delete();
+        $token->tokenable->tokens()->where('name', $token->name)->delete();
     }
 }

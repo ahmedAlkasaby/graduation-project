@@ -43,7 +43,6 @@ class AuthController extends ApiHomeController
         $this->registerService->sendVerificationCode(
             $request->validated('email'),
             $request->validated('phone'),
-            $this->sms_minutes,
         );
 
         return $this->successResponse();

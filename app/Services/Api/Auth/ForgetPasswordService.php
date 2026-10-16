@@ -24,11 +24,11 @@ class ForgetPasswordService
     /**
      * Email a fresh reset code; any earlier code stops working.
      */
-    public function sendCode(string $email, int $minutes): void
+    public function sendCode(string $email): void
     {
         $user = User::where('email', $email)->firstOrFail();
 
-        $code = $this->userCodes->issueForUser($user, UserCodeTypeEnum::ForgetPassword, $minutes);
+        $code = $this->userCodes->issueForUser($user, UserCodeTypeEnum::ForgetPassword);
 
         $user->notify(new PasswordResetRequestNotification($code));
     }

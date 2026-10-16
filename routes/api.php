@@ -21,7 +21,7 @@ Route::group([
 
     Route::post('login', [AuthController::class, 'login'])->name('login')->middleware('throttle:login');
     Route::post('refresh', [AuthController::class, 'refresh'])->name('refresh')
-        ->middleware(['auth:sanctum', 'abilities:'.TokenAbilityEnum::IssueAccessToken->value]);
+        ->middleware(['auth:sanctum', 'abilities:'.TokenAbilityEnum::RefreshToken->value]);
     Route::get('settings', [ApiController::class, 'settings'])->name('settings')->withoutMiddleware('site.open');
 
     Route::group(['prefix' => 'register', 'as' => 'register.'], function () {
@@ -38,7 +38,7 @@ Route::group([
 
         Route::apiResource('cities', CityController::class)->only(['index', 'show']);
 
-        Route::middleware(['auth:sanctum', 'abilities:'.TokenAbilityEnum::AccessApi->value])->group(function () {
+        Route::middleware(['auth:sanctum', 'abilities:'.TokenAbilityEnum::AccessToken->value])->group(function () {
 
             Route::group(['prefix' => 'profile/change', 'as' => 'profile.change.'], function () {
                 Route::post('image', [ProfileController::class, 'changeImage'])->name('image');
@@ -53,10 +53,7 @@ Route::group([
 
             Route::apiResource('notifications', NotificationController::class)->except(['store']);
 
-            // Dashboard endpoints: admins only.
-            Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => 'admin'], function () {
-                //
-            });
+           
         });
     });
 });

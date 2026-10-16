@@ -19,7 +19,7 @@ class ForgetPasswordController extends ApiHomeController
 
     public function forget(ForgetPasswordRequest $request): JsonResponse
     {
-        $this->forgetPasswordService->sendCode($request->validated('email'), $this->sms_minutes);
+        $this->forgetPasswordService->sendCode($request->validated('email'));
 
         return $this->successResponse();
     }

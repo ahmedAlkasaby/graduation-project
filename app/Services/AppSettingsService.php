@@ -78,6 +78,15 @@ class AppSettingsService
         return $this->get('site_open') !== 'no';
     }
 
+    public function getUserCodeLifetimeMinutes(): int
+    {
+        return (int) ($this->get('user_code_lifetime_minutes') ?: 10);
+    }
+
+    public function getUserCodeLength(): int
+    {
+        return (int) ($this->get('user_code_length') ?: 4);
+    }
 
     protected function load(): array
     {
