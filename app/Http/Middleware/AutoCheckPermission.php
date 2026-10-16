@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Permission;
 use App\Traits\AdminHelperTrait;
 use Closure;
+use Illuminate\Auth\Access\AuthorizationException;
 
 /**
  * Every admin route is named after its module and action ("users.edit"), and
@@ -20,7 +21,7 @@ class AutoCheckPermission
 
     public function handle($request, Closure $next)
     {
-        $user = auth('web')->user();
+        $user = auth('sanctum')->user();
 
         if ($user && in_array($user->type, $this->access_all_type)) {
             return $next($request);
@@ -31,7 +32,7 @@ class AutoCheckPermission
         $permission = Permission::nameForRoute($route);
 
         if ($permission !== null && ! $user?->can($permission)) {
-            return redirect()->route('admin.unauthorized');
+            throw new AuthorizationException;
         }
 
         return $next($request);

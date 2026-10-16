@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 
 /**
- * The API side of SiteOpen: honours the "app_open" setting.
+ * Honours the "app_open" setting: while the app is closed only owners get through.
  */
 class AppOpen
 {

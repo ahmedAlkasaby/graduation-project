@@ -7,13 +7,12 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| The starter ships no public site — a project adds its own front controllers
-| and views here. Signing in happens in the admin panel only: see the
-| admin.login routes in routes/admin.php.
+| The project is API only: the dashboard and the mobile app both talk to
+| routes/api.php. Nothing is rendered here.
 |
 */
 
-Route::get('/', fn () => redirect()->route('admin.index'))->name('home');
-
-// Shown when the site_open setting is off.
-Route::view('close', 'errors.close')->name('close');
+Route::get('/', fn () => response()->json([
+    'name' => config('app.name'),
+    'status' => 'ok',
+]))->name('home');

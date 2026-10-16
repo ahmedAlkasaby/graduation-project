@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 
 class CheckSocialLoginAccess
@@ -17,7 +18,7 @@ class CheckSocialLoginAccess
     public function handle(Request $request, Closure $next)
     {
         if (settings()->get('social_login') !== 'yes') {
-            return redirect()->route('admin.unauthorized');
+            throw new AuthorizationException;
         }
 
         return $next($request);

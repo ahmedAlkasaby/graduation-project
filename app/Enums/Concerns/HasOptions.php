@@ -3,12 +3,8 @@
 namespace App\Enums\Concerns;
 
 /**
- * Turns a backed enum into the shapes the admin forms and API resources need.
- *
- * The admin selects are built by `html()->select($name, $options)`, which wants
- * a plain `value => label` array — this is what lets an enum replace the
- * hand-maintained arrays that used to live in app/Helpers/Functions.php without
- * touching a single Blade file.
+ * Turns a backed enum into the `value => label` shapes the API resources and
+ * the dashboard's select options need.
  *
  * The using enum must declare `label(): string`.
  */

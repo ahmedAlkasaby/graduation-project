@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Traits\AdminHelperTrait;
 use Closure;
+use Illuminate\Auth\Access\AuthorizationException;
 
 /**
  * Guards the parts of the panel only an owner should reach — settings,
@@ -18,7 +19,7 @@ class AccessAll
         $user = auth()->user();
 
         if (! $user || ! in_array($user->type, $this->access_all_type)) {
-            return redirect()->route('admin.unauthorized');
+            throw new AuthorizationException;
         }
 
         return $next($request);

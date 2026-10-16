@@ -17,18 +17,14 @@ use App\Services\ActivityLogger;
 use App\Services\AppSettingsService;
 use App\Services\FirebaseService;
 use App\Services\ModelChangeLogger;
-use App\Traits\AdminHelperTrait;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    use AdminHelperTrait;
-
     public function register(): void
     {
         $this->app->singleton(FirebaseService::class, fn () => new FirebaseService);
@@ -45,7 +41,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Paginator::useBootstrap();
         Schema::defaultStringLength(191);
 
         /*
@@ -69,7 +64,6 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         $this->registerUserValidators();
-        $this->registerViewComposers();
     }
 
     /**
@@ -110,56 +104,5 @@ class AppServiceProvider extends ServiceProvider
                 return $query->where($column, $value)->count() === 0;
             });
         }
-    }
-
-    protected function registerViewComposers(): void
-    {
-        $languages = $this->language_array;
-
-        view()->composer(['admin.*'], function ($view) use ($languages) {
-            $settings = settings();
-
-            $admin_language = $settings->get('admin_language', 'en');
-            $admin_theme_style = 'light';
-            $user_account = null;
-            $user_id = 0;
-
-            if (auth()->check()) {
-                $user_account = auth()->user();
-                $admin_language = $user_account->locale ?: $admin_language;
-                $admin_theme_style = $user_account->theme ?: 'light';
-                $user_id = $user_account->id;
-            }
-
-            $admin_language = in_array($admin_language, $languages) ? $admin_language : 'en';
-
-            $view->with([
-                'company_name' => $settings->get('site_title', config('app.name')),
-                'admin_language' => $admin_language,
-                'admin_dir' => $admin_language === 'ar' ? 'rtl' : 'ltr',
-                'admin_theme_style' => $admin_theme_style,
-                'admin_url' => $settings->getAdminUrl(),
-                'user_account' => $user_account,
-                'user_id' => $user_id,
-                'limit' => $settings->getTableLimit(),
-                'table_limit' => $settings->getTableLimit(),
-                'phone_regex' => $settings->getPhoneRegex(),
-                'limit_array_admin' => $this->limit_array_admin,
-                'access_all_type' => $this->access_all_type,
-                'access_all_id' => $this->access_all_id,
-                'access_all_perms' => $this->access_all_perms,
-                'admin_perms_models' => $this->admin_perms_models,
-                'admin_delete_models' => $this->admin_delete_models,
-                'admin_restore_models' => $this->admin_restore_models,
-                'user_admins' => $this->user_admins,
-            ]);
-        });
-
-        // The sidebar needs $siteLogo too: it shows the site title only when there is no logo.
-        view()->composer(['admin.layouts.image-head', 'admin.layouts.sidebar'], function ($view) {
-            $logo = settings()->get('logo_image');
-
-            $view->with('siteLogo', $logo ? asset(trim($logo, "'")) : null);
-        });
     }
 }

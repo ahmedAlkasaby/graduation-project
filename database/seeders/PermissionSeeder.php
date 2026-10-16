@@ -22,7 +22,6 @@ class PermissionSeeder extends Seeder
 
         'activity_logs',
         'logs',
-        'translations',
         'images',
         'settings',
     ];

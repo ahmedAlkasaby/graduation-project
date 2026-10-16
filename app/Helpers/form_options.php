@@ -5,12 +5,11 @@ use App\Enums\LoginMethodEnum;
 use App\Enums\NotificationChannelEnum;
 
 /**
- * Option arrays for the admin panel's <select> fields.
+ * Option lists the dashboard API serves for its select fields.
  *
- * Each returns `value => translated label`, the shape html()->select() wants.
- * Closed value sets live in app/Enums; the functions here are thin adapters so
- * a Blade template never has to name an enum class. The rest are UI-only lists
- * (yes/no toggles, page sizes) with no domain meaning.
+ * Each returns `value => translated label`. Closed value sets live in
+ * app/Enums; the functions here are thin adapters over them. The rest are
+ * UI-only lists (yes/no toggles, page sizes) with no domain meaning.
  *
  * A project adds its own lists at the bottom.
  */

@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\ActivityLogger;
 use Carbon\Carbon;
 use Closure;
+use Illuminate\Auth\AuthenticationException;
 
 
 class CheckLastActiveAdmin
@@ -16,7 +17,7 @@ class CheckLastActiveAdmin
         $user = auth($guard)->user();
 
         if (! $user) {
-            return redirect()->route('admin.login');
+            throw new AuthenticationException;
         }
 
         $user->forceFill(['last_active' => Carbon::now()])->saveQuietly();

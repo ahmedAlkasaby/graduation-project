@@ -8,9 +8,8 @@ use Illuminate\Notifications\Notifiable;
 use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Sanctum\HasApiTokens;
-use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject, LaratrustUser, MustVerifyEmail
+class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
 {
     use HasApiTokens, HasRolesAndPermissions, Notifiable;
 
@@ -106,19 +105,6 @@ class User extends Authenticatable implements JWTSubject, LaratrustUser, MustVer
     public function isClient(): bool
     {
         return ! $this->isAdmin();
-    }
-
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getJWTCustomClaims()
-    {
-        return [
-            'email' => $this->email,
-            'name' => $this->full_name,
-        ];
     }
 
     public function newEloquentBuilder($query): \App\Builders\UserBuilder

@@ -66,7 +66,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
             'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
             'can' => \Illuminate\Auth\Middleware\Authorize::class,
-            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
             'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
             'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
@@ -75,13 +74,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Custom
             'access.all' => \App\Http\Middleware\AccessAll::class,
-            'admin' => \App\Http\Middleware\AdminPanel::class,
-            'admin.trans' => \App\Http\Middleware\AdminPanelTrans::class,
             'check.lastactive' => \App\Http\Middleware\CheckLastActive::class,
             'check.lastactive.admin' => \App\Http\Middleware\CheckLastActiveAdmin::class,
             'locale' => \App\Http\Middleware\Locale::class,
             'locale.admin' => \App\Http\Middleware\LocaleAdmin::class,
-            'site.open' => \App\Http\Middleware\SiteOpen::class,
             'app.open' => \App\Http\Middleware\AppOpen::class,
             'auto-check-permission' => \App\Http\Middleware\AutoCheckPermission::class,
             'cors' => \App\Http\Middleware\Cors::class,
@@ -94,9 +90,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
 
 
-        $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->expectsJson()
-        );
+        // API only: every error is answered as JSON, whatever the request asked for.
+        $exceptions->shouldRenderJsonWhen(fn (Request $request) => true);
 
 
         $exceptions->dontReport([
@@ -109,43 +104,23 @@ return Application::configure(basePath: dirname(__DIR__))
         };
 
         $exceptions->render(function (ValidationException $e, Request $request) use ($json) {
-            if (! $request->is('api/*') && ! $request->expectsJson()) {
-                return null; // let the web flow redirect back with the error bag
-            }
-
             return $json('error', __('validation_error'), 422, ['errors' => $e->errors()]);
         });
 
         $exceptions->render(function (AuthenticationException $e, Request $request) use ($json) {
-            if (! $request->is('api/*') && ! $request->expectsJson()) {
-                return null;
-            }
-
             return $json('unauthenticated', __('Please login'), 401);
         });
 
         $exceptions->render(function (AuthorizationException $e, Request $request) use ($json) {
-            if (! $request->is('api/*') && ! $request->expectsJson()) {
-                return null;
-            }
-
             return $json('unauthorized', __("You don't have permission to do this"), 403);
         });
 
         $exceptions->render(function (ModelNotFoundException|NotFoundHttpException $e, Request $request) use ($json) {
-            if (! $request->is('api/*') && ! $request->expectsJson()) {
-                return null;
-            }
-
             return $json('error', __('Not found'), 404);
         });
 
 
         $exceptions->render(function (Throwable $e, Request $request) use ($json) {
-            if (! $request->is('api/*') && ! $request->expectsJson()) {
-                return null;
-            }
-
             if ($e instanceof HttpExceptionInterface) {
                 return null; // 405, 429 and friends already carry a sensible status
             }

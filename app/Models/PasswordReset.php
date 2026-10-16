@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-
+use Illuminate\Support\Str;
 
 class PasswordReset extends SiteModel
 {
@@ -13,7 +13,7 @@ class PasswordReset extends SiteModel
 
     public static function createToken($email)
     {
-        $token = str_random(60);
+        $token = Str::random(60);
         self::updateOrCreate(
             ['email' => $email],
             [
