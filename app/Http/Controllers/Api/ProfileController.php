@@ -7,7 +7,6 @@ use App\Http\Requests\Api\Profile\ChangeAddressRequest;
 use App\Http\Requests\Api\Profile\ChangeAvailableRequest;
 use App\Http\Requests\Api\Profile\ChangeImageRequest;
 use App\Http\Requests\Api\Profile\ChangeLangRequest;
-use App\Http\Requests\Api\Profile\ChangeLocationRequest;
 use App\Http\Requests\Api\Profile\ChangePasswordRequest;
 use App\Http\Requests\Api\Profile\ChangeSettingsReuest;
 use App\Http\Requests\Api\Profile\UpdateProfileRequest;
@@ -158,21 +157,6 @@ class ProfileController extends ApiHomeController
             return $this->successResponse(null, $message);
         } catch (\Exception $e) {
             $message = $this->getMessageError('image');
-            return $this->errorResponse($message);
-        }
-    }
-
-    public function changeLocation(ChangeLocationRequest $request)
-    {
-        $user = $this->authUser();
-        try {
-            $user->update($request->validated());
-            $message = $this->getMessageSuccess('location');
-
-            return $this->successResponse(null, $message);
-        } catch (\Exception $e) {
-            $message = $this->getMessageError();
-
             return $this->errorResponse($message);
         }
     }

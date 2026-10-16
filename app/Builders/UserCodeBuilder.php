@@ -33,4 +33,14 @@ class UserCodeBuilder extends BaseBuilder
             }
         });
     }
+
+    /**
+     * The unexpired code issued to an existing account, e.g. for a password reset.
+     */
+    public function pendingForUser(int $userId, string $type): static
+    {
+        return $this->where('user_id', $userId)
+            ->where('type', $type)
+            ->where('code_expire', '>', now());
+    }
 }

@@ -18,7 +18,7 @@ class EnsureUserIsClient
     {
         $user = auth('sanctum')->user() ?? $request->user();
 
-        if (! $user || (int) $user->is_client !== 1) {
+        if (! $user || ! $user->isClient()) {
             return response()->json([
                 'status' => 'unauthorized',
                 'message' => __("You don't have permission to do this"),

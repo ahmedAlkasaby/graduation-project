@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\UserRequest;
-use App\Models\City;
-use App\Models\Country;
 use App\Models\User;
 use App\Services\ImageHandlerService;
 use App\Services\User\AdminLogicService;
@@ -46,8 +44,6 @@ class UserController extends AdminController
         return view('admin.users.create', [
             'new' => 1,
             'roles' => $this->getRoles(),
-            'countries' => Country::listForSelect('default'),
-            'cities' => City::listForSelect('default'),
         ]);
     }
 
@@ -99,8 +95,6 @@ class UserController extends AdminController
             'new' => 0,
             'roles' => $this->getRoles(),
             'userRoles' => $user->roles->pluck('id')->toArray(),
-            'countries' => Country::listForSelect('default'),
-            'cities' => City::listForSelect('default'),
         ]);
     }
 
@@ -124,11 +118,6 @@ class UserController extends AdminController
 
         if (blank($input['password'] ?? null)) {
             unset($input['password']);
-        }
-
-        // The seeded owner cannot be locked out of their own panel.
-        if (in_array((int) $id, $this->access_all_id)) {
-            $input['active'] = 1;
         }
 
         $input['image'] = $this->imageHandler->editImage($request, $user, 'uploads/users');

@@ -42,8 +42,7 @@ class RegisterRequest extends BaseRequest
     protected function baseRules(): array
     {
         return [
-            'name_first' => 'required|string|max:255',
-            'name_last'  => 'required|string|max:255',
+            'full_name' => 'required|string|max:255',
 
             'password' => 'required|min:8|same:confirm_password',
             'confirm_password' => 'required|min:8',

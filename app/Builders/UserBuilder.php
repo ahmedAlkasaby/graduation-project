@@ -26,7 +26,6 @@ class UserBuilder extends BaseBuilder
 
         return $this->mainSearch($request->only(['name', 'email', 'phone']))
             ->userType($request)
-            ->mainApplyDynamicFilters($request->only(['country_id', 'city_id', 'active']))
             ->dateFilter($request);
     }
 }

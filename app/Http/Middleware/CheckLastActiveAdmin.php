@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Services\ActivityLogger;
 use Carbon\Carbon;
 use Closure;
-use Illuminate\Support\Facades\Auth;
 
 
 class CheckLastActiveAdmin
@@ -18,12 +17,6 @@ class CheckLastActiveAdmin
 
         if (! $user) {
             return redirect()->route('admin.login');
-        }
-
-        if (! $user->active) {
-            Auth::logout();
-
-            return redirect()->route('admin.login')->with('error', __('Your account is not active'));
         }
 
         $user->forceFill(['last_active' => Carbon::now()])->saveQuietly();

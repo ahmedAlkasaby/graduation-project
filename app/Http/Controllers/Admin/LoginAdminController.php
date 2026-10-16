@@ -82,7 +82,7 @@ class LoginAdminController extends Controller
 
     private function mayEnterPanel($user): bool
     {
-        if (! $user || ! $user->isActive() || ! $user->isAdmin()) {
+        if (! $user || ! $user->isAdmin()) {
             return false;
         }
 
