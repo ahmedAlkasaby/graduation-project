@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Enums\UserTypeEnum;
 use App\Models\Country;
 use App\Services\AppSettingsService;
 use Illuminate\Contracts\Validation\Validator;
@@ -46,27 +47,27 @@ abstract class BaseRequest extends FormRequest
     }
 
     /**
-     * Contact rules per audience. Uniqueness is scoped so a client and an admin
-     * may share a phone number — see AppServiceProvider::registerUserValidators().
+     * Contact rules per audience. Uniqueness is scoped so an app user and an
+     * admin may share a phone number — see
+     * AppServiceProvider::registerUserValidators().
      */
     protected function roleContactRules(?string $type = null): array
     {
-        $type = $type ?? $this->input('type', 'client');
+        $type = $type ?? $this->input('type');
 
         $phoneRule = (new PhoneRule)->country($this->resolveCountryCode());
 
-        $rules = [
-            'client' => [
-                'email' => 'nullable|max:255|email|required_without:phone|uniqueUserClientEmail',
-                'phone' => ['nullable', 'required_without:email', 'max:50', $phoneRule, 'uniqueUserClientPhone'],
-            ],
-            'admin' => [
+        if ($type === UserTypeEnum::Admin->value) {
+            return [
                 'email' => 'nullable|max:255|email|required_without:phone|uniqueUserEmail',
                 'phone' => ['nullable', 'required_without:email', 'max:50', $phoneRule, 'uniqueUserPhone'],
-            ],
-        ];
+            ];
+        }
 
-        return $rules[$type] ?? $rules['client'];
+        return [
+            'email' => 'nullable|max:255|email|required_without:phone|uniqueUserClientEmail',
+            'phone' => ['nullable', 'required_without:email', 'max:50', $phoneRule, 'uniqueUserClientPhone'],
+        ];
     }
 
     protected function prepareForValidation(): void

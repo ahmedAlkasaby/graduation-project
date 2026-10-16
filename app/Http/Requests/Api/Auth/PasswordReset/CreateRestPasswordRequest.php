@@ -21,9 +21,6 @@ class CreateRestPasswordRequest extends BaseRequest
      */
     public function rules(): array
     {
-        if(! $this->has('type')){
-            $this->merge(['type'=>'client']);
-        }
         if(! $this->has('sms_type')){
             $this->merge(['sms_type'=>'email']);
         }
@@ -34,7 +31,7 @@ class CreateRestPasswordRequest extends BaseRequest
             'email' => 'required|string',
             'country_id' => 'nullable|integer|exists:countries,id',
             'code_type' => 'required|in:phone,email',
-            'type' => ['nullable', 'string', 'in:client,admin'],
+            'type' => ['nullable', Rule::enum(UserTypeEnum::class)],
             'sms_type' => 'nullable|in:sms,firebase,email',
         ];
         return $rules;

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserTypeEnum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -19,9 +20,8 @@ class AdminUserSeeder extends Seeder
                 'full_name' => 'Super Admin',
                 'phone' => '01000000000',
                 'password' => env('ADMIN_PASSWORD', 'password'),
-                'type' => 'super_admin',
+                'type' => UserTypeEnum::Admin->value,
                 'locale' => 'en',
-                'is_admin' => 1,
             ]
         );
 

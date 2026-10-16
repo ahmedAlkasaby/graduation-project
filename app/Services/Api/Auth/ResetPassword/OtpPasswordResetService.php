@@ -19,7 +19,7 @@ class OtpPasswordResetService extends ResetPasswordMainService
                 'field' => 'token'
             ];
         }
-        $type = $request->type ?? "client";
+        $type = $request->type;
         $sms_type = $request->sms_type ?? 'email';
         $field = $this->checkValidateEmailOrPhoneAndGetField($request->email);
         $user = $this->checkEmailInUsersAndGetUser($field, $request->email, $type);

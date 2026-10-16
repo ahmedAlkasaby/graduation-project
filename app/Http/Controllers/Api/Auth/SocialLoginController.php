@@ -29,6 +29,7 @@ class SocialLoginController extends ApiHomeController
             $request->validated('imei'),
             $request->validated('firebase_token'),
             $request->validated('device_type'),
+            $request->userType(),
         );
 
         if (! $result instanceof AuthenticatedUserDTO) {

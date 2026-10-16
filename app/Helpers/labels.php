@@ -230,6 +230,10 @@ function couponName($type)
 
 function userName($type = "")
 {
+    if ($userType = \App\Enums\UserTypeEnum::tryFrom((string) $type)) {
+        return $userType->label();
+    }
+
     $array = array(
         'super_admin' => __('Super Admin'),
         'admin' => __('Admin'),

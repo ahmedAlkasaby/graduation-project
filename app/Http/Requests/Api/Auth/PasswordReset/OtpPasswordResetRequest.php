@@ -21,7 +21,7 @@ class OtpPasswordResetRequest extends BaseRequest
             'email' => 'required|string',
             'code' => 'required_unless:sms_type,firebase|string',
             'token' => 'required|string',
-            'type' => ['nullable', 'string', 'in:client,admin'],
+            'type' => ['nullable', Rule::enum(UserTypeEnum::class)],
             'sms_type' => 'nullable|in:sms,firebase,email',
         ];
         return $rules;

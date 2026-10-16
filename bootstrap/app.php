@@ -84,6 +84,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'json.response' => \App\Http\Middleware\ForceJsonResponse::class,
             'check.socialLogin' => \App\Http\Middleware\CheckSocialLoginAccess::class,
             'check.client' => \App\Http\Middleware\EnsureUserIsClient::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
 
     })

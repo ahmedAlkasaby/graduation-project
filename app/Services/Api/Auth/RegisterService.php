@@ -36,8 +36,10 @@ class RegisterService
 
     /**
      * Fill in what registration decides rather than what the app sends: the
-     * audience flag and the fact that a user who got
-     * here has already proved they own the address they signed up with.
+     * locale and the fact that a user who got here has already proved they
+     * own the address they signed up with.
+     *
+     * The password is hashed by the model's `hashed` cast.
      *
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
@@ -46,10 +48,6 @@ class RegisterService
     {
         $input['locale'] = $this->getLocaleInRegister($input['locale'] ?? null);
         $input['email_verified_at'] = new Carbon;
-        $input['type'] = $input['type'] ?? 'client';
-
-        // Password is hashed by the model's `hashed` cast.
-        $input['is_admin'] = $input['type'] === 'admin' ? 1 : 0;
 
         return $input;
     }

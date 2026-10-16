@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserTypeEnum;
 use App\Models\UserModel as Authenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
@@ -9,7 +10,7 @@ use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
+class User extends Authenticatable implements  LaratrustUser, MustVerifyEmail
 {
     use HasApiTokens, HasRolesAndPermissions, Notifiable;
 
@@ -20,14 +21,12 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         'provider', 'provider_id', 'provider_token', 'email_verified_at',
         'type', 'image', 'phone',
         'locale', 'theme', 'is_notify', 'birth_date', 'gender', 'last_active',
-        'is_admin',
     ];
 
     protected $searchable = [
         'full_name', 'email', 'phone',
     ];
 
-    /** Matches the users_search_fulltext index. Keep the two in step. */
     protected $fullTextSearchable = [
         'full_name', 'email', 'phone',
     ];
@@ -75,10 +74,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         };
     }
 
-    // -------------------------------------------------------------------------
-    // Relations
-    // -------------------------------------------------------------------------
-
+   
     public function userMetas()
     {
         return $this->hasMany(UserMeta::class);
@@ -96,16 +92,23 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
 
     // -------------------------------------------------------------------------
 
-    public function isAdmin(): bool
+    public function typeEnum(): ?UserTypeEnum
     {
-        return (int) $this->is_admin === 1;
+        return UserTypeEnum::tryFrom((string) $this->type);
     }
 
-    /** Anyone who is not an admin is a client of the app. */
+    public function isAdmin(): bool
+    {
+        return $this->typeEnum() === UserTypeEnum::Admin;
+    }
+
+    /** Donors and volunteers: the people who use the app, not the dashboard. */
     public function isClient(): bool
     {
-        return ! $this->isAdmin();
+        return in_array($this->typeEnum(), UserTypeEnum::appTypes(), true);
     }
+
+   
 
     public function newEloquentBuilder($query): \App\Builders\UserBuilder
     {

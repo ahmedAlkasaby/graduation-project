@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\UserTypeEnum;
 use App\Models\ActivityLog;
 use App\Models\Attachment;
 use App\Models\City;
@@ -67,13 +68,13 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Uniqueness for users is scoped by audience: a client and an admin may
-     * share a phone number, two admins may not.
+     * Uniqueness for users is scoped by audience: an app user (donor or
+     * volunteer) and an admin may share a phone number, two admins may not.
      */
     protected function registerUserValidators(): void
     {
-        $adminOnly = fn ($query) => $query->where('is_admin', 1);
-        $clientOnly = fn ($query) => $query->where('is_admin', 0);
+        $adminOnly = fn ($query) => $query->where('type', UserTypeEnum::Admin->value);
+        $clientOnly = fn ($query) => $query->whereIn('type', UserTypeEnum::appValues());
 
         $rules = [
             'uniqueUserName' => ['full_name', $adminOnly, false],

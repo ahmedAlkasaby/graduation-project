@@ -57,7 +57,7 @@ class SmsController extends ApiHomeController
     {
         $userCode = $this->userCodeService->verify(
             $request->code,
-            $request->input('type', 'client'),
+            $request->validated('type'),
             $request->phone,
             $request->email
         );

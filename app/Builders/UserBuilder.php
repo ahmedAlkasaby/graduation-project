@@ -5,8 +5,8 @@ namespace App\Builders;
 class UserBuilder extends BaseBuilder
 {
     /**
-     * Narrows the admin list to one kind of user (super_admin, admin,
-     * sub_admin). No value — or 'all' — leaves every user in.
+     * Narrows a list to one kind of user (donor, volunteer, admin). No value —
+     * or 'all' — leaves every user in.
      */
     public function userType($request = null, string $userType = 'all'): static
     {

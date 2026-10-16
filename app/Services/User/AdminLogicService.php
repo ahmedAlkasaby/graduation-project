@@ -37,18 +37,4 @@ class AdminLogicService
 
         return true;
     }
-
-    /**
-     * `type` is the single source of truth; is_admin exists so lists can be
-     * filtered without a join. Everyone created in the panel is an admin —
-     * the API is what creates the app's own users.
-     */
-    public function mapTypeFlags(array &$data): void
-    {
-        if (! isset($data['type'])) {
-            return;
-        }
-
-        $data['is_admin'] = 1;
-    }
 }

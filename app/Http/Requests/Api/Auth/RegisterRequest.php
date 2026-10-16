@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\Api\Auth;
 
+use App\Enums\DeviceTypeEnum;
+use App\Enums\UserTypeEnum;
 use App\Http\Requests\Api\BaseRequest;
+use Illuminate\Validation\Rule;
 
 class RegisterRequest extends BaseRequest
 {
@@ -12,20 +15,6 @@ class RegisterRequest extends BaseRequest
     public function authorize(): bool
     {
         return true;
-    }
-
-    /**
-     * Default the audience before validation rather than inside rules():
-     * rules() is asked for rules, and mutating the payload from there means
-     * the default silently depends on rules() being called exactly once.
-     */
-    protected function prepareForValidation(): void
-    {
-        parent::prepareForValidation();
-
-        if (! $this->has('type')) {
-            $this->merge(['type' => 'client']);
-        }
     }
 
     /**
@@ -52,10 +41,12 @@ class RegisterRequest extends BaseRequest
 
             'imei' => 'required|string',
             'token' => 'required|string',
-            'device_type' => 'required|in:android,huawei,apple,website',
+            'device_type' => ['required', Rule::enum(DeviceTypeEnum::class)],
 
             'locale' => 'nullable|in:ar,en',
-            'type' => 'nullable|in:client,admin',
+
+            // Admins are made on the dashboard; the app only signs up its own users.
+            'type' => ['required', Rule::in(UserTypeEnum::appValues())],
         ];
     }
 

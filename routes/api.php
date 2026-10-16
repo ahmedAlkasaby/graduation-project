@@ -59,6 +59,11 @@ Route::group([
             Route::apiResource('profile', ProfileController::class)->except(['store']);
 
             Route::apiResource('notifications', NotificationController::class)->except(['store']);
+
+            // Dashboard endpoints: admins only.
+            Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => 'admin'], function () {
+                //
+            });
         });
     });
 });

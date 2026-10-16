@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Api\Auth\Sms;
 
+use App\Enums\UserTypeEnum;
 use App\Http\Requests\Api\BaseRequest;
+use Illuminate\Validation\Rule;
 
 class SmsSendRequest extends BaseRequest
 {
@@ -29,10 +31,6 @@ class SmsSendRequest extends BaseRequest
 
     protected function baseRules(): array
     {
-        if (! $this->has('type')) {
-            $this->merge(['type' => 'client']);
-        }
-
         if (! $this->has('code_type')) {
             $this->merge(['code_type' => 'email']);
         }
@@ -42,7 +40,8 @@ class SmsSendRequest extends BaseRequest
         }
 
         return [
-            'type' => ['nullable', 'in:client,admin'],
+            // Must match the `type` the app registers with — the code is checked against it.
+            'type' => ['required', Rule::in(UserTypeEnum::appValues())],
             'full_name' => 'nullable|max:255',
             'country_id' => 'nullable|integer|exists:countries,id',
             'code_type' => ['required', 'in:phone,email'],

@@ -32,7 +32,7 @@ class SettingSeeder extends Seeder
         ];
 
         $debug = [
-            ['type' => 'user_type_debug', 'key' => 'user_type_debug', 'value' => 'super_admin,admin', 'group' => 'setting'],
+            ['type' => 'user_type_debug', 'key' => 'user_type_debug', 'value' => 'admin', 'group' => 'setting'],
             ['type' => 'user_id_debug',   'key' => 'user_id_debug',   'value' => '1',                 'group' => 'setting'],
             ['type' => 'app_debug',       'key' => 'app_debug',       'value' => 'yes',               'group' => 'setting'],
         ];

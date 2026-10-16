@@ -6,6 +6,7 @@ use App\Contracts\SocialTokenVerifierInterface;
 use App\DTOs\AuthenticatedUserDTO;
 use App\DTOs\SocialUserDTO;
 use App\Enums\SocialProviderEnum;
+use App\Enums\UserTypeEnum;
 use App\Models\Device;
 use App\Models\User;
 use App\Services\Api\Auth\Social\AppleTokenVerifier;
@@ -22,6 +23,7 @@ class SocialLoginService
         string $imei,
         string $deviceToken,
         string $deviceType,
+        UserTypeEnum $type = UserTypeEnum::Donor,
     ): ?AuthenticatedUserDTO {
         $socialUser = $this->verifierFor($provider)->verify($socialToken);
 
@@ -29,7 +31,7 @@ class SocialLoginService
             return null;
         }
 
-        $user = $this->findOrCreateUser($provider, $socialUser);
+        $user = $this->findOrCreateUser($provider, $socialUser, $type);
 
         Device::updateDevice($user->id, $imei, $deviceToken, $deviceType);
 
@@ -48,14 +50,19 @@ class SocialLoginService
         });
     }
 
-    private function findOrCreateUser(SocialProviderEnum $provider, SocialUserDTO $socialUser): User
+    /**
+     * Only app users are matched, the same as a password sign in; $type is
+     * used only when the account is first created.
+     */
+    private function findOrCreateUser(SocialProviderEnum $provider, SocialUserDTO $socialUser, UserTypeEnum $type): User
     {
         $profile = [
             'email' => $socialUser->email,
             'full_name' => $socialUser->displayName(),
         ];
 
-        $user = User::where('provider', $provider->value)
+        $user = User::whereIn('type', UserTypeEnum::appValues())
+            ->where('provider', $provider->value)
             ->where('provider_id', $socialUser->id)
             ->first();
 
@@ -68,8 +75,7 @@ class SocialLoginService
         return User::create($profile + [
             'provider' => $provider->value,
             'provider_id' => $socialUser->id,
-            'type' => 'client',
-            'is_admin' => 0,
+            'type' => $type->value,
         ]);
     }
 }

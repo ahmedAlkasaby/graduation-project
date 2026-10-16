@@ -4,6 +4,7 @@ namespace App\Services\Api\Auth;
 
 use App\DTOs\AuthenticatedUserDTO;
 use App\Enums\LoginMethodEnum;
+use App\Enums\UserTypeEnum;
 use App\Models\Device;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -30,13 +31,13 @@ class LoginService
     }
 
     /**
-     * Credentials include the audience flag, so an admin signing in on the
-     * client app fails at the same point a wrong password does — the response
-     * never says which.
+     * Credentials are scoped to an audience — admins, or app users (donors and
+     * volunteers) — so an admin signing in on the app fails at the same point
+     * a wrong password does; the response never says which.
      *
      * @return array<string, mixed>
      */
-    public function getCredentials(?string $identifier, string $password, string $type = 'client'): array
+    public function getCredentials(?string $identifier, string $password, ?string $type = null): array
     {
         $credentials = ['password' => $password];
 
@@ -46,7 +47,8 @@ class LoginService
             $credentials['phone'] = (string) $identifier;
         }
 
-        $credentials['is_admin'] = $type === 'admin' ? 1 : 0;
+        // An array value is matched with whereIn by the user provider.
+        $credentials['type'] = UserTypeEnum::audienceValues($type);
 
         return $credentials;
     }

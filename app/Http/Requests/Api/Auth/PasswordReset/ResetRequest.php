@@ -25,7 +25,7 @@ class ResetRequest extends BaseRequest
             'email' => 'required|string',
             'password' => 'required|string|min:8|same:confirm_password',
             'token' => 'required|string',
-            'type' => ['nullable', 'string', 'in:client,admin'],
+            'type' => ['nullable', Rule::enum(UserTypeEnum::class)],
             'sms_type' => 'nullable|in:sms,firebase',
         ];
         return $rules;

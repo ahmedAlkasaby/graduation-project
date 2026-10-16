@@ -35,16 +35,10 @@ trait ApiResponseTrait
         return (int) ($this->authUser()?->id ?? 0);
     }
 
-    /** The caller's audience, as the app understands it. */
+    /** The caller's user type (donor, volunteer or admin). */
     protected function authUserType($guard = null): string
     {
-        $user = $this->authUser($guard);
-
-        if (! $user) {
-            return '';
-        }
-
-        return $user->isAdmin() ? 'admin' : 'client';
+        return (string) $this->authUser($guard)?->type;
     }
 
 

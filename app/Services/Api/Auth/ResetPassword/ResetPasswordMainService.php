@@ -2,6 +2,7 @@
 
 namespace App\Services\Api\Auth\ResetPassword;
 
+use App\Enums\UserTypeEnum;
 use App\Http\Controllers\Api\ApiHomeController;
 use App\Models\PasswordReset;
 use App\Models\User;
@@ -21,7 +22,7 @@ class ResetPasswordMainService extends ApiHomeController
                 'field' => 'token'
             ];
         }
-        $type = $request->type ?? "client";
+        $type = $request->type;
         $sms_type = $request->sms_type ?? 'email';
         $field = $this->checkValidateEmailOrPhoneAndGetField($passwordReset->email);
         $user = $this->checkEmailInUsersAndGetUser($field, $passwordReset->email, $type);
@@ -67,9 +68,9 @@ class ResetPasswordMainService extends ApiHomeController
         $user->password = bcrypt($password);
         $user->save();
     }
-    public function checkEmailInUsersAndGetUser($field, $email, $type = "client")
+    public function checkEmailInUsersAndGetUser($field, $email, $type = null)
     {
-        $user = User::where('is_admin', $type === 'admin' ? 1 : 0)->where($field, $email)->first();
+        $user = User::whereIn('type', UserTypeEnum::audienceValues($type))->where($field, $email)->first();
         if (!$user) {
             return false;
         }

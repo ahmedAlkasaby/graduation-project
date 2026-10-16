@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\UserTypeEnum;
 use App\Traits\AdminHelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -36,7 +37,7 @@ class UserRequest extends FormRequest
             'birth_date' => ['nullable', 'date', 'before_or_equal:'.now()->subYears(15)->toDateString()],
 
             'email' => [
-                $this->input('type') === 'client' ? 'nullable' : 'required',
+                $this->input('type') === UserTypeEnum::Admin->value ? 'required' : 'nullable',
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->ignore($userId),

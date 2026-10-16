@@ -29,7 +29,7 @@ class SmsCodeRequest extends BaseRequest
             'phone' => ['nullable', 'required_without:email', 'max:50', $phoneRule, 'exists:user_codes,phone'],
             'email' => ['nullable', 'required_without:phone', 'max:50', 'exists:user_codes,email'],
             'code'  => ['required', 'max:50'],
-            'type'  => ['nullable', 'string', 'in:client,admin'],
+            'type'  => ['required', Rule::in(UserTypeEnum::appValues())],
             'country_id' => ['nullable', 'integer', 'exists:countries,id'],
         ];
     }

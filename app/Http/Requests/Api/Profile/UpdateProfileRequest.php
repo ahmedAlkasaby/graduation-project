@@ -40,7 +40,7 @@ class UpdateProfileRequest extends BaseRequest
         ];
 
         if ($primaryLogin !== 'email') {
-            $rules['email'] = $user->type === 'client'
+            $rules['email'] = $user->isClient()
                 ? "nullable|email|max:255|uniqueUserClientEmailUpdate:$user->id"
                 : "nullable|email|max:255|uniqueUserEmailUpdate:$user->id";
         }

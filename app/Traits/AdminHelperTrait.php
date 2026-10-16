@@ -2,6 +2,9 @@
 
 namespace App\Traits;
 
+use App\Enums\DeviceTypeEnum;
+use App\Enums\UserTypeEnum;
+
 /**
  * The vocabulary the admin panel is built on: which modules exist, which user
  * types exist, and the small lists the forms and filters read from.
@@ -74,18 +77,21 @@ trait AdminHelperTrait
 
     protected $property_date_time_array = ['created_at', 'updated_at', 'deleted_at'];
 
-    protected $device_type_array = ['apple', 'android', 'huawei', 'website'];
+    protected $device_type_array = [DeviceTypeEnum::Apple->value, DeviceTypeEnum::Android->value, DeviceTypeEnum::Huawei->value, DeviceTypeEnum::Website->value];
 
 
-    protected $type_array = ['admin'];
+    // User types, see UserTypeEnum. Admin is the only type that reaches the
+    // dashboard, and an admin has access to all of it.
 
-    protected $admin_roles = ['super_admin', 'admin', 'sub_admin'];
+    protected $type_array = [UserTypeEnum::Admin->value];
 
-    protected $user_admins = ['super_admin', 'admin', 'sub_admin'];
+    protected $admin_roles = [UserTypeEnum::Admin->value];
 
-    protected $user_roles_array = ['super_admin', 'admin', 'sub_admin'];
+    protected $user_admins = [UserTypeEnum::Admin->value];
 
-    protected $access_all_type = ['super_admin'];
+    protected $user_roles_array = [UserTypeEnum::Donor->value, UserTypeEnum::Volunteer->value, UserTypeEnum::Admin->value];
+
+    protected $access_all_type = [UserTypeEnum::Admin->value];
 
     protected $access_all_id = [1];
 

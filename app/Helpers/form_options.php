@@ -3,6 +3,7 @@
 use App\Enums\LanguageEnum;
 use App\Enums\LoginMethodEnum;
 use App\Enums\NotificationChannelEnum;
+use App\Enums\UserTypeEnum;
 
 /**
  * Option lists the dashboard API serves for its select fields.
@@ -15,53 +16,23 @@ use App\Enums\NotificationChannelEnum;
  */
 
 /**
- * The user types a form may offer. Nobody is shown a type that outranks their
- * own, so an admin cannot promote someone past themselves.
+ * The user types a form may offer. Only an admin is offered the admin type,
+ * so nobody can promote someone past themselves.
  */
 function userType($all = 'yes', $is_search = 'no')
 {
-    $array = [
-        '' => __('None'),
-        'sub_admin' => __('Sub Admin'),
-        'admin' => __('Admin'),
-        'super_admin' => __('Super Admin'),
-    ];
+    $array = auth()->user()?->isAdmin()
+        ? UserTypeEnum::options()
+        : UserTypeEnum::optionsOnly(UserTypeEnum::appTypes());
 
-    $current = auth()->user()?->type;
-
-    if ($all !== 'yes' || $current !== 'super_admin') {
-        unset($array['super_admin']);
-    }
-
-    if (! in_array($current, ['super_admin', 'admin'])) {
-        unset($array['admin']);
-    }
-
-    if (! in_array($current, ['super_admin', 'admin', 'sub_admin'])) {
-        unset($array['sub_admin']);
-    }
-
-    if ($is_search !== 'yes') {
-        unset($array['']);
-    }
-
-    return $array;
+    return $is_search === 'yes' ? ['' => __('None')] + $array : $array;
 }
 
 function userTypeDefault($all = 'yes')
 {
-    $array = [
-        '' => __('None'),
-        'sub_admin' => __('Sub Admin'),
-        'admin' => __('Admin'),
-        'super_admin' => __('Super Admin'),
-    ];
-
-    if ($all !== 'yes') {
-        unset($array['']);
-    }
-
-    return $array;
+    return $all === 'yes'
+        ? UserTypeEnum::optionsWithPlaceholder(__('None'))
+        : UserTypeEnum::options();
 }
 
 /**
