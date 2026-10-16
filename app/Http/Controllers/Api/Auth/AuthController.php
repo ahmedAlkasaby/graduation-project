@@ -81,10 +81,7 @@ class AuthController extends ApiHomeController
         return $this->successResponse();
     }
 
-    /**
-     * Trade the refresh token sent as the bearer token for a new access /
-     * refresh pair. The refresh token used here stops working.
-     */
+   
     public function refresh(Request $request): JsonResponse
     {
         $user = $request->user();

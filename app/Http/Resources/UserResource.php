@@ -18,6 +18,7 @@ class UserResource extends MainResource
             'locale' => $this->locale,
             'theme' => $this->theme,
             'is_notify' => (int) $this->is_notify,
+            'active' => (int) $this->active,
             'last_active' => $this->last_active?->toDateTimeString(),
             'created_at' => $this->created_at?->timezone(config('app.timezone'))->toDateTimeString(),
         ];
