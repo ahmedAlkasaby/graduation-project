@@ -36,19 +36,9 @@ class SmsController extends ApiHomeController
             return $this->errorResponse($this->getMessageError('code_send'));
         }
 
-        if ($data['code_type'] === 'phone') {
-            $message = $response->code . ' your verification code to ' . config('app.name');
-            $country = Country::where('id', $data['country_id'])->first();
-            $mobile  = prefixPhoneWithCountryCode($data['phone'], $country->phone_code);
-
-            try {
-                $this->smsService->send($mobile, $message);
-            } catch (SmsException $e) {
-                return $this->failedResponse($e, $this->getMessageError('code_send'));
-            }
-        } else {
-            Notification::route('mail', $data['email'])->notify(new EmailVerification($response->code));
-        }
+     
+        Notification::route('mail', $data['email'])->notify(new EmailVerification($response->code));
+        
 
         return $this->successResponse();
     }

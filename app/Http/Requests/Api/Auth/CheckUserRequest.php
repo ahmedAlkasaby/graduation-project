@@ -17,8 +17,11 @@ class CheckUserRequest extends BaseRequest
 
     public function rules()
     {
-        return $this->roleContactRules();
+        return [
+            'email'=>'required|string|email|unique:users,email',
+        ];
     }
+   
 
    
 }

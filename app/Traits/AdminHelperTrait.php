@@ -53,7 +53,7 @@ trait AdminHelperTrait
 
  
 
-    protected $setting_array_api = ['site_email', 'site_phone', 'address', 'social_login', 'site_open'];
+    protected $setting_array_api = ['site_email', 'site_phone', 'address', 'social_login', 'site_open','logo_image'];
 
     protected $limit_array = [25, 50, 100, 250];
 

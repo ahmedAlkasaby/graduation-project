@@ -25,7 +25,7 @@ Route::group([
     Route::get('settings', [ApiController::class, 'settings'])->name('settings')->withoutMiddleware('site.open');
 
     Route::group(['prefix' => 'register', 'as' => 'register.'], function () {
-        Route::post('', [AuthController::class, 'register'])->name('store')->middleware('throttle:register');
+        Route::post('', [AuthController::class, '`register`'])->name('store')->middleware('throttle:register');
         Route::post('check', [AuthController::class, 'checkUser'])->name('check');
     });
 
