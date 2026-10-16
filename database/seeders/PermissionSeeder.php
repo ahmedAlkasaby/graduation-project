@@ -10,8 +10,8 @@ use Illuminate\Database\Seeder;
  * Generates the permission set from the module list in AdminHelperTrait, so a
  * new module only has to be named there.
  *
- * A permission name may hold several route names, comma separated, which is
- * what lets one checkbox in the role form cover "create and store".
+ * The app is API only, so a module has no create/edit form routes: its
+ * permissions are index, store, update, show, status and destroy.
  */
 class PermissionSeeder extends Seeder
 {
@@ -44,8 +44,8 @@ class PermissionSeeder extends Seeder
         foreach ($crudModels as $model) {
             $permissions = [
                 "{$model}.index" => 'view',
-                "{$model}.create,{$model}.store" => 'create',
-                "{$model}.edit,{$model}.update" => 'edit',
+                "{$model}.store" => 'create',
+                "{$model}.update" => 'edit',
                 "{$model}.show" => 'show',
                 "{$model}.status" => 'status',
                 "{$model}.destroy" => 'delete',
