@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\VerifyCsrfToken;
+use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
 use Laravel\Sanctum\Sanctum;
 
 return [
@@ -50,6 +53,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Access / Refresh Token Lifetimes
+    |--------------------------------------------------------------------------
+    |
+    | Minutes until the tokens issued at login expire. The access token calls
+    | the API and is short lived; the refresh token can only be traded at
+    | POST /refresh for a new pair.
+    |
+    */
+
+    'access_token_expiration' => (int) env('SANCTUM_ACCESS_TOKEN_EXPIRATION', 60),
+
+    'refresh_token_expiration' => (int) env('SANCTUM_REFRESH_TOKEN_EXPIRATION', 60 * 24 * 30),
+
+    /*
+    |--------------------------------------------------------------------------
     | Token Prefix
     |--------------------------------------------------------------------------
     |
@@ -75,9 +93,9 @@ return [
     */
 
     'middleware' => [
-        'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
-        'encrypt_cookies' => App\Http\Middleware\EncryptCookies::class,
-        'verify_csrf_token' => App\Http\Middleware\VerifyCsrfToken::class,
+        'authenticate_session' => AuthenticateSession::class,
+        'encrypt_cookies' => EncryptCookies::class,
+        'verify_csrf_token' => VerifyCsrfToken::class,
     ],
 
 ];

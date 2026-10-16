@@ -2,19 +2,20 @@
 
 namespace App\Services\Api\Auth;
 
+use App\Enums\UserCodeTypeEnum;
 use App\Models\User;
 use App\Models\UserCode;
 
 /**
- * The one-time codes that prove someone owns a phone number or an email before
- * an account exists for them.
+ * The one-time codes sent by email, see UserCodeTypeEnum for what each is for.
  *
- * Rows are keyed by contact detail rather than by user: the account is only
- * created once the code comes back, and attachToUser() then ties the code to
- * the account it produced and expires it so it cannot be replayed.
-     *
- * Codes for an account that already exists (password reset) are keyed by
- * user_id instead, under their own type so they never match a registration.
+ * Registration codes are keyed by contact detail rather than by user: the
+ * account is only created once the code comes back, and attachToUser() then
+ * ties the code to the account it produced and expires it so it cannot be
+ * replayed.
+ *
+ * Codes for an account that already exists (forget password) are keyed by
+ * user_id instead.
  */
 class UserCodeService
 {
@@ -22,41 +23,40 @@ class UserCodeService
 
     public const DEFAULT_LENGTH = 4;
 
-    public const TYPE_PASSWORD_RESET = 'password_reset';
-
     /**
-     * Issue a code, or hand back the one already outstanding.
+     * Issue a registration code, or hand back the one already outstanding.
      *
      * Re-sending must not mint a second code: the first one is still valid and
-     * may already be on its way to the handset, so both would work and the
-     * older would look broken to whoever typed it.
-     *
-     * @return object{status: bool, code: string}  status false = an existing code was reused
+     * may already be in the inbox, so both would work and the older would look
+     * broken to whoever typed it.
      */
-    public function generate(array $data, int $minutes = self::DEFAULT_LIFETIME_MINUTES, int $length = self::DEFAULT_LENGTH): object
-    {
-        $existing = $this->pending(
-            type: $data['type'],
-            phone: $data['phone'] ?? null,
-            email: $data['email'] ?? null,
-        );
+    public function generate(
+        UserCodeTypeEnum $type,
+        string $email,
+        ?string $phone = null,
+        int $minutes = self::DEFAULT_LIFETIME_MINUTES,
+        int $length = self::DEFAULT_LENGTH,
+    ): string {
+        $existing = $this->pending(type: $type, email: $email);
 
         if ($existing) {
-            return (object) ['status' => false, 'code' => $existing->code];
+            return $existing->code;
         }
 
-        $userCode = UserCode::create($data + [
+        return UserCode::create([
+            'user_id' => 0,
+            'type' => $type,
+            'email' => $email,
+            'phone' => $phone,
             'code' => $this->randomCode($length),
             'code_expire' => now()->addMinutes($minutes),
-        ]);
-
-        return (object) ['status' => true, 'code' => $userCode->code];
+        ])->code;
     }
 
     /**
      * The unexpired code matching what the caller typed, or null.
      */
-    public function verify(string $code, string $type, ?string $phone = null, ?string $email = null): ?UserCode
+    public function verify(string $code, UserCodeTypeEnum $type, ?string $phone = null, ?string $email = null): ?UserCode
     {
         return $this->pending(type: $type, code: $code, phone: $phone, email: $email);
     }
@@ -72,7 +72,10 @@ class UserCodeService
         ]);
     }
 
-    public function createCodeExpire(UserCode $userCode): void
+    /**
+     * Burn a code so it cannot be used again.
+     */
+    public function expire(UserCode $userCode): void
     {
         $userCode->update(['code_expire' => now()]);
     }
@@ -81,7 +84,7 @@ class UserCodeService
      * Issue a fresh code to an existing account. Any code it still holds is
      * burned first, so only the newest one works.
      */
-    public function issueForUser(User $user, string $type, int $minutes = self::DEFAULT_LIFETIME_MINUTES, int $length = self::DEFAULT_LENGTH): string
+    public function issueForUser(User $user, UserCodeTypeEnum $type, int $minutes = self::DEFAULT_LIFETIME_MINUTES, int $length = self::DEFAULT_LENGTH): string
     {
         UserCode::query()->pendingForUser($user->id, $type)->update(['code_expire' => now()]);
 
@@ -99,7 +102,7 @@ class UserCodeService
      * The account's unexpired code of this type, optionally matching what the
      * caller typed, or null.
      */
-    public function pendingForUser(User $user, string $type, ?string $code = null): ?UserCode
+    public function pendingForUser(User $user, UserCodeTypeEnum $type, ?string $code = null): ?UserCode
     {
         return UserCode::query()
             ->pendingForUser($user->id, $type)
@@ -108,14 +111,8 @@ class UserCodeService
             ->first();
     }
 
-    /**
-     * Latest unexpired, unclaimed code for a contact detail.
-     *
-     * Named arguments throughout: the builder takes type first and the four
-     * parameters are all nullable strings, so a positional call that drifts out
-     * of order fails silently rather than loudly.
-     */
-    protected function pending(string $type, ?string $code = null, ?string $phone = null, ?string $email = null): ?UserCode
+   
+    protected function pending(UserCodeTypeEnum $type, ?string $code = null, ?string $phone = null, ?string $email = null): ?UserCode
     {
         return UserCode::query()
             ->latestNotExpired(type: $type, code: $code, phone: $phone, email: $email)
