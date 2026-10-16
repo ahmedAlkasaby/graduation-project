@@ -5,7 +5,6 @@ namespace App\Services\Api\Auth;
 use App\DTOs\AuthenticatedUserDTO;
 use App\Enums\LoginMethodEnum;
 use App\Models\Device;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -15,7 +14,10 @@ use Illuminate\Support\Str;
  */
 class LoginService
 {
-    
+    public function __construct(
+        private readonly TokenService $tokenService,
+    ) {}
+
     public function methodFor(?string $identifier): LoginMethodEnum
     {
         return filter_var((string) $identifier, FILTER_VALIDATE_EMAIL)
@@ -23,7 +25,6 @@ class LoginService
             : LoginMethodEnum::Phone;
     }
 
-   
     public function getCredentials(?string $identifier, string $password): array
     {
         $credentials = ['password' => $password];
@@ -37,7 +38,6 @@ class LoginService
         return $credentials;
     }
 
-   
     public function attemptLogin(array $credentials, string $imei, string $token, string $deviceType): ?AuthenticatedUserDTO
     {
         if (! Auth::attempt($credentials)) {
@@ -48,9 +48,6 @@ class LoginService
 
         Device::updateDevice($user->id, $imei, $token, $deviceType);
 
-        return new AuthenticatedUserDTO(
-            user: $user,
-            accessToken: $user->createToken('auth_token')->plainTextToken,
-        );
+        return $this->tokenService->issue($user);
     }
 }

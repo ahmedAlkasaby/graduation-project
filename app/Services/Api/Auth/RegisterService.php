@@ -3,13 +3,17 @@
 namespace App\Services\Api\Auth;
 
 use App\Enums\SmsTypeEnum;
+use App\Enums\UserCodeTypeEnum;
 use App\Exceptions\UserFacingException;
 use App\Models\User;
+use App\Models\UserCode;
+use App\Notifications\EmailVerification;
 use App\Services\AppSettingsService;
 use App\Traits\ResponseMessageTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class RegisterService
 {
@@ -29,21 +33,25 @@ class RegisterService
         private UserCodeService $userCodes,
     ) {}
 
+    /**
+     * Email the code that proves the address belongs to whoever is signing up.
+     *
+     * An outstanding code is sent again rather than replaced, so an earlier
+     * email still holds a working code.
+     */
+    public function sendVerificationCode(string $email, ?string $phone, int $minutes): void
+    {
+        $code = $this->userCodes->generate(UserCodeTypeEnum::VerifyRegister, $email, $phone, $minutes);
+
+        Notification::route('mail', $email)->notify(new EmailVerification($code));
+    }
+
     public function getLocaleInRegister($locale = null): string
     {
         return $locale ?: $this->settings->get('site_language', 'en');
     }
 
-    /**
-     * Fill in what registration decides rather than what the app sends: the
-     * locale and the fact that a user who got here has already proved they
-     * own the address they signed up with.
-     *
-     * The password is hashed by the model's `hashed` cast.
-     *
-     * @param  array<string, mixed>  $input
-     * @return array<string, mixed>
-     */
+    
     public function getDataRegister(array $input): array
     {
         $input['locale'] = $this->getLocaleInRegister($input['locale'] ?? null);
@@ -52,18 +60,7 @@ class RegisterService
         return $input;
     }
 
-    /**
-     * Turn a validated registration into an account.
-     *
-     * Checking the code, creating the user and burning the code are one
-     * transaction: the code is single-use, so a failure between creating the
-     * account and consuming it would leave a code that still works and an
-     * account that already exists.
-     *
-     * @param  array<string, mixed>  $input  already validated
-     *
-     * @throws UserFacingException when the one-time code does not check out
-     */
+    
     public function register(array $input): User
     {
         $input = $this->getDataRegister($input);
@@ -90,13 +87,12 @@ class RegisterService
      *
      * @param  array<string, mixed>  $input
      */
-    private function consumableCode(array $input)
+    private function consumableCode(array $input): UserCode
     {
         $userCode = $this->userCodes->verify(
-            (string) ($input['code'] ?? ''),
-            (string) $input['type'],
-            $input['phone'] ?? null,
-            $input['email'] ?? null,
+            code: (string) ($input['code'] ?? ''),
+            type: UserCodeTypeEnum::VerifyRegister,
+            email: $input['email'],
         );
 
         if (! $userCode) {

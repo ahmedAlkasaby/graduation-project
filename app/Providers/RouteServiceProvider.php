@@ -47,13 +47,11 @@ class RouteServiceProvider extends ServiceProvider
 
     }
 
-
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
-
 
         RateLimiter::for('login', function (Request $request) {
             $identifier = (string) ($request->input('email') ?: $request->input('phone') ?: '');
@@ -68,14 +66,13 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perHour(10)->by('register:'.$request->ip());
         });
 
-
         RateLimiter::for('sms', function (Request $request) {
-            $phone = (string) $request->input('phone', '');
+            $identifier = (string) ($request->input('email') ?: $request->input('phone') ?: '');
 
             return [
                 Limit::perMinute(3)->by('sms:'.$request->ip()),
                 Limit::perHour(10)->by('sms:'.$request->ip()),
-                Limit::perHour(5)->by('sms-phone:'.$phone),
+                Limit::perHour(5)->by('sms-contact:'.mb_strtolower($identifier)),
             ];
         });
 

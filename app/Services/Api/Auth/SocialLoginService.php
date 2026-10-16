@@ -13,10 +13,12 @@ use App\Services\Api\Auth\Social\AppleTokenVerifier;
 use App\Services\Api\Auth\Social\FacebookTokenVerifier;
 use App\Services\Api\Auth\Social\GoogleTokenVerifier;
 
-
 class SocialLoginService
 {
-   
+    public function __construct(
+        private readonly TokenService $tokenService,
+    ) {}
+
     public function login(
         SocialProviderEnum $provider,
         string $socialToken,
@@ -35,10 +37,7 @@ class SocialLoginService
 
         Device::updateDevice($user->id, $imei, $deviceToken, $deviceType);
 
-        return new AuthenticatedUserDTO(
-            user: $user,
-            accessToken: $user->createToken('api-token')->plainTextToken,
-        );
+        return $this->tokenService->issue($user);
     }
 
     private function verifierFor(SocialProviderEnum $provider): SocialTokenVerifierInterface

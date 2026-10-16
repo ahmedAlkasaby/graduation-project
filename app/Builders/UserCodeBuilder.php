@@ -2,6 +2,7 @@
 
 namespace App\Builders;
 
+use App\Enums\UserCodeTypeEnum;
 use Illuminate\Database\Eloquent\Builder;
 
 class UserCodeBuilder extends BaseBuilder
@@ -10,13 +11,13 @@ class UserCodeBuilder extends BaseBuilder
      * The unexpired code issued for a phone or email before the account exists.
      */
     public function latestNotExpired(
-        string $type,
+        UserCodeTypeEnum $type,
         ?string $code = null,
         ?string $phone = null,
         ?string $email = null,
     ): static {
         $this->where('user_id', 0)
-            ->where('type', $type)
+            ->where('type', $type->value)
             ->where('code_expire', '>', now());
 
         if (! is_null($code)) {
@@ -37,10 +38,10 @@ class UserCodeBuilder extends BaseBuilder
     /**
      * The unexpired code issued to an existing account, e.g. for a password reset.
      */
-    public function pendingForUser(int $userId, string $type): static
+    public function pendingForUser(int $userId, UserCodeTypeEnum $type): static
     {
         return $this->where('user_id', $userId)
-            ->where('type', $type)
+            ->where('type', $type->value)
             ->where('code_expire', '>', now());
     }
 }

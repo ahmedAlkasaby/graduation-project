@@ -5,6 +5,7 @@ namespace App\Http\Requests\Api\Auth;
 use App\Enums\DeviceTypeEnum;
 use App\Enums\UserTypeEnum;
 use App\Http\Requests\Api\BaseRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
 class RegisterRequest extends BaseRequest
@@ -18,13 +19,13 @@ class RegisterRequest extends BaseRequest
     }
 
     /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return array_merge(
             $this->baseRules(),
-            $this->roleContactRules(),
+            (new CheckUserRequest)->rules(),
         );
     }
 
@@ -49,6 +50,4 @@ class RegisterRequest extends BaseRequest
             'type' => ['required', Rule::in(UserTypeEnum::appValues())],
         ];
     }
-
-
 }

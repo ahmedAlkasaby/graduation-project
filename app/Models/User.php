@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Builders\UserBuilder;
 use App\Enums\UserTypeEnum;
 use App\Models\UserModel as Authenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -10,7 +11,7 @@ use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements  LaratrustUser, MustVerifyEmail
+class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
 {
     use HasApiTokens, HasRolesAndPermissions, Notifiable;
 
@@ -46,7 +47,6 @@ class User extends Authenticatable implements  LaratrustUser, MustVerifyEmail
         'password' => 'hashed',
     ];
 
-
     public static function listUserForSelect(
         $type = null,
         $key = 'id',
@@ -74,7 +74,6 @@ class User extends Authenticatable implements  LaratrustUser, MustVerifyEmail
         };
     }
 
-   
     public function userMetas()
     {
         return $this->hasMany(UserMeta::class);
@@ -88,6 +87,32 @@ class User extends Authenticatable implements  LaratrustUser, MustVerifyEmail
     public function devices()
     {
         return $this->hasMany(Device::class);
+    }
+
+    public function passwordHistories()
+    {
+        return $this->hasMany(PasswordHistory::class);
+    }
+
+    /**
+     * Record the outgoing hash on every password change, whichever flow made it
+     * (forget password, profile, dashboard).
+     */
+    protected static function booted(): void
+    {
+        parent::booted();
+
+        static::updated(function (User $user) {
+            if (! $user->wasChanged('password') || ! $user->getOriginal('password')) {
+                return;
+            }
+
+            $user->passwordHistories()->create([
+                'old_password' => $user->getOriginal('password'),
+                'ip_address' => request()->ip(),
+                'user_agent' => substr((string) request()->userAgent(), 0, 255) ?: null,
+            ]);
+        });
     }
 
     // -------------------------------------------------------------------------
@@ -108,10 +133,8 @@ class User extends Authenticatable implements  LaratrustUser, MustVerifyEmail
         return in_array($this->typeEnum(), UserTypeEnum::appTypes(), true);
     }
 
-   
-
-    public function newEloquentBuilder($query): \App\Builders\UserBuilder
+    public function newEloquentBuilder($query): UserBuilder
     {
-        return new \App\Builders\UserBuilder($query);
+        return new UserBuilder($query);
     }
 }
