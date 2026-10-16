@@ -2,7 +2,6 @@
 
 namespace App\Services\Api\Auth;
 
-use App\Enums\SmsTypeEnum;
 use App\Enums\UserCodeTypeEnum;
 use App\Exceptions\UserFacingException;
 use App\Models\User;
@@ -20,7 +19,7 @@ class RegisterService
     use ResponseMessageTrait;
 
     private const NOT_USER_ATTRIBUTES = [
-        'code', 'sms_type', 'confirm_password', 'imei', 'token', 'device_type',
+        'code', 'confirm_password', 'imei', 'token', 'device_type',
     ];
 
     public function __construct(
@@ -51,17 +50,13 @@ class RegisterService
     public function register(array $input): User
     {
         $input = $this->getDataRegister($input);
-        $smsType = SmsTypeEnum::fromRequest($input['sms_type'] ?? null);
 
-        return DB::transaction(function () use ($input, $smsType) {
-           
-            $userCode = $smsType->verifiedExternally() ? null : $this->consumableCode($input);
+        return DB::transaction(function () use ($input) {
+            $userCode = $this->consumableCode($input);
 
             $user = User::create(Arr::except($input, self::NOT_USER_ATTRIBUTES));
 
-            if ($userCode) {
-                $this->userCodes->attachToUser($userCode, $user->id);
-            }
+            $this->userCodes->attachToUser($userCode, $user->id);
 
             return $user;
         });

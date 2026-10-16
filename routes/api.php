@@ -21,7 +21,7 @@ Route::group([
 
     Route::post('login', [AuthController::class, 'login'])->name('login')->middleware('throttle:login');
     Route::post('refresh', [AuthController::class, 'refresh'])->name('refresh')
-        ->middleware(['auth:sanctum', 'abilities:'.TokenAbilityEnum::RefreshToken->value]);
+        ->middleware(['auth:sanctum', 'abilities:'.TokenAbilityEnum::RefreshToken->value, 'check.lastactive']);
     Route::get('settings', [ApiController::class, 'settings'])->name('settings')->withoutMiddleware('site.open');
 
     Route::group(['prefix' => 'register', 'as' => 'register.'], function () {
@@ -53,7 +53,6 @@ Route::group([
 
             Route::apiResource('notifications', NotificationController::class)->except(['store']);
 
-           
         });
     });
 });

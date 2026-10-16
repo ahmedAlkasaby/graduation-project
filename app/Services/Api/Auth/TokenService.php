@@ -9,10 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
 
-/**
- * Every login creates an access token and a refresh token with the same name,
- * so the pair can be found and deleted together.
- */
+
 class TokenService
 {
     public function issue(User $user): AuthenticatedUserDTO

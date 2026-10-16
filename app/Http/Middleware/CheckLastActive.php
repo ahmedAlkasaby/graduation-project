@@ -7,8 +7,8 @@ use Carbon\Carbon;
 use Closure;
 
 /**
- * API side: keeps `last_active` current and records the request in
- * `activity_logs`. Sits on the authenticated api group.
+ * API side: blocks inactive users, keeps `last_active` current and records the
+ * request in `activity_logs`. Sits on the authenticated api group.
  */
 class CheckLastActive
 {
@@ -18,6 +18,13 @@ class CheckLastActive
     {
         $user = auth('sanctum')->user()
             ?: ($guard && auth()->guard($guard)->check() ? auth($guard)->user() : auth()->user());
+
+        if ($user && ! $user->active) {
+            return response()->json([
+                'status' => 'error',
+                'message' => __('Your account is not active'),
+            ], 403);
+        }
 
         if ($user) {
             $user->forceFill(['last_active' => Carbon::now()])->saveQuietly();

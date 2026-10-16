@@ -37,8 +37,7 @@ class RegisterRequest extends BaseRequest
             'password' => 'required|min:8|same:confirm_password',
             'confirm_password' => 'required|min:8',
 
-            'code' => 'required_unless:sms_type,firebase|exists:user_codes,code',
-            'sms_type' => 'nullable|in:sms,firebase',
+            'code' => 'required|exists:user_codes,code',
 
             'imei' => 'required|string',
             'token' => 'required|string',

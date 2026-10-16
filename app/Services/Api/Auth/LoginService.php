@@ -40,7 +40,7 @@ class LoginService
 
     public function attemptLogin(array $credentials, string $imei, string $token, string $deviceType): ?AuthenticatedUserDTO
     {
-        if (! Auth::attempt($credentials)) {
+        if (! Auth::attempt([...$credentials, 'active' => true])) {
             return null;
         }
 

@@ -35,6 +35,10 @@ class SocialLoginService
 
         $user = $this->findOrCreateUser($provider, $socialUser, $type);
 
+        if (! $user->active) {
+            return null;
+        }
+
         Device::updateDevice($user->id, $imei, $deviceToken, $deviceType);
 
         return $this->tokenService->issue($user);

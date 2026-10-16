@@ -28,4 +28,8 @@ class UserBuilder extends BaseBuilder
             ->userType($request)
             ->dateFilter($request);
     }
+    public function active(): static
+    {
+        return $this->where('active', true);
+    }
 }

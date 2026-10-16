@@ -19,8 +19,8 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
 
     protected $fillable = [
         'full_name', 'email', 'password',
-        'provider', 'provider_id', 'provider_token', 'email_verified_at',
-        'type', 'image', 'phone',
+        'provider', 'provider_id', 'email_verified_at',
+        'type', 'image', 'phone', 'active',
         'locale', 'theme', 'is_notify', 'birth_date', 'gender', 'last_active',
     ];
 
@@ -45,6 +45,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         'last_active' => 'datetime',
         'birth_date' => 'date',
         'password' => 'hashed',
+        'active' => 'boolean',
     ];
 
     public static function listUserForSelect(
