@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Builders\CityBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class City extends SiteModel
 {
@@ -25,6 +26,11 @@ class City extends SiteModel
     public function country()
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function regions(): HasMany
+    {
+        return $this->hasMany(Region::class);
     }
 
     public function newEloquentBuilder($query): CityBuilder

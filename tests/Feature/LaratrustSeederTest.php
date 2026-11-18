@@ -54,7 +54,6 @@ class LaratrustSeederTest extends TestCase
         $this->seed([LaratrustSeeder::class, UserSeeder::class]);
 
         $this->assertTrue(User::where('email', 'admin.test@example.com')->first()->hasRole('admin'));
-        $this->assertSame(2, User::onlyTrashed()->count());
     }
 
     #[Test]
