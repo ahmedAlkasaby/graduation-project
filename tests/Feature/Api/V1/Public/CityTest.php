@@ -38,6 +38,14 @@ class CityTest extends TestCase
     }
 
     #[Test]
+    public function inactive_signed_in_user_is_blocked(): void
+    {
+        Sanctum::actingAs(User::factory()->inactive()->create(), [TokenAbilityEnum::AccessToken->value]);
+
+        $this->getJson(route('api.v1.public.cities.index'))->assertForbidden();
+    }
+
+    #[Test]
     public function public_context_has_no_write_endpoints_for_cities(): void
     {
         $this->postJson('/api/v1/public/cities', [])->assertMethodNotAllowed();

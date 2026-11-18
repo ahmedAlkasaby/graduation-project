@@ -127,7 +127,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
     /** Admin or super admin. */
     public function isAdmin(): bool
     {
-        return (bool) $this->typeEnum()?->isAdmin();
+        return in_array($this->typeEnum(), [UserTypeEnum::Admin, UserTypeEnum::SuperAdmin], true);
     }
 
     public function isSuperAdmin(): bool

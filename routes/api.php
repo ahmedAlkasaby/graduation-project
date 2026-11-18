@@ -23,25 +23,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['cors', 'json.response'])->group(function () {
+Route::middleware(['cors', 'json.response', 'locale'])->group(function () {
 
     Route::prefix('v1')->as('api.v1.')->group(function () {
 
         Route::prefix('admin')
             ->as('admin.')
             ->middleware([
-                'locale.admin',
                 'auth:sanctum',
                 'abilities:'.TokenAbilityEnum::AccessToken->value,
                 'admin',
-                'check.lastactive.admin:sanctum',
+                'check.lastactive',
                 'auto-check-permission',
             ])
             ->group(base_path('routes/api/v1/admin.php'));
 
         Route::prefix('public')
             ->as('public.')
-            ->middleware(['locale'])
             ->group(base_path('routes/api/v1/public.php'));
     });
 });

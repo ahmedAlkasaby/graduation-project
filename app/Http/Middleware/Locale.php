@@ -2,39 +2,35 @@
 
 namespace App\Http\Middleware;
 
-
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class Locale {
+/**
+ * Sets the request language: the signed in user's own locale, else a valid
+ * `lang` header, else the default setting — `admin_language` on admin routes,
+ * `site_language` everywhere else.
+ */
+class Locale
+{
+    protected array $languages = ['ar', 'en'];
 
-   
-    protected $languages = ['ar','en'];
-
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        $lang=settings()->get('site_language',app()->getLocale());
+        $setting = $request->routeIs('api.*.admin.*') ? 'admin_language' : 'site_language';
 
-        if ($request->header('lang') && in_array($request->header('lang'), $this->languages)) {
-           $lang = $request->header('lang');
+        $lang = settings()->get($setting, app()->getLocale());
+
+        if (in_array($request->header('lang'), $this->languages, true)) {
+            $lang = $request->header('lang');
         }
 
-        $auth=auth('sanctum')->user();
-        if($auth && $auth->locale != $lang){
-            $lang=$auth->locale;
+        if ($user = $request->user('sanctum')) {
+            $lang = $user->locale;
         }
 
         app()->setLocale($lang);
 
         return $next($request);
     }
-   
-
 }

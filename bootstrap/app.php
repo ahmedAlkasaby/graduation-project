@@ -4,7 +4,6 @@ use App\Http\Middleware\AccessAll;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\AutoCheckPermission;
 use App\Http\Middleware\CheckLastActive;
-use App\Http\Middleware\CheckLastActiveAdmin;
 use App\Http\Middleware\CheckSocialLoginAccess;
 use App\Http\Middleware\Cors;
 use App\Http\Middleware\EncryptCookies;
@@ -13,7 +12,6 @@ use App\Http\Middleware\EnsureUserIsClient;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\HttpsProtocol;
 use App\Http\Middleware\Locale;
-use App\Http\Middleware\LocaleAdmin;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Http\Middleware\SiteOpen;
 use App\Http\Middleware\TrimStrings;
@@ -24,6 +22,7 @@ use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Auth\Middleware\RequirePassword;
+use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -92,6 +91,20 @@ return Application::configure(basePath: dirname(__DIR__))
 
         /*
         |--------------------------------------------------------------------------
+        | Middleware Priority
+        |--------------------------------------------------------------------------
+        |
+        | The language is set before authentication, so a 401 is already answered
+        | in the right language.
+        |
+        */
+        $middleware->prependToPriorityList(
+            before: AuthenticatesRequests::class,
+            prepend: Locale::class,
+        );
+
+        /*
+        |--------------------------------------------------------------------------
         | Route Middleware Aliases
         |--------------------------------------------------------------------------
         */
@@ -110,9 +123,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Custom
             'access.all' => AccessAll::class,
             'check.lastactive' => CheckLastActive::class,
-            'check.lastactive.admin' => CheckLastActiveAdmin::class,
             'locale' => Locale::class,
-            'locale.admin' => LocaleAdmin::class,
             'site.open' => SiteOpen::class,
             'auto-check-permission' => AutoCheckPermission::class,
             'cors' => Cors::class,
