@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1\Public;
 
+use App\Http\Controllers\Api\ApiHomeController;
 use App\Http\Resources\NotificationCollection;
 use App\Http\Resources\NotificationResource;
 use Exception;

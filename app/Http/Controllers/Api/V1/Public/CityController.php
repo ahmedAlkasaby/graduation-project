@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1\Public;
 
+use App\Http\Controllers\Api\ApiHomeController;
 use App\Http\Resources\CityCollection;
 use App\Http\Resources\CityResource;
 use App\Models\City;

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\UserTypeEnum;
+use App\Http\Middleware\AutoCheckPermission;
 use App\Models\ActivityLog;
 use App\Models\Attachment;
 use App\Models\City;
@@ -20,6 +21,7 @@ use App\Services\FirebaseService;
 use App\Services\ModelChangeLogger;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
@@ -65,6 +67,20 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         $this->registerUserValidators();
+        $this->registerRoutePermissionMacro();
+    }
+
+    /**
+     * `->permission('cities.export')` on an admin route: replaces the group's
+     * route-name check with these permissions, so only one check runs.
+     */
+    protected function registerRoutePermissionMacro(): void
+    {
+        Route::macro('permission', function (string ...$permissions): Route {
+            /** @var Route $this */
+            return $this->withoutMiddleware(AutoCheckPermission::ALIAS)
+                ->middleware(AutoCheckPermission::ALIAS.':'.implode(',', $permissions));
+        });
     }
 
     /**
@@ -73,7 +89,7 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerUserValidators(): void
     {
-        $adminOnly = fn ($query) => $query->where('type', UserTypeEnum::Admin->value);
+        $adminOnly = fn ($query) => $query->whereIn('type', UserTypeEnum::adminValues());
         $clientOnly = fn ($query) => $query->whereIn('type', UserTypeEnum::appValues());
 
         $rules = [

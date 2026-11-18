@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Country extends SiteModel
 {
+    use HasFactory;
+
     protected $table = 'countries';
 
     protected $fillable = [

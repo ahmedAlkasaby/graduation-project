@@ -5,7 +5,6 @@ namespace App\Traits;
 use App\Enums\DeviceTypeEnum;
 use App\Enums\UserTypeEnum;
 
-
 trait AdminHelperTrait
 {
     protected $phone_code_default = '20';
@@ -51,9 +50,7 @@ trait AdminHelperTrait
         'default_country',
     ];
 
- 
-
-    protected $setting_array_api = ['site_email', 'site_phone', 'address', 'social_login', 'site_open','logo_image'];
+    protected $setting_array_api = ['site_email', 'site_phone', 'address', 'social_login', 'site_open', 'logo_image'];
 
     protected $limit_array = [25, 50, 100, 250];
 
@@ -69,18 +66,15 @@ trait AdminHelperTrait
 
     protected $device_type_array = [DeviceTypeEnum::Apple->value, DeviceTypeEnum::Android->value, DeviceTypeEnum::Huawei->value, DeviceTypeEnum::Website->value];
 
+    protected $type_array = [UserTypeEnum::Admin->value, UserTypeEnum::SuperAdmin->value];
 
+    protected $admin_roles = [UserTypeEnum::Admin->value, UserTypeEnum::SuperAdmin->value];
 
+    protected $user_admins = [UserTypeEnum::Admin->value, UserTypeEnum::SuperAdmin->value];
 
-    protected $type_array = [UserTypeEnum::Admin->value];
+    protected $user_roles_array = [UserTypeEnum::Donor->value, UserTypeEnum::Volunteer->value, UserTypeEnum::Admin->value, UserTypeEnum::SuperAdmin->value];
 
-    protected $admin_roles = [UserTypeEnum::Admin->value];
-
-    protected $user_admins = [UserTypeEnum::Admin->value];
-
-    protected $user_roles_array = [UserTypeEnum::Donor->value, UserTypeEnum::Volunteer->value, UserTypeEnum::Admin->value];
-
-    protected $access_all_type = [UserTypeEnum::Admin->value];
+    protected $access_all_type = [UserTypeEnum::SuperAdmin->value];
 
     protected $access_all_id = [1];
 

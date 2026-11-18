@@ -1,58 +1,47 @@
 <?php
 
 use App\Enums\TokenAbilityEnum;
-use App\Http\Controllers\Api\ApiController;
-use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\Auth\ForgetPasswordController;
-use App\Http\Controllers\Api\Auth\SocialLoginController;
-use App\Http\Controllers\Api\CityController;
-use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::group([
-    'middleware' => ['locale', 'cors', 'json.response', 'site.open'],
-    'as' => 'api.',
-], function () {
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Every endpoint is versioned (/api/v1/...) and lives in one of two contexts:
+|
+|  - admin  : dashboard management. Every route is behind the admin guard and
+|            the permission named after the route ("admin.cities.index"
+|            needs "cities.index").
+|  - public : everything else — guests, signed in app users, and the
+|            self-service endpoints an admin uses as a regular user
+|            (sign in, own profile, own notifications). No permissions.
+|
+| Controllers mirror this layout: App\Http\Controllers\Api\V1\{Admin,Public}.
+| A new version gets its own route folder (routes/api/v2), controller folder
+| (Api\V2) and block here; existing versions are left untouched.
+|
+*/
 
-    Route::middleware(['check.socialLogin'])->group(function () {
-        Route::get('social_login', [SocialLoginController::class, 'tokenLogin'])->name('social.login');
-    });
+Route::middleware(['cors', 'json.response'])->group(function () {
 
-    Route::post('login', [AuthController::class, 'login'])->name('login')->middleware('throttle:login');
-    Route::post('refresh', [AuthController::class, 'refresh'])->name('refresh')
-        ->middleware(['auth:sanctum', 'abilities:'.TokenAbilityEnum::RefreshToken->value, 'check.lastactive']);
-    Route::get('settings', [ApiController::class, 'settings'])->name('settings')->withoutMiddleware('site.open');
+    Route::prefix('v1')->as('api.v1.')->group(function () {
 
-    Route::group(['prefix' => 'register', 'as' => 'register.'], function () {
-        Route::post('', [AuthController::class, 'register'])->name('store')->middleware('throttle:register');
-        Route::post('check', [AuthController::class, 'checkUser'])->name('check')->middleware('throttle:sms');
-    });
+        Route::prefix('admin')
+            ->as('admin.')
+            ->middleware([
+                'locale.admin',
+                'auth:sanctum',
+                'abilities:'.TokenAbilityEnum::AccessToken->value,
+                'admin',
+                'check.lastactive.admin:sanctum',
+                'auto-check-permission',
+            ])
+            ->group(base_path('routes/api/v1/admin.php'));
 
-    Route::group(['prefix' => 'password', 'as' => 'password.'], function () {
-        Route::post('forget', [ForgetPasswordController::class, 'forget'])->name('forget')->middleware('throttle:sms');
-        Route::post('reset', [ForgetPasswordController::class, 'reset'])->name('reset')->middleware('throttle:otp');
-    });
-
-    Route::middleware(['check.lastactive'])->group(function () {
-
-        Route::apiResource('cities', CityController::class)->only(['index', 'show']);
-
-        Route::middleware(['auth:sanctum', 'abilities:'.TokenAbilityEnum::AccessToken->value])->group(function () {
-
-            Route::group(['prefix' => 'profile/change', 'as' => 'profile.change.'], function () {
-                Route::post('image', [ProfileController::class, 'changeImage'])->name('image');
-                Route::post('password', [ProfileController::class, 'changePassword'])->name('password');
-                Route::post('lang', [ProfileController::class, 'changeLang'])->name('lang');
-            });
-
-            Route::post('logout', [AuthController::class, 'logout'])->name('logout.token');
-            Route::post('profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
-            Route::post('profile/delete', [ProfileController::class, 'delete'])->name('profile.deleteAccount');
-            Route::apiResource('profile', ProfileController::class)->except(['store']);
-
-            Route::apiResource('notifications', NotificationController::class)->except(['store']);
-
-        });
+        Route::prefix('public')
+            ->as('public.')
+            ->middleware(['locale'])
+            ->group(base_path('routes/api/v1/public.php'));
     });
 });

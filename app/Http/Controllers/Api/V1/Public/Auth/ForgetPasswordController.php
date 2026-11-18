@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\V1\Public\Auth;
 
 use App\Exceptions\UserFacingException;
 use App\Http\Controllers\Api\ApiHomeController;

@@ -26,12 +26,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/register/check",
+              "raw": "{{baseUrl}}/api/v1/public/register/check",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "register",
                 "check"
               ]
@@ -67,12 +69,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/register",
+              "raw": "{{baseUrl}}/api/v1/public/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "register"
               ]
             },
@@ -122,12 +126,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/login",
+              "raw": "{{baseUrl}}/api/v1/public/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "login"
               ]
             },
@@ -173,12 +179,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/social_login?provider=google&token=social-provider-token&imei={{imei}}&device_type=android&firebase_token=firebase-device-token&type=donor",
+              "raw": "{{baseUrl}}/api/v1/public/social_login?provider=google&token=social-provider-token&imei={{imei}}&device_type=android&firebase_token=firebase-device-token&type=donor",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "social_login"
               ],
               "query": [
@@ -241,12 +249,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/refresh",
+              "raw": "{{baseUrl}}/api/v1/public/refresh",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "refresh"
               ]
             },
@@ -297,12 +307,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/logout",
+              "raw": "{{baseUrl}}/api/v1/public/logout",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "logout"
               ]
             },
@@ -352,12 +364,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/password/forget",
+              "raw": "{{baseUrl}}/api/v1/public/password/forget",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "password",
                 "forget"
               ]
@@ -393,12 +407,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/password/reset",
+              "raw": "{{baseUrl}}/api/v1/public/password/reset",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "password",
                 "reset"
               ]
@@ -435,12 +451,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/settings",
+              "raw": "{{baseUrl}}/api/v1/public/settings",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
+                "public",
                 "settings"
               ]
             },

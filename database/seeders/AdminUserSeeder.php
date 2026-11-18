@@ -7,8 +7,9 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 
 /**
- * The first account. Change the credentials before deploying, or override them
- * from .env (ADMIN_EMAIL / ADMIN_PASSWORD).
+ * The first account, a super admin: its type alone skips every permission
+ * check, so it needs no role. Change the credentials before deploying, or
+ * override them from .env (ADMIN_EMAIL / ADMIN_PASSWORD).
  */
 class AdminUserSeeder extends Seeder
 {
@@ -20,11 +21,10 @@ class AdminUserSeeder extends Seeder
                 'full_name' => 'Super Admin',
                 'phone' => '01000000000',
                 'password' => env('ADMIN_PASSWORD', 'password'),
-                'type' => UserTypeEnum::Admin->value,
                 'locale' => 'en',
             ]
         );
 
-        $user->syncRoles(['super_admin']);
+        $user->forceFill(['type' => UserTypeEnum::SuperAdmin->value])->save();
     }
 }

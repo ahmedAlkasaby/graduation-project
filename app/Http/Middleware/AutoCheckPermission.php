@@ -3,38 +3,47 @@
 namespace App\Http\Middleware;
 
 use App\Models\Permission;
-use App\Traits\AdminHelperTrait;
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Every admin route is named after its module and action ("users.edit"), and
- * every permission is named after the routes it covers. So instead of hanging
- * a permission check on each route, this looks the current route name up and
- * enforces whatever permission claims it.
+ * Checks the dashboard permission of the current admin route.
  *
- * A route with no matching permission is public within the panel.
+ *  - Permissions passed to the middleware are used as given:
+ *    `->permission('cities.export')` (any one of several is enough).
+ *  - Otherwise the permission is taken from the route name:
+ *    "api.v1.admin.cities.index" needs "cities.index".
+ *
+ * A super admin skips the check. A route with no permission is refused.
  */
 class AutoCheckPermission
 {
-    use AdminHelperTrait;
+    public const ALIAS = 'auto-check-permission';
 
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next, string ...$permissions): Response
     {
-        $user = auth('sanctum')->user();
+        $user = $request->user('sanctum');
 
-        if ($user && in_array($user->type, $this->access_all_type)) {
+        if ($user?->isSuperAdmin()) {
             return $next($request);
         }
 
-        $route = str_replace('admin.', '', (string) $request->route()?->getName());
+        if ($permissions === []) {
+            $permissions = array_filter([Permission::nameForRoute(static::permissionRouteName($request->route()->getName()))]);
+        }
 
-        $permission = Permission::nameForRoute($route);
-
-        if ($permission !== null && ! $user?->can($permission)) {
+        if ( $permissions === [] || ! $user->hasPermission($permissions)) {
             throw new AuthorizationException;
         }
 
         return $next($request);
+    }
+
+    /** "api.v1.admin.cities.index" becomes "cities.index". */
+    public static function permissionRouteName(?string $routeName): string
+    {
+        return (string) preg_replace('/^(api\.v\d+\.)?admin\./', '', (string) $routeName);
     }
 }

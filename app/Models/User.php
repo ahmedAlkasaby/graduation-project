@@ -6,6 +6,7 @@ use App\Builders\UserBuilder;
 use App\Enums\UserTypeEnum;
 use App\Models\UserModel as Authenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
@@ -13,7 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
 {
-    use HasApiTokens, HasRolesAndPermissions, Notifiable;
+    use HasApiTokens, HasFactory, HasRolesAndPermissions, Notifiable;
 
     protected $table = 'users';
 
@@ -123,9 +124,15 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         return UserTypeEnum::tryFrom((string) $this->type);
     }
 
+    /** Admin or super admin. */
     public function isAdmin(): bool
     {
-        return $this->typeEnum() === UserTypeEnum::Admin;
+        return (bool) $this->typeEnum()?->isAdmin();
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return (bool) $this->typeEnum()?->isSuperAdmin();
     }
 
     /** Donors and volunteers: the people who use the app, not the dashboard. */

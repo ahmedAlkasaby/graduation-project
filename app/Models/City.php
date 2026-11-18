@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
+use App\Builders\CityBuilder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class City extends SiteModel
 {
+    use HasFactory;
+
     protected $table = 'cities';
 
     protected $fillable = [
@@ -22,8 +27,8 @@ class City extends SiteModel
         return $this->belongsTo(Country::class);
     }
 
-    public function newEloquentBuilder($query): \App\Builders\CityBuilder
+    public function newEloquentBuilder($query): CityBuilder
     {
-        return new \App\Builders\CityBuilder($query);
+        return new CityBuilder($query);
     }
 }

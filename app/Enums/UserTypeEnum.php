@@ -4,7 +4,6 @@ namespace App\Enums;
 
 use App\Enums\Concerns\HasOptions;
 
-
 enum UserTypeEnum: string
 {
     use HasOptions;
@@ -12,6 +11,7 @@ enum UserTypeEnum: string
     case Donor = 'donor';
     case Volunteer = 'volunteer';
     case Admin = 'admin';
+    case SuperAdmin = 'super_admin';
 
     public function label(): string
     {
@@ -19,29 +19,44 @@ enum UserTypeEnum: string
             self::Donor => __('Donor'),
             self::Volunteer => __('Volunteer'),
             self::Admin => __('Admin'),
+            self::SuperAdmin => __('Super Admin'),
         };
     }
 
+    /** Admin or super admin: anyone who uses the dashboard. */
     public function isAdmin(): bool
     {
-        return $this === self::Admin;
+        return in_array($this, self::adminTypes(), true);
     }
 
-   
+    /** Skips every dashboard permission check. */
+    public function isSuperAdmin(): bool
+    {
+        return $this === self::SuperAdmin;
+    }
+
+    public static function adminTypes(): array
+    {
+        return [self::Admin, self::SuperAdmin];
+    }
+
+    public static function adminValues(): array
+    {
+        return array_map(fn (self $type) => $type->value, self::adminTypes());
+    }
+
     public static function appTypes(): array
     {
         return [self::Donor, self::Volunteer];
     }
 
-  
     public static function appValues(): array
     {
         return array_map(fn (self $type) => $type->value, self::appTypes());
     }
 
-   
     public static function audienceValues(?string $type): array
     {
-        return $type === self::Admin->value ? [self::Admin->value] : self::appValues();
+        return in_array($type, self::adminValues(), true) ? self::adminValues() : self::appValues();
     }
 }
