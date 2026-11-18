@@ -27,6 +27,7 @@ return [
         // Modules backed by a model: its CRUD actions, plus any extra ones.
         'resources' => [
             'cities' => $crud,
+            'regions' => $crud,
             'roles' => ['index', 'show', 'store', 'update', 'destroy'],
             'users' => [...$crud, 'restore'],
             'activity_logs' => ['index'],

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Admin\CityController;
 use App\Http\Controllers\Api\V1\Admin\PermissionController;
+use App\Http\Controllers\Api\V1\Admin\RegionController;
 use App\Http\Controllers\Api\V1\Admin\RoleController;
 use App\Http\Controllers\Api\V1\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -23,8 +24,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::patch('cities/{city}/status', [CityController::class, 'status'])->name('cities.status');
-// Route::apiResource('cities', CityController::class);
+Route::patch('cities/{city}/status', [CityController::class, 'status'])->name('cities.status');
+Route::apiResource('cities', CityController::class);
+
+Route::patch('regions/{region}/status', [RegionController::class, 'status'])->name('regions.status');
+Route::apiResource('regions', RegionController::class);
 
 Route::get('users/form-options', [UserController::class, 'formOptions'])
     ->name('users.form-options')

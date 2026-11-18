@@ -10,6 +10,7 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\Log;
 use App\Models\Meta;
+use App\Models\Region;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
@@ -58,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
             'settings' => Setting::class,
             'countries' => Country::class,
             'cities' => City::class,
+            'regions' => Region::class,
             'activity_logs' => ActivityLog::class,
             'logs' => Log::class,
             'user_devices' => UserDevice::class,

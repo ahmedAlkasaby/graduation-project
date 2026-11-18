@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Builders\RegionBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -21,5 +22,10 @@ class Region extends SiteModel
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
+    }
+
+    public function newEloquentBuilder($query): RegionBuilder
+    {
+        return new RegionBuilder($query);
     }
 }
