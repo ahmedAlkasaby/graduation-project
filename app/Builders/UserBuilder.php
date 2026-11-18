@@ -2,34 +2,33 @@
 
 namespace App\Builders;
 
+use App\Enums\UserTypeEnum;
+use Illuminate\Database\Eloquent\Builder;
+
 class UserBuilder extends BaseBuilder
 {
-    /**
-     * Narrows a list to one kind of user (donor, volunteer, admin). No value —
-     * or 'all' — leaves every user in.
-     */
-    public function userType($request = null, string $userType = 'all'): static
+    public function filter(array $filters): static
     {
-        $type = $request?->input('type') ?: $userType;
+        return $this->search($filters['search'] ?? null)
+            ->ofType($filters['type'] ?? null)
+            ->when(isset($filters['active']), fn (Builder $query) => $query->active((bool) $filters['active']))
+            ->trashed($filters['trashed'] ?? null)
+            ->createdBetween($filters['date_start'] ?? null, $filters['date_end'] ?? null);
+    }
 
-        return $type === 'all' ? $this : $this->where('type', $type);
+    public function ofType(?string $type): static
+    {
+        return blank($type) || $type === 'all' ? $this : $this->where('type', $type);
+    }
+
+    /** @param  list<UserTypeEnum>  $types */
+    public function ofTypes(array $types): static
+    {
+        return $this->whereIn('type', array_map(fn (UserTypeEnum $type): string => $type->value, $types));
     }
 
     public function ofRole(string $role): static
     {
-        return $this->whereHas('roles', fn ($q) => $q->where('name', $role));
-    }
-
-    public function filter($request = null): static
-    {
-        $request = $request ?? request();
-
-        return $this->mainSearch($request->only(['name', 'email', 'phone']))
-            ->userType($request)
-            ->dateFilter($request);
-    }
-    public function active(): static
-    {
-        return $this->where('active', true);
+        return $this->whereHas('roles', fn (Builder $query) => $query->where('name', $role));
     }
 }

@@ -11,10 +11,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CountrySeeder::class,
             CitySeeder::class,
-            PermissionSeeder::class,
-            RoleSeeder::class,
+            LaratrustSeeder::class,
             AdminUserSeeder::class,
             SettingSeeder::class,
         ]);
+
+        if (! app()->isProduction()) {
+            $this->call(UserSeeder::class);
+        }
     }
 }

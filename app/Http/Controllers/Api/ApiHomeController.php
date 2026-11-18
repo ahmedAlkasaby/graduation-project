@@ -54,6 +54,32 @@ class ApiHomeController extends Controller
         $this->phone_regex = $settings->getPhoneRegex();
     }
 
+    /** The list page's buttons, as response flag => permission action. */
+    protected const LIST_PAGE_ACTIONS = [
+        'is_store' => 'store',
+        'is_update' => 'update',
+        'is_delete' => 'destroy',
+        'is_status' => 'status',
+    ];
+
+    /**
+     * What the signed in admin may do on a module's list page, so the
+     * dashboard knows which buttons to show: ['is_store' => true, ...].
+     * A super admin may do everything.
+     *
+     * @param  array<string, string>  $actions  response flag => permission action
+     * @return array<string, bool>
+     */
+    protected function listPagePermissions(string $module, array $actions = self::LIST_PAGE_ACTIONS): array
+    {
+        $user = request()->user();
+
+        return array_map(
+            fn (string $action): bool => (bool) $user?->isSuperAdmin() || (bool) $user?->hasPermission("{$module}.{$action}"),
+            $actions,
+        );
+    }
+
     /**
      * Honour an "all_data=0" request by returning the whole set unpaginated,
      * and report which of the two happened so the caller can attach meta.

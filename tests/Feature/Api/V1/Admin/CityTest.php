@@ -6,7 +6,7 @@ use App\Enums\TokenAbilityEnum;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\User;
-use Database\Seeders\PermissionSeeder;
+use Database\Seeders\LaratrustSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\Attributes\Test;
@@ -20,7 +20,7 @@ class CityTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(PermissionSeeder::class);
+        $this->seed(LaratrustSeeder::class);
     }
 
     /**

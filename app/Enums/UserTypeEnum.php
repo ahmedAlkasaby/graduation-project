@@ -23,6 +23,23 @@ enum UserTypeEnum: string
         };
     }
 
+    /** Position in the hierarchy: super admin > admin > volunteer > donor. */
+    public function rank(): int
+    {
+        return match ($this) {
+            self::Donor => 1,
+            self::Volunteer => 2,
+            self::Admin => 3,
+            self::SuperAdmin => 4,
+        };
+    }
+
+    /** Whether this type may manage a user of $type: anyone at the same rank or below. */
+    public function canManage(self $type): bool
+    {
+        return $this->rank() >= $type->rank();
+    }
+
     /** Admin or super admin: anyone who uses the dashboard. */
     public function isAdmin(): bool
     {

@@ -2,39 +2,75 @@
 
 namespace App\Services\User;
 
+use App\Enums\UserTypeEnum;
+use App\Models\Permission;
 use App\Models\User;
-use App\Traits\AdminHelperTrait;
 
 /**
- * The rules about who may create or edit whom, kept out of the controller so
- * they read as one thing and a project can change them in one place.
+ * Who may create or edit whom, and what each admin sees on the dashboard.
+ *
+ * Each type manages its own rank and everything below it (see
+ * UserTypeEnum::rank()):
+ *
+ *  - super admin : everyone
+ *  - admin       : admins, volunteers and donors
+ *  - volunteer   : volunteers and donors
+ *  - donor       : donors (never reaches the dashboard anyway)
  */
 class AdminLogicService
 {
-    use AdminHelperTrait;
+    /**
+     * Each dashboard sidebar item and the permission(s) that open it. A list
+     * opens the item when the user holds any one of them.
+     *
+     * @var array<string, string|list<string>>
+     */
+    private const SIDEBAR = [
+        // 'is_dashboard' => 'dashboard',
+        // 'is_statistics' => 'statistics',
+        // 'is_cities' => 'cities.index',
+        'is_users' => 'users.index',
+        'is_roles' => 'roles.index',
+        // 'is_activity_logs' => 'activity_logs.index',
+        // 'is_logs' => 'logs.index',
+        // 'is_images' => 'images.index',
+        // 'is_settings' => 'settings.index',
+    ];
+
+    public function canManageType(?User $actor, ?string $type): bool
+    {
+        $actorType = $actor?->typeEnum();
+        $targetType = UserTypeEnum::tryFrom((string) $type);
+
+        return $actorType !== null && $targetType !== null && $actorType->canManage($targetType);
+    }
 
     /**
-     * Whether $actor is allowed to act on a user of the given type. Nobody can
-     * hand out a type that outranks their own.
+     * Every permission name the user holds through their roles and direct
+     * permissions; all of them for a super admin.
+     *
+     * @return list<string>
      */
-    public function authorize(?string $type, ?User $actor): bool
+    public function effectivePermissionsFor(User $user): array
     {
-        if (! $actor || ! in_array($type, $this->user_roles_array)) {
-            return false;
-        }
+        $names = $user->isSuperAdmin()
+            ? Permission::query()->pluck('name')
+            : $user->allPermissions(['name'])->pluck('name');
 
-        if (in_array($actor->type, $this->access_all_type)) {
-            return true;
-        }
+        return $names->unique()->sort()->values()->all();
+    }
 
-        if (in_array($type, $this->access_all_type)) {
-            return false;
-        }
-
-        if (in_array($type, $this->admin_roles) && ! in_array($actor->type, $this->admin_roles)) {
-            return false;
-        }
-
-        return true;
+    /**
+     * The dashboard sidebar as true / false flags for the given permission names.
+     *
+     * @param  list<string>  $permissions
+     * @return array<string, bool>
+     */
+    public function sidebar(array $permissions): array
+    {
+        return array_map(
+            fn (string|array $needs): bool => array_intersect((array) $needs, $permissions) !== [],
+            self::SIDEBAR,
+        );
     }
 }

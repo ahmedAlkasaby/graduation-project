@@ -58,6 +58,7 @@ Route::middleware(['site.open'])->group(function () {
             });
 
             Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+            Route::get('profile/permissions', [ProfileController::class, 'permissions'])->name('profile.permissions');
             Route::post('profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
             Route::post('profile/delete', [ProfileController::class, 'delete'])->name('profile.deleteAccount');
             Route::apiResource('profile', ProfileController::class)->except(['store']);

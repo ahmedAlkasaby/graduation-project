@@ -6,46 +6,43 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait FiltersLogs
 {
-    protected function filterUser($request): static
+    /** @param  array<int, int|string>|null  $userIds */
+    protected function filterUser(?array $userIds): static
     {
-        $user_id = $request->input('user_id');
-
-        if (empty($user_id)) {
-            return $this;
-        }
-
-        return $this->whereIn('user_id', array_filter((array) $user_id, fn ($id) => $id !== '' && $id !== null));
+        return empty($userIds) ? $this : $this->whereIn('user_id', $userIds);
     }
 
-    protected function filterDevice($request): static
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function filterDevice(array $filters): static
     {
-        if ($request->filled('user_device_id')) {
-            $this->where('user_device_id', $request->input('user_device_id'));
-        }
+        $matches = array_filter(
+            [
+                'device' => $filters['device'] ?? null,
+                'platform' => $filters['platform'] ?? null,
+                'browser' => $filters['browser'] ?? null,
+            ],
+            fn ($value) => filled($value),
+        );
 
-        $matches = array_filter([
-            'device' => $request->input('device'),
-            'platform' => $request->input('platform'),
-            'browser' => $request->input('browser'),
-        ], fn ($value) => $value !== null && $value !== '');
+        $flags = array_filter(
+            [
+                'is_desktop' => $filters['is_desktop'] ?? null,
+                'is_phone' => $filters['is_phone'] ?? null,
+            ],
+            fn ($value) => filled($value),
+        );
 
-        $flags = array_filter([
-            'is_desktop' => $request->input('is_desktop'),
-            'is_phone' => $request->input('is_phone'),
-        ], fn ($value) => $value !== null && $value !== '');
+        return $this->when($filters['user_device_id'] ?? null, fn (Builder $query, $id) => $query->where('user_device_id', $id))
+            ->when($matches !== [] || $flags !== [], fn (Builder $query) => $query->whereHas('userDevice', function (Builder $device) use ($matches, $flags): void {
+                foreach ($matches as $column => $value) {
+                    $device->where($column, 'like', "%{$value}%");
+                }
 
-        if ($matches === [] && $flags === []) {
-            return $this;
-        }
-
-        return $this->whereHas('userDevice', function (Builder $query) use ($matches, $flags) {
-            foreach ($matches as $column => $value) {
-                $query->where($column, 'like', '%'.$value.'%');
-            }
-
-            foreach ($flags as $column => $value) {
-                $query->where($column, (int) $value);
-            }
-        });
+                foreach ($flags as $column => $value) {
+                    $device->where($column, (int) $value);
+                }
+            }));
     }
 }

@@ -29,10 +29,6 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         'full_name', 'email', 'phone',
     ];
 
-    protected $fullTextSearchable = [
-        'full_name', 'email', 'phone',
-    ];
-
     protected $orderByAllowed = [
         'id', 'full_name', 'email', 'phone', 'created_at',
     ];
@@ -62,7 +58,7 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
 
         $items = $query
             ->select($columns)
-            ->userType(null, $userType)
+            ->ofType($userType)
             ->get()
             ->mapWithKeys(fn ($item) => [
                 $item->$key => trim($item->full_name.' '.$item->phone),

@@ -2,15 +2,18 @@
 
 namespace App\Builders;
 
+use Illuminate\Database\Eloquent\Builder;
+
 class CityBuilder extends BaseBuilder
 {
-    public function filter($request = null, string $type_app = 'app'): static
+    /**
+     * @param  array{search?: string, country_id?: int|string, active?: bool|string}  $filters
+     */
+    public function filter(array $filters): static
     {
-        $request = $request ?? request();
-
-        return $this->visibleTo($type_app, $request)
-            ->mainSearch($this->searchTerm($request))
-            ->mainApplyDynamicFilters($request->only(['country_id']))
+        return $this->search($filters['search'] ?? null)
+            ->when($filters['country_id'] ?? null, fn (Builder $query, $countryId) => $query->where('country_id', $countryId))
+            ->when(isset($filters['active']), fn (Builder $query) => $query->active((bool) $filters['active']))
             ->defaultOrder();
     }
 }

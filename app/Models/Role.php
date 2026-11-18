@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Builders\RoleBuilder;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\DB;
 use Laratrust\Models\Role as LaratrustRole;
 
@@ -20,6 +21,12 @@ class Role extends LaratrustRole
     public function newEloquentBuilder($query): RoleBuilder
     {
         return new RoleBuilder($query);
+    }
+
+    /** The users holding this role, so it can be counted and eager loaded. */
+    public function users(): MorphToMany
+    {
+        return $this->getMorphByUserRelation('users');
     }
 
     public function getSearchable(): array

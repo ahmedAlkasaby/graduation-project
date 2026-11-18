@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Api\ApiHomeController;
+use App\Http\Requests\Admin\CityFilterRequest;
 use App\Http\Requests\Admin\CityRequest;
 use App\Http\Resources\CityCollection;
 use App\Http\Resources\CityResource;
 use App\Models\City;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -20,9 +20,9 @@ use Illuminate\Http\Response;
  */
 class CityController extends ApiHomeController
 {
-    public function index(Request $request): JsonResponse
+    public function index(CityFilterRequest $request): JsonResponse
     {
-        $query = City::with('country')->filter($request, 'admin');
+        $query = City::with('country')->filter($request->validated());
 
         [$cities, $paginated] = $this->getDataWithPagination($query, $request);
 

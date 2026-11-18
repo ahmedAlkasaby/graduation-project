@@ -4,7 +4,7 @@ namespace Tests\Feature\Api\V1\Admin;
 
 use App\Enums\TokenAbilityEnum;
 use App\Models\User;
-use Database\Seeders\PermissionSeeder;
+use Database\Seeders\LaratrustSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Sanctum;
@@ -26,7 +26,7 @@ class AutoCheckPermissionTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(PermissionSeeder::class);
+        $this->seed(LaratrustSeeder::class);
 
         Route::middleware(self::GROUP_MIDDLEWARE)
             ->get('api/v1/admin/_test/explicit', fn () => response()->json(['ok' => true]))

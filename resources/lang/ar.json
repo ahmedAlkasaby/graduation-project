@@ -2120,6 +2120,7 @@
     "Services Yearly": "خدمات سنويه",
     "Setting": "الاعدادات",
     "Setting update successfully": "تم تعديل الإعدادات بنجاح",
+    "Settings": "الاعدادات",
     "Share Image": "صورة المشاركة",
     "Shawwal": "شوال",
     "Shipping": "الشحن",
@@ -2652,5 +2653,13 @@
     "you sent wrong product id, main product must not have parent": "لقد أرسلت معرف المنتج الخاطئ، يجب ألا يكون المنتج الرئيسي له أصل",
     "youtube": "يوتيوب",
     "اختر الساعة": "اختر الساعة",
-    "شكرا لطلبكم سنعمل جاهدين لتوصيل الطلب في اسرع وقت وبافضل جوده": "شكرا لطلبكم سنعمل جاهدين لتوصيل الطلب في اسرع وقت وبافضل جوده"
+    "شكرا لطلبكم سنعمل جاهدين لتوصيل الطلب في اسرع وقت وبافضل جوده": "شكرا لطلبكم سنعمل جاهدين لتوصيل الطلب في اسرع وقت وبافضل جوده",
+    "Deleted successfully": "تم الحذف بنجاح",
+    "Donor": "متبرع",
+    "This role cannot be deleted": "لا يمكن حذف هذا الدور",
+    "This role is assigned to users": "هذا الدور مسند إلى مستخدمين",
+    "Volunteer": "متطوع",
+    "You cannot change your own type": "لا يمكنك تغيير نوع حسابك",
+    "You cannot deactivate your own account": "لا يمكنك إيقاف حسابك",
+    "You cannot delete your own account": "لا يمكنك حذف حسابك"
 }

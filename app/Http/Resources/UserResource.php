@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\UserTypeEnum;
+
 class UserResource extends MainResource
 {
     public function toArray($request): array
@@ -11,6 +13,13 @@ class UserResource extends MainResource
             'full_name' => $this->full_name,
             'phone' => $this->phone,
             'email' => $this->email,
+            'type' => $this->type,
+            'type_name' => UserTypeEnum::labelFor($this->type),
+            'roles' => $this->whenLoaded('roles', fn () => $this->roles->map(fn ($role) => [
+                'id' => $role->id,
+                'name' => $role->name,
+                'display_name' => $role->display_name,
+            ])->values()),
             'image' => $this->image,
             'gender' => $this->gender,
             'gender_name' => labelForValue($this->gender),
@@ -21,6 +30,8 @@ class UserResource extends MainResource
             'active' => (int) $this->active,
             'last_active' => $this->last_active?->toDateTimeString(),
             'created_at' => $this->created_at?->timezone(config('app.timezone'))->toDateTimeString(),
+            'updated_at' => $this->updated_at?->timezone(config('app.timezone'))->toDateTimeString(),
+            'deleted_at' => $this->deleted_at?->timezone(config('app.timezone'))->toDateTimeString(),
         ];
     }
 }

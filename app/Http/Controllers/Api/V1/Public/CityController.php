@@ -14,7 +14,7 @@ class CityController extends ApiHomeController
     public function index(Request $request)
     {
         try {
-            $query = City::with('country')->filter($request);
+            $query = City::with('country')->active()->filter($request->only(['search', 'country_id']));
 
             [$cities, $paginated] = $this->getDataWithPagination($query, $request);
 

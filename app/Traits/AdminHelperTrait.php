@@ -15,29 +15,6 @@ trait AdminHelperTrait
 
     protected $language_array = ['en', 'ar'];
 
-    protected $admin_models = [
-        'cities',
-        'roles',
-        'users',
-    ];
-
-    protected $admin_delete_models = [
-        'cities',
-        'users',
-    ];
-
-    protected $admin_restore_models = [
-        'users',
-    ];
-
-    protected $admin_perms_models = [
-        'activity_logs.index',
-        'cities.index',
-        'logs.index',
-        'roles.index',
-        'users.index',
-    ];
-
     protected $log_not_in = ['id', 'password', 'remember_token', 'image', 'created_at', 'updated_at', 'deleted_at'];
 
     protected $setting_image = ['logo_image', 'share_image'];

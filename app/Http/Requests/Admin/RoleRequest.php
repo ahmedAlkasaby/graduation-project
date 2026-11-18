@@ -25,7 +25,7 @@ class RoleRequest extends FormRequest
             'display_name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:255'],
             'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['integer', 'exists:permissions,id'],
+            'permissions.*' => ['integer', 'distinct', 'exists:permissions,id'],
         ];
     }
 

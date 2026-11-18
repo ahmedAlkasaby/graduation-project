@@ -18,8 +18,8 @@ class AdminUserSeeder extends Seeder
         $user = User::firstOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@example.com')],
             [
-                'full_name' => 'Super Admin',
-                'phone' => '01000000000',
+                'full_name' => 'Ahmed Elkasaby',
+                'phone' => '01016192604',
                 'password' => env('ADMIN_PASSWORD', 'password'),
                 'locale' => 'en',
             ]

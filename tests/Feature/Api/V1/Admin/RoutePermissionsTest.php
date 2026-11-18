@@ -4,7 +4,7 @@ namespace Tests\Feature\Api\V1\Admin;
 
 use App\Http\Middleware\AutoCheckPermission;
 use App\Models\Permission;
-use Database\Seeders\PermissionSeeder;
+use Database\Seeders\LaratrustSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 /**
  * AutoCheckPermission refuses an admin route no permission claims, so a route
- * added without its permission in PermissionSeeder would be unreachable for
+ * added without its permission in config/laratrust_seeder.php would be unreachable for
  * every admin but the super admin. This catches that at test time.
  */
 class RoutePermissionsTest extends TestCase
@@ -63,7 +63,7 @@ class RoutePermissionsTest extends TestCase
     #[Test]
     public function every_admin_route_is_claimed_by_a_seeded_permission(): void
     {
-        $this->seed(PermissionSeeder::class);
+        $this->seed(LaratrustSeeder::class);
 
         $seeded = Permission::query()->pluck('name')->all();
 

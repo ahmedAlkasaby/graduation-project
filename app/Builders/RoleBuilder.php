@@ -6,12 +6,12 @@ class RoleBuilder extends BaseBuilder
 {
     /**
      * Roles have no `active` flag and no `order_id`, so the list filters on the
-     * search box alone and stays newest-first.
+     * search box alone and stays newest first.
+     *
+     * @param  array{search?: string}  $filters
      */
-    public function filter($request = null): static
+    public function filter(array $filters): static
     {
-        $request = $request ?? request();
-
-        return $this->mainSearch($this->searchTerm($request))->latest();
+        return $this->search($filters['search'] ?? null)->latest();
     }
 }

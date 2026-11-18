@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\Public;
 
-use App\Http\Controllers\Api\ApiHomeController;
 use App\Actions\User\UserAction;
+use App\Http\Controllers\Api\ApiHomeController;
 use App\Http\Requests\Api\Profile\ChangeAddressRequest;
 use App\Http\Requests\Api\Profile\ChangeAvailableRequest;
 use App\Http\Requests\Api\Profile\ChangeImageRequest;
@@ -12,6 +12,9 @@ use App\Http\Requests\Api\Profile\ChangePasswordRequest;
 use App\Http\Requests\Api\Profile\ChangeSettingsReuest;
 use App\Http\Requests\Api\Profile\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
+use App\Services\User\AdminLogicService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProfileController extends ApiHomeController
 {
@@ -38,6 +41,14 @@ class ProfileController extends ApiHomeController
         $data += $this->getSettingApi();
 
         return $this->successResponse($data);
+    }
+
+    /** Which dashboard sidebar items the signed in user's permissions open. */
+    public function permissions(Request $request, AdminLogicService $adminLogic): JsonResponse
+    {
+        return $this->successResponse($adminLogic->sidebar(
+            $adminLogic->effectivePermissionsFor($request->user()),
+        ));
     }
 
     public function update(UpdateProfileRequest $request)
@@ -158,6 +169,7 @@ class ProfileController extends ApiHomeController
             return $this->successResponse(null, $message);
         } catch (\Exception $e) {
             $message = $this->getMessageError('image');
+
             return $this->errorResponse($message);
         }
     }

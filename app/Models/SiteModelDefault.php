@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Builders\BaseBuilder;
+use App\Casts\UnescapedJson;
 use App\Services\ModelChangeLogger;
 use App\Traits\AdminHelperTrait;
 use Illuminate\Database\Eloquent\Model;
@@ -24,9 +25,9 @@ class SiteModelDefault extends Model
     use AdminHelperTrait;
 
     protected $casts = [
-        'name' => \App\Casts\UnescapedJson::class,
-        'title' => \App\Casts\UnescapedJson::class,
-        'content' => \App\Casts\UnescapedJson::class,
+        'name' => UnescapedJson::class,
+        'title' => UnescapedJson::class,
+        'content' => UnescapedJson::class,
     ];
 
     /**
@@ -38,7 +39,7 @@ class SiteModelDefault extends Model
         return new BaseBuilder($query);
     }
 
-    /** Columns mainSearch() looks through. */
+    /** Columns search() looks through. */
     public function getSearchable(): array
     {
         return $this->searchable ?? [];
@@ -50,11 +51,6 @@ class SiteModelDefault extends Model
         return $this->orderByAllowed ?? [];
     }
 
-
-    public function getFullTextSearchable(): array
-    {
-        return $this->fullTextSearchable ?? [];
-    }
     protected static function booted()
     {
         static::creating(function ($model) {
@@ -64,13 +60,12 @@ class SiteModelDefault extends Model
 
                     $name = $model->nameLang('en');
 
-
                     $slug = $name ? Str::slug($name) : Str::slug(Str::random(8));
                     $original = $slug;
                     $count = 1;
 
                     while (DB::table($model->getTable())->where('link', $slug)->exists()) {
-                        $slug = $original . '-' . $count++;
+                        $slug = $original.'-'.$count++;
                     }
 
                     $model->link = $slug;
@@ -88,6 +83,7 @@ class SiteModelDefault extends Model
         static::updated(fn ($model) => app(ModelChangeLogger::class)->updated($model));
         static::deleted(fn ($model) => app(ModelChangeLogger::class)->deleted($model));
     }
+
     public static function listForSelect(
         $type = null,
         $key = 'id',
@@ -130,8 +126,10 @@ class SiteModelDefault extends Model
         if ($lang === null) {
 
             $defaultLang = app()->getLocale();
+
             return $data[$defaultLang] ?? null;
         }
+
         return $data[$lang] ?? null;
     }
 
@@ -141,8 +139,10 @@ class SiteModelDefault extends Model
         if ($lang === null) {
 
             $defaultLang = app()->getLocale();
-            return  $data[$defaultLang] ?? null;
+
+            return $data[$defaultLang] ?? null;
         }
+
         return $data[$lang] ?? null;
     }
 
@@ -152,15 +152,17 @@ class SiteModelDefault extends Model
         if ($lang === null) {
 
             $defaultLang = app()->getLocale();
-            return  $data[$defaultLang] ?? null;
+
+            return $data[$defaultLang] ?? null;
         }
+
         return $data[$lang] ?? null;
     }
+
     protected function asJson($value, $flags = 0)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
-
 
     /**
      * Flip a boolean column on one row.
