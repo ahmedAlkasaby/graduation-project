@@ -3,37 +3,35 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
-class LocaleAdmin {
-    /**
-     * The availables languages.
-     *
-     * @array $languages
-     */
-protected $languages = ['ar','en'];
+/**
+ * Same as Locale, but the default comes from the `admin_language` setting.
+ */
+class LocaleAdmin
+{
+    protected $languages = ['ar', 'en'];
 
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next, $guard = null) {
+    public function handle(Request $request, Closure $next)
+    {
+        $lang = settings()->get('admin_language', app()->getLocale());
 
-        if(auth('sanctum')->user()){
-            $user = auth('sanctum')->user();
-            app()->setLocale($user->locale);
-        }elseif(auth()->guard($guard)->check()){
-            $user = auth($guard)->user();
-            app()->setLocale($user->locale);
-        }else{
-            $admin_language = settings()->get('admin_language');
-            $language = ( in_array( $admin_language, $this->languages) ) ? $admin_language : "ar";
-            app()->setLocale($language);
+        if ($request->header('lang') && in_array($request->header('lang'), $this->languages)) {
+            $lang = $request->header('lang');
         }
+
+        $auth = auth('sanctum')->user();
+        if ($auth && $auth->locale != $lang) {
+            $lang = $auth->locale;
+        }
+
+        app()->setLocale($lang);
+
         return $next($request);
     }
-
 }
