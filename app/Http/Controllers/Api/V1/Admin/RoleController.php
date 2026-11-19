@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Services\User\RoleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Managing dashboard roles and their permissions. Roles only matter for the
@@ -62,6 +63,8 @@ class RoleController extends ApiHomeController
 
     public function update(RoleRequest $request, Role $role): JsonResponse
     {
+        Gate::authorize('update', $role);
+
         $role = $this->roleService->update($role, $request->validated());
 
         return $this->successResponse(['role' => new RoleResource($role->load('permissions'))]);

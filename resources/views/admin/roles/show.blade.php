@@ -21,6 +21,16 @@
                 <label>{{ __('Description') }}</label>
                 {{ $role->description }}
             </div>
+            @foreach (['can_login_web' => __('Web dashboard'), 'can_login_mobile' => __('Mobile app')] as $platformField => $platformLabel)
+                <div class="form-group">
+                    <label>{{ $platformLabel }}</label>
+                    @if ($role->{$platformField})
+                        <span class="badge bg-label-success">{{ __('Allowed') }}</span>
+                    @else
+                        <span class="badge bg-label-secondary">{{ __('Not allowed') }}</span>
+                    @endif
+                </div>
+            @endforeach
             <div class="form-group">
                 <label>{{ __('Permissions') }}</label>
                 {{ $role->permissions->count() }} / {{ $totalPermissions }}

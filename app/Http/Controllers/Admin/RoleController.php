@@ -11,6 +11,7 @@ use App\Services\User\RoleService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 /**
@@ -50,6 +51,7 @@ class RoleController extends AdminController
         return view('admin.roles.create', [
             'permissions' => $this->permissionGroupsForForm(),
             'rolePermissions' => [],
+            'isSystemRole' => false,
         ]);
     }
 
@@ -79,10 +81,15 @@ class RoleController extends AdminController
         ]);
     }
 
-    public function edit(Role $role): View
+    public function edit(Role $role): View|RedirectResponse
     {
+        if (Gate::denies('update', $role)) {
+            return redirect()->route('admin.unauthorized');
+        }
+
         return view('admin.roles.edit', [
             'role' => $role,
+            'isSystemRole' => $this->roleService->isSystemRole($role),
             'permissions' => $this->permissionGroupsForForm(),
             'rolePermissions' => $role->permissions()->pluck('id')->all(),
         ]);
@@ -90,6 +97,10 @@ class RoleController extends AdminController
 
     public function update(RoleRequest $request, Role $role): RedirectResponse
     {
+        if (Gate::denies('update', $role)) {
+            return redirect()->route('admin.unauthorized');
+        }
+
         // An unchecked box is not posted, so an empty list means "none".
         $this->roleService->update($role, $request->validated() + ['permissions' => []]);
 

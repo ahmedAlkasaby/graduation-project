@@ -2699,5 +2699,12 @@
     "Users Management": "إدارة المستخدمين",
     "Volunteers": "المتطوعون",
     "What a role can be given. Assign them from the role form.": "ما يمكن منحه للدور. يتم تعيينها من نموذج الدور.",
-    "With deleted": "مع المحذوفين"
+    "With deleted": "مع المحذوفين",
+    "A seeded role keeps its name": "الدور الأساسي يحتفظ باسمه",
+    "Allowed": "مسموح",
+    "Mobile app": "تطبيق الجوال",
+    "Not allowed": "غير مسموح",
+    "Users with this role can sign in on": "يمكن لمستخدمي هذا الدور تسجيل الدخول على",
+    "Web dashboard": "لوحة التحكم",
+    "Your role cannot sign in to the web dashboard": "دورك لا يسمح بتسجيل الدخول إلى لوحة التحكم"
 }

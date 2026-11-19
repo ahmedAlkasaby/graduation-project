@@ -23,12 +23,21 @@ class RoutePermissionsTest extends TestCase
     use RefreshDatabase;
 
     /**
+     * Admin routes a guest has to reach, so they sit outside the auth and
+     * permission group on purpose. Keep this list as short as it is.
+     *
+     * @var list<string>
+     */
+    private const GUEST_ROUTES = ['api.v1.admin.login'];
+
+    /**
      * @return Collection<int, Route>
      */
     private function routesNamed(string $prefix): Collection
     {
         return collect(app(Router::class)->getRoutes()->getRoutes())
             ->filter(fn (Route $route) => str_starts_with((string) $route->getName(), $prefix))
+            ->reject(fn (Route $route) => in_array($route->getName(), self::GUEST_ROUTES, true))
             ->values();
     }
 
@@ -90,6 +99,19 @@ class RoutePermissionsTest extends TestCase
             array_diff(['auth:sanctum', 'admin'], $route->gatherMiddleware()),
             "{$route->getName()} is missing admin middleware."
         ));
+    }
+
+    #[Test]
+    public function guest_routes_are_only_rate_limited(): void
+    {
+        foreach (self::GUEST_ROUTES as $name) {
+            $route = app(Router::class)->getRoutes()->getByName($name);
+
+            $this->assertNotNull($route, "{$name} is listed as a guest route but does not exist.");
+            $this->assertSame([], $this->permissionMiddleware($route));
+            $this->assertNotContains('auth:sanctum', $route->gatherMiddleware());
+            $this->assertContains('throttle:login', $route->gatherMiddleware());
+        }
     }
 
     #[Test]

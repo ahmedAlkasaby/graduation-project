@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\TokenAbilityEnum;
+use App\Http\Controllers\Api\V1\Admin\Auth\AuthController as AdminAuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,16 +28,19 @@ Route::middleware(['cors', 'json.response', 'locale'])->group(function () {
 
     Route::prefix('v1')->as('api.v1.')->group(function () {
 
-        Route::prefix('admin')
-            ->as('admin.')
-            ->middleware([
+        Route::prefix('admin')->as('admin.')->group(function () {
+
+            // The one admin route a guest can reach: it hands out the token the rest need.
+            Route::post('login', [AdminAuthController::class, 'login'])->name('login')->middleware('throttle:login');
+
+            Route::middleware([
                 'auth:sanctum',
                 'abilities:'.TokenAbilityEnum::AccessToken->value,
                 'admin',
                 'check.lastactive',
                 'auto-check-permission',
-            ])
-            ->group(base_path('routes/api/v1/admin.php'));
+            ])->group(base_path('routes/api/v1/admin.php'));
+        });
 
         Route::prefix('public')
             ->as('public.')

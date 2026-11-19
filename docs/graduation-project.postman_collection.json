@@ -514,8 +514,70 @@
     },
     {
       "name": "Admin",
-      "description": "Dashboard management. Sign in with an admin or super admin account first (Auth > Login). Each request needs the permission named in its description; a super admin skips every check.",
+      "description": "Dashboard management. Sign in with an admin or super admin account first (Admin > Auth > Admin login). Each request needs the permission named in its description; a super admin skips every check.",
       "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Admin login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "lang",
+                    "value": "{{lang}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "login"
+                  ]
+                },
+                "description": "Dashboard sign in. Only an active admin or super admin whose roles allow the dashboard (`can_login_web`) gets a token; anyone else gets 401, the same as a wrong password. `email` also accepts a phone number. No token or permission needed. Saves access/refresh tokens. Refresh and logout use Auth > Refresh token / Logout.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\",\n  \"imei\": \"{{imei}}\",\n  \"token\": \"firebase-device-token\",\n  \"device_type\": \"website\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.data && json.data.access_token) {",
+                      "  pm.collectionVariables.set('accessToken', json.data.access_token);",
+                      "  pm.collectionVariables.set('refreshToken', json.data.refresh_token);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
         {
           "name": "Users",
           "item": [
@@ -1048,7 +1110,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"content_editor\",\n  \"display_name\": \"Content Editor\",\n  \"description\": \"Manages users only\",\n  \"permissions\": [\n    1,\n    2\n  ]\n}",
+                  "raw": "{\n  \"name\": \"content_editor\",\n  \"display_name\": \"Content Editor\",\n  \"description\": \"Manages users only\",\n  \"can_login_web\": true,\n  \"can_login_mobile\": false,\n  \"permissions\": [\n    1,\n    2\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1155,7 +1217,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"content_editor\",\n  \"display_name\": \"Content Editor (updated)\",\n  \"description\": \"Manages users only\",\n  \"permissions\": [\n    1,\n    2\n  ]\n}",
+                  "raw": "{\n  \"name\": \"content_editor\",\n  \"display_name\": \"Content Editor (updated)\",\n  \"description\": \"Manages users only\",\n  \"can_login_web\": true,\n  \"can_login_mobile\": false,\n  \"permissions\": [\n    1,\n    2\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"

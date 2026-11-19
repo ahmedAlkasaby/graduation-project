@@ -47,6 +47,11 @@ class RoleService
      */
     public function update(Role $role, array $data): Role
     {
+        // The seeder finds its roles by name, so a seeded role keeps its name.
+        if ($this->isSystemRole($role)) {
+            unset($data['name']);
+        }
+
         return DB::transaction(function () use ($role, $data): Role {
             $role->update(Arr::except($data, ['permissions']));
 

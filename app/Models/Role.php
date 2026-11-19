@@ -10,8 +10,19 @@ use Laratrust\Models\Role as LaratrustRole;
 class Role extends LaratrustRole
 {
     protected $fillable = [
-        'name', 'display_name', 'description',
+        'name', 'display_name', 'description', 'can_login_web', 'can_login_mobile',
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'can_login_web' => 'boolean',
+            'can_login_mobile' => 'boolean',
+        ];
+    }
 
     protected $searchable = [
         'name', 'display_name',

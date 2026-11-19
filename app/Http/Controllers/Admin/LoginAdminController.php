@@ -38,6 +38,10 @@ class LoginAdminController extends AdminController
             throw ValidationException::withMessages(['email' => __('Your account is not active')]);
         }
 
+        if (! $user->canLoginWeb()) {
+            throw ValidationException::withMessages(['email' => __('Your role cannot sign in to the web dashboard')]);
+        }
+
         Auth::guard('web')->login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 

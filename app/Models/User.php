@@ -131,6 +131,33 @@ class User extends Authenticatable implements LaratrustUser, MustVerifyEmail
         return (bool) $this->typeEnum()?->isSuperAdmin();
     }
 
+    /** Whether a role lets this user into the Blade admin panel. */
+    public function canLoginWeb(): bool
+    {
+        return $this->rolesAllowLogin('can_login_web');
+    }
+
+    /** Whether a role lets this user sign in through the API (the app). */
+    public function canLoginMobile(): bool
+    {
+        return $this->rolesAllowLogin('can_login_mobile');
+    }
+
+    /**
+     * A super admin and a user without roles are not limited; otherwise one
+     * of the user's roles has to allow the platform.
+     */
+    private function rolesAllowLogin(string $column): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        $flags = $this->roles()->pluck(config('laratrust.tables.roles').'.'.$column);
+
+        return $flags->isEmpty() || $flags->contains(fn ($allowed): bool => (bool) $allowed);
+    }
+
     /** Donors and volunteers: the people who use the app, not the dashboard. */
     public function isClient(): bool
     {

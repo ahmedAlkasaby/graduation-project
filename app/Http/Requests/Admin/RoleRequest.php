@@ -24,6 +24,8 @@ class RoleRequest extends FormRequest
             ],
             'display_name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:255'],
+            'can_login_web' => ['nullable', 'boolean'],
+            'can_login_mobile' => ['nullable', 'boolean'],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['integer', 'distinct', 'exists:permissions,id'],
         ];

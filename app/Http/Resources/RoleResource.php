@@ -11,6 +11,8 @@ class RoleResource extends MainResource
             'name' => $this->name,
             'display_name' => $this->display_name,
             'description' => $this->description,
+            'can_login_web' => (bool) $this->can_login_web,
+            'can_login_mobile' => (bool) $this->can_login_mobile,
             'users_count' => $this->whenCounted('users'),
             'permissions_count' => $this->whenCounted('permissions'),
             'permissions' => $this->whenLoaded('permissions', fn () => $this->permissions->map(fn ($permission) => [

@@ -19,8 +19,10 @@ use Illuminate\Support\Facades\Route;
 | Name each route after its module and action, matching config/laratrust_seeder.php, or
 | set the permission yourself: ->permission('cities.export').
 |
-| Self-service endpoints an admin needs as a user (sign in, own profile, own
-| notifications) are not repeated here: they live in public.php.
+| Signing in to the dashboard (POST /api/v1/admin/login) is the one admin
+| route open to guests, so it is registered in routes/api.php, outside this
+| file's auth group. Other self-service endpoints an admin needs as a user
+| (refresh, sign out, own profile, own notifications) live in public.php.
 |
 */
 
