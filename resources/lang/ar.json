@@ -2717,5 +2717,14 @@
     "Show granted only": "عرض الممنوحة فقط",
     "System role": "دور أساسي",
     "Updated At": "تاريخ التعديل",
-    "What this role can do, module by module": "ما يستطيع هذا الدور فعله في كل قسم"
+    "What this role can do, module by module": "ما يستطيع هذا الدور فعله في كل قسم",
+    "First": "الأولى",
+    "Last": "الأخيرة",
+    "Next": "التالي",
+    "No data found": "لا توجد بيانات",
+    "Page navigation": "التنقل بين الصفحات",
+    "Previous": "السابق",
+    "Showing :from to :to of :total entries": "عرض :from إلى :to من :total",
+    "per page": "لكل صفحة",
+    "Page :current of :last": "صفحة :current من :last"
 }

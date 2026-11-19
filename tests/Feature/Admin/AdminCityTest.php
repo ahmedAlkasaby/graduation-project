@@ -49,6 +49,21 @@ class AdminCityTest extends TestCase
     }
 
     #[Test]
+    public function list_footer_pages_the_rows_and_keeps_the_filters_when_the_page_size_changes(): void
+    {
+        City::factory()->count(12)->create();
+        $this->signInAdmin(['cities.index']);
+
+        $response = $this->get(route('admin.cities.index', ['limit' => 10, 'active' => 1, 'page' => 2]))
+            ->assertOk()
+            ->assertSee('admin-per-page', false)
+            ->assertSee(e(route('admin.cities.index', ['limit' => 10, 'active' => 1, 'page' => 1])), false);
+
+        // Changing the page size goes back to page 1 and keeps the other filters.
+        $response->assertSee(e(route('admin.cities.index', ['limit' => 25, 'active' => 1])), false);
+    }
+
+    #[Test]
     public function create_edit_and_show_screens_render(): void
     {
         $city = City::factory()->create();

@@ -36,6 +36,25 @@ function userTypeDefault($all = 'yes')
 }
 
 /**
+ * Page sizes the admin lists offer. They stay within the `limit` cap of the
+ * filter requests (max 100), and the size in use is kept even when it is not
+ * one of them (the table_limit setting may be anything).
+ *
+ * @return array<int, string>
+ */
+function adminPerPageOptions(?int $current = null): array
+{
+    $sizes = [10, 25, 50, 100];
+
+    if ($current !== null && $current > 0 && $current <= 100 && ! in_array($current, $sizes, true)) {
+        $sizes[] = $current;
+        sort($sizes);
+    }
+
+    return array_combine($sizes, array_map('strval', $sizes));
+}
+
+/**
  * Page sizes. The larger ones are only offered to users allowed to pull big
  * exports, since they are what make a list query expensive.
  */
@@ -214,24 +233,23 @@ function themeType()
 |---------------------------------------------------------------------------
 */
 
-/** @see \App\Enums\LanguageEnum */
+/** @see LanguageEnum */
 function languageType()
 {
     return LanguageEnum::options();
 }
 
-/** @see \App\Enums\LoginMethodEnum */
+/** @see LoginMethodEnum */
 function primaryLoginType()
 {
     return LoginMethodEnum::options();
 }
 
-/** @see \App\Enums\NotificationChannelEnum */
+/** @see NotificationChannelEnum */
 function notificationChannels()
 {
     return NotificationChannelEnum::options();
 }
-
 
 function logActionType($all = 'yes')
 {

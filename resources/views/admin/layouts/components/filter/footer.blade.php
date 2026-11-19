@@ -11,7 +11,7 @@
                                                 'label' => __('Per Page'),
                                                 'select_name' => 'limit',
                                                 'select_value' => request()->input('limit') ?? null,
-                                                'select_function' => perPageOptions('yes'),
+                                                'select_function' => adminPerPageOptions((int) request()->input('limit') ?: null),
                                             ])
                                         @endif
                                     </div>

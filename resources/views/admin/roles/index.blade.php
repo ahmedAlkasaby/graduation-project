@@ -21,8 +21,8 @@
                     @include('admin.layouts.table-head')
                     @include('admin.roles.components.table')
                     @include('admin.layouts.table-foot')
-                    @include('admin.layouts.paginate-all')
                 </div>
+                @include('admin.layouts.paginate-all')
               </div>
               <!--/ Basic Bootstrap Table -->
 @stop

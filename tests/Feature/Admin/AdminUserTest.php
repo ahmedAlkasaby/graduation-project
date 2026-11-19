@@ -52,6 +52,19 @@ class AdminUserTest extends TestCase
     }
 
     #[Test]
+    public function list_is_paginated_with_the_entry_count_and_page_links(): void
+    {
+        User::factory()->count(3)->create();
+        $this->signInAdmin(['users.index']);
+
+        $this->get(route('admin.users.index', ['limit' => 2]))
+            ->assertOk()
+            ->assertSeeText('Showing 1 to 2 of 4 entries')
+            ->assertSee('class="pagination', false)
+            ->assertSee(route('admin.users.index', ['limit' => 2, 'page' => 2]));
+    }
+
+    #[Test]
     public function create_edit_and_show_screens_render(): void
     {
         $donor = User::factory()->create();

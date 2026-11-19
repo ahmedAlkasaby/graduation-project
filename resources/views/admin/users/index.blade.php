@@ -20,8 +20,8 @@
             @include('admin.layouts.table-head')
             @include('admin.users.components.table')
             @include('admin.layouts.table-foot')
-            @include('admin.layouts.paginate-all')
         </div>
+        @include('admin.layouts.paginate-all')
     </div>
 @stop
 @section('after_foot')
