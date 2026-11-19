@@ -3,6 +3,7 @@
 namespace App\Services\User;
 
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -48,6 +49,48 @@ class PermissionGroupService
                     ->values()),
             'custom' => $customPermissions->values(),
         ];
+    }
+
+    /**
+     * Every permission, module by module, marked with whether $role holds it.
+     * Modules come in name order with the custom permissions last.
+     *
+     * @return Collection<int, array{key: string, name: string, granted: int, total: int, percent: int, permissions: list<array{label: string, granted: bool}>}>
+     */
+    public function coverage(Role $role): Collection
+    {
+        $grantedIds = $role->permissions->pluck('id')->flip();
+
+        return Permission::query()
+            ->select(['id', 'name', 'display_name', 'description'])
+            ->orderBy('id')
+            ->get()
+            ->groupBy(fn (Permission $permission): string => (string) $permission->description)
+            ->sortKeys()
+            ->sortBy(fn (Collection $permissions, string $module): int => $module === '' ? 1 : 0)
+            ->map(function (Collection $permissions, string $module) use ($grantedIds): array {
+                $isCustom = $module === '';
+
+                $items = $permissions
+                    ->sortBy(fn (Permission $permission): int => $isCustom ? 0 : $this->actionOrder((string) $permission->display_name))
+                    ->map(fn (Permission $permission): array => [
+                        'label' => $isCustom ? $this->customLabel($permission) : __(Str::headline($permission->label())),
+                        'granted' => $grantedIds->has($permission->id),
+                    ])
+                    ->values();
+
+                $granted = $items->where('granted', true)->count();
+
+                return [
+                    'key' => $isCustom ? 'custom' : $module,
+                    'name' => $isCustom ? __('Custom Permissions') : $this->moduleLabel($module),
+                    'granted' => $granted,
+                    'total' => $items->count(),
+                    'percent' => (int) round($granted / max($items->count(), 1) * 100),
+                    'permissions' => $items->all(),
+                ];
+            })
+            ->values();
     }
 
     /** What a module is called on the form. */

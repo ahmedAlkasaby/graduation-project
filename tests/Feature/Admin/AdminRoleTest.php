@@ -43,6 +43,22 @@ class AdminRoleTest extends TestCase
     }
 
     #[Test]
+    public function show_lists_module_coverage_and_members(): void
+    {
+        $role = Role::create(['name' => 'city_manager', 'display_name' => 'City Manager']);
+        $role->givePermissions(['cities.index', 'cities.show']);
+        User::factory()->admin()->create(['full_name' => 'Mona Member'])->addRole($role);
+        $this->signInSuperAdmin();
+
+        $this->get(route('admin.roles.show', $role))
+            ->assertOk()
+            ->assertSee('City Manager')
+            ->assertSee('2 / '.Permission::query()->where('description', 'cities')->count())
+            ->assertSee('Mona Member')
+            ->assertSee(route('admin.roles.edit', $role), false);
+    }
+
+    #[Test]
     public function store_creates_a_role_with_its_permissions(): void
     {
         $permissions = Permission::query()->whereIn('name', ['cities.index', 'cities.store'])->pluck('id')->all();

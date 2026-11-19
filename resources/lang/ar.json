@@ -2706,5 +2706,16 @@
     "Not allowed": "غير مسموح",
     "Users with this role can sign in on": "يمكن لمستخدمي هذا الدور تسجيل الدخول على",
     "Web dashboard": "لوحة التحكم",
-    "Your role cannot sign in to the web dashboard": "دورك لا يسمح بتسجيل الدخول إلى لوحة التحكم"
+    "Your role cannot sign in to the web dashboard": "دورك لا يسمح بتسجيل الدخول إلى لوحة التحكم",
+    "And :count more": "و :count آخرين",
+    "Coverage": "نسبة التغطية",
+    "Custom role": "دور مخصص",
+    "Modules covered": "الأقسام المغطاة",
+    "No description": "لا يوجد وصف",
+    "No users hold this role yet": "لا يوجد مستخدمون بهذا الدور بعد",
+    "Permissions granted": "الصلاحيات الممنوحة",
+    "Show granted only": "عرض الممنوحة فقط",
+    "System role": "دور أساسي",
+    "Updated At": "تاريخ التعديل",
+    "What this role can do, module by module": "ما يستطيع هذا الدور فعله في كل قسم"
 }

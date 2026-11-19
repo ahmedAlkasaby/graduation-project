@@ -66,18 +66,22 @@ class RoleController extends AdminController
     {
         $role->load('permissions')->loadCount('users');
 
+        $modules = $this->permissionGroups->coverage($role);
+        $totalPermissions = $modules->sum('total');
+
         return view('admin.roles.show', [
             'role' => $role,
-            'totalPermissions' => Permission::count(),
-            'modules' => $role->permissions
-                ->groupBy(fn (Permission $permission): string => $permission->description ?? '')
-                ->map(fn (Collection $permissions, string $module): array => [
-                    'name' => $module === '' ? __('Custom Permissions') : $this->permissionGroups->moduleLabel($module),
-                    'permissions' => $permissions->map(fn (Permission $permission): string => $module === ''
-                        ? $this->permissionGroups->customLabel($permission)
-                        : __(Str::headline($permission->label())))->all(),
-                ])
-                ->values(),
+            'modules' => $modules,
+            'totalPermissions' => $totalPermissions,
+            'grantedPermissions' => $modules->sum('granted'),
+            'coveredModules' => $modules->where('granted', '>', 0)->count(),
+            'coveragePercent' => (int) round($modules->sum('granted') / max($totalPermissions, 1) * 100),
+            'isSystemRole' => $this->roleService->isSystemRole($role),
+            'canEdit' => Gate::allows('update', $role),
+            'members' => $role->users()
+                ->latest('users.id')
+                ->limit(6)
+                ->get(['users.id', 'users.full_name', 'users.email', 'users.type']),
         ]);
     }
 
