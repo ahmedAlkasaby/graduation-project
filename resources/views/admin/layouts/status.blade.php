@@ -3,37 +3,37 @@
 
         // One entry per module whose list view renders a status toggle. The key
         // is the table name, which is what tables.status uses for the class.
+        // ":id" is replaced with the row's id: PATCH admin/<table>/{id}/status.
         var statusRoutes = {
-            'users': "{{ route('admin.users.status') }}",
-            'cities': "{{ route('admin.cities.status') }}",
+            'users': "{{ route('admin.users.status', ':id') }}",
+            'cities': "{{ route('admin.cities.status', ':id') }}",
+            'regions': "{{ route('admin.regions.status', ':id') }}",
         };
 
         $.each(statusRoutes, function(table, url) {
             $('body').on('change', '.' + table + '-status', function() {
                 var obj = $(this);
-                var status = obj.is(':checked') ? 1 : 0;
+                var wanted = obj.is(':checked');
 
                 $.ajax({
                     type: 'POST',
-                    url: url,
+                    url: url.replace(':id', obj.attr('data-id')),
                     data: {
                         _token: $('meta[name="_token"]').attr('content'),
-                        id: obj.attr('data-id'),
-                        status: status
+                        _method: 'PATCH'
                     },
                     cache: false,
                     dataType: 'json',
                     success: function(data) {
-                        // The controller answers false when it refuses the
-                        // change, so only then does the switch snap back.
-                        if (data !== "" && data == true) {
-                            obj.prop('checked', status);
-                        } else {
-                            obj.prop('checked', !status);
-                        }
+                        // The switch always shows what the server saved.
+                        obj.prop('checked', !!data.active);
                     },
-                    error: function() {
-                        obj.prop('checked', !status);
+                    error: function(xhr) {
+                        obj.prop('checked', !wanted);
+                        var message = xhr.responseJSON && xhr.responseJSON.message;
+                        if (message && typeof toastr !== 'undefined') {
+                            toastr.error(message);
+                        }
                     }
                 });
 

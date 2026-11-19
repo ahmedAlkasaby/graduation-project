@@ -1,41 +1,27 @@
-<thead>
+<thead class="border-top">
     <tr>
-        <th>{{ __('Role') }}</th>
         <th>{{ __('Name') }}</th>
-        {{--  <th>{{ __('Permissions') }}</th>  --}}
-        <th>{{ __('Web dashboard') }}</th>
-        <th>{{ __('Mobile app') }}</th>
+        <th>{{ __('Display Name') }}</th>
+        <th>{{ __('Users') }}</th>
+        <th>{{ __('Permissions') }}</th>
         <th>{{ __('Setting') }}</th>
-
     </tr>
 </thead>
 <tbody>
-
-@foreach ($data as $key => $model)
-
-<tr>
-    <td>{{ userName($model->name) }}</td>
-    <td>{{ $model->display_name }}</td>
-    {{--  <td>
-        @if(!empty($model->permissions))
-        @foreach($model->permissions as $v)
-        <small class="label bg-red">{{ $v->name }}</small>
-        @endforeach
-        @endif
-    </td>  --}}
-    @foreach (['can_login_web', 'can_login_mobile'] as $platformField)
+@foreach ($data as $model)
+    <tr>
+        <td><code>{{ $model->name }}</code></td>
+        <td>{{ $model->display_name }}</td>
+        <td><span class="badge bg-label-info">{{ $model->users_count }}</span></td>
+        <td><span class="badge bg-label-primary">{{ $model->permissions_count }}</span></td>
         <td>
-            @if ($model->{$platformField})
-                <span class="badge bg-label-success">{{ __('Allowed') }}</span>
-            @else
-                <span class="badge bg-label-secondary">{{ __('Not allowed') }}</span>
-            @endif
+            {{-- Seeded roles come back on every seed, and a role still held by users would orphan them. --}}
+            @include('admin.layouts.forms.dropdowns.dropdown', [
+                'show' => true,
+                'showEdit' => true,
+                'showDelete' => ! in_array($model->name, $systemRoles, true) && (int) $model->users_count === 0,
+            ])
         </td>
-    @endforeach
-      <td>
-        @include('admin.layouts.forms.dropdowns.dropdown', [  'showEdit' => true])
-    </td>
-</tr>
-
+    </tr>
 @endforeach
-
+</tbody>

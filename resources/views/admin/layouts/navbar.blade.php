@@ -107,16 +107,16 @@
                                 </div>
                             @endcan
 
-                            @if (in_array(auth()->user()->type, $access_all_type ?? []))
+                            @can('cities.index')
                                 <div class="dropdown-shortcuts-item col">
                                     <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                        <i class="ti ti-settings fs-4"></i>
+                                        <i class="ti ti-map-pin fs-4"></i>
                                     </span>
-                                    <a href="{{ route('admin.settings.developer.setting') }}"
-                                        class="stretched-link">{{ __('Setting') }}</a>
-                                    <small class="text-muted mb-0">{{ __('App Settings') }}</small>
+                                    <a href="{{ route('admin.cities.index') }}"
+                                        class="stretched-link">{{ __('Cities') }}</a>
+                                    <small class="text-muted mb-0">{{ __('Locations') }}</small>
                                 </div>
-                            @endif
+                            @endcan
                         </div>
                     </div>
                 </div>
@@ -132,7 +132,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
-                        <a class="dropdown-item" href="{{ route('admin.users.edit', $user_account->id) }}">
+                        <a class="dropdown-item" href="javascript:void(0);">
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
                                     <div class="avatar avatar-online">
@@ -150,15 +150,17 @@
                     <li>
                         <div class="dropdown-divider"></div>
                     </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('admin.users.edit', $user_account->id) }}">
-                            <i class="ti ti-user-check me-2 ti-sm"></i>
-                            <span class="align-middle">{{ __('Profile') }}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
+                    @can('users.update')
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.users.edit', $user_account->id) }}">
+                                <i class="ti ti-user-check me-2 ti-sm"></i>
+                                <span class="align-middle">{{ __('Profile') }}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                    @endcan
                     <li>
                         <a class="dropdown-item"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();"

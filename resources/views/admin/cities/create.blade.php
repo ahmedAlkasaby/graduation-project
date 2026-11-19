@@ -2,7 +2,7 @@
 @section('title') {{ __('Create City') }}
 @stop
 @section('head_content')
-@include('admin.layouts.components.head', ['back_url' => $previous_url ?? route('admin.cities.index')])
+@include('admin.layouts.components.head', ['back_url' => route('admin.cities.index')])
 @stop
 @section('content')
 @include('admin.errors.errors')

@@ -17,7 +17,7 @@ class Locale
 
     public function handle(Request $request, Closure $next): Response
     {
-        $setting = $request->routeIs('api.*.admin.*') ? 'admin_language' : 'site_language';
+        $setting = $request->routeIs('api.*.admin.*', 'admin.*') ? 'admin_language' : 'site_language';
 
         $lang = settings()->get($setting, app()->getLocale());
 

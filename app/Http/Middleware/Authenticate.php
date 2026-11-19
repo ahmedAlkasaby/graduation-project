@@ -3,17 +3,20 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Http\Request;
 
 class Authenticate extends Middleware
 {
     /**
-     * API only: never redirect, let the exception handler answer with a 401.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string|null
+     * The API never redirects: the exception handler answers with a 401.
+     * A guest on the Blade admin panel is sent to its login page.
      */
-    protected function redirectTo($request)
+    protected function redirectTo(Request $request): ?string
     {
-        return null;
+        if ($request->is('api/*') || $request->expectsJson()) {
+            return null;
+        }
+
+        return route('admin.login');
     }
 }

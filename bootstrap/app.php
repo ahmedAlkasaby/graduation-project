@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AccessAll;
+use App\Http\Middleware\AdminPanel;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\AutoCheckPermission;
 use App\Http\Middleware\CheckLastActive;
@@ -38,6 +39,7 @@ use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -53,6 +55,9 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            Route::middleware('web')->group(base_path('routes/admin.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware) {
 
@@ -131,13 +136,22 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.socialLogin' => CheckSocialLoginAccess::class,
             'check.client' => EnsureUserIsClient::class,
             'admin' => EnsureUserIsAdmin::class,
+            'admin.panel' => AdminPanel::class,
         ]);
+
+        // The Blade admin panel: guests go to its login, signed in admins skip it.
+        $middleware->redirectGuestsTo(fn () => route('admin.login'));
+        $middleware->redirectUsersTo(fn () => route('admin.index'));
 
     })
     ->withExceptions(function (Exceptions $exceptions) {
 
-        // API only: every error is answered as JSON, whatever the request asked for.
-        $exceptions->shouldRenderJsonWhen(fn (Request $request) => true);
+        // The API answers every error as JSON, whatever the request asked for.
+        // The Blade admin panel keeps Laravel's own handling: validation
+        // redirects back with errors, a guest goes to the login page.
+        $isApi = fn (Request $request): bool => $request->is('api/*') || $request->expectsJson();
+
+        $exceptions->shouldRenderJsonWhen($isApi);
 
         $exceptions->dontReport([
             NotFoundHttpException::class,
@@ -148,23 +162,43 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json(['status' => $status, 'message' => $message] + $extra, $code);
         };
 
-        $exceptions->render(function (ValidationException $e, Request $request) use ($json) {
+        $exceptions->render(function (ValidationException $e, Request $request) use ($json, $isApi) {
+            if (! $isApi($request)) {
+                return null;
+            }
+
             return $json('error', __('validation_error'), 422, ['errors' => $e->errors()]);
         });
 
-        $exceptions->render(function (AuthenticationException $e, Request $request) use ($json) {
+        $exceptions->render(function (AuthenticationException $e, Request $request) use ($json, $isApi) {
+            if (! $isApi($request)) {
+                return null;
+            }
+
             return $json('unauthenticated', __('Please login'), 401);
         });
 
-        $exceptions->render(function (AuthorizationException $e, Request $request) use ($json) {
+        $exceptions->render(function (AuthorizationException $e, Request $request) use ($json, $isApi) {
+            if (! $isApi($request)) {
+                return null;
+            }
+
             return $json('unauthorized', __("You don't have permission to do this"), 403);
         });
 
-        $exceptions->render(function (ModelNotFoundException|NotFoundHttpException $e, Request $request) use ($json) {
+        $exceptions->render(function (ModelNotFoundException|NotFoundHttpException $e, Request $request) use ($json, $isApi) {
+            if (! $isApi($request)) {
+                return null;
+            }
+
             return $json('error', __('Not found'), 404);
         });
 
-        $exceptions->render(function (Throwable $e, Request $request) use ($json) {
+        $exceptions->render(function (Throwable $e, Request $request) use ($json, $isApi) {
+            if (! $isApi($request)) {
+                return null;
+            }
+
             if ($e instanceof HttpExceptionInterface) {
                 return null; // 405, 429 and friends already carry a sensible status
             }

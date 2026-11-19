@@ -2,7 +2,7 @@
 @section('title') {{ __('Show Role') }}
 @stop
 @section('head_content')
-@include('admin.layouts.components.head', ['back_url' => $previous_url ?? route('admin.roles.index')])
+@include('admin.layouts.components.head', ['back_url' => route('admin.roles.index')])
 @stop
 @section('content')
 
@@ -25,6 +25,10 @@
                 <label>{{ __('Permissions') }}</label>
                 {{ $role->permissions->count() }} / {{ $totalPermissions }}
             </div>
+            <div class="form-group">
+                <label>{{ __('Users') }}</label>
+                {{ $role->users_count }}
+            </div>
 
             @if ($modules->isEmpty())
                 <p class="text-muted">{{ __('No permissions') }}</p>
@@ -43,7 +47,7 @@
                                     <td>{{ $module['name'] }}</td>
                                     <td>
                                         @foreach ($module['permissions'] as $permission)
-                                            <span class="badge bg-label-primary me-1">{{ __($permission) }}</span>
+                                            <span class="badge bg-label-primary me-1">{{ $permission }}</span>
                                         @endforeach
                                     </td>
                                 </tr>

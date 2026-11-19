@@ -1,72 +1,115 @@
-<!-- Default Wizard -->
-@include('admin.layouts.forms.fields.hidden', [
-    'hidden' => 'previous_url',
-    'hidden_id' => url()->previous(),
-])
+{{--
+    The user create / edit form. Every select list comes from
+    UserService::formOptions(), the same data the API's form-options
+    endpoint serves, so a type outranking the signed in admin is never offered.
+--}}
 <div class="col-12 mb-4">
-    <small class="text-light fw-medium"></small>
-    <div class="bs-stepper wizard-numbered mt-2">
-        <div class="bs-stepper-content">
-            <form onSubmit="return false">
-                <div class="row">
-                    <div class="col-sm-12">
-                        @include('admin.layouts.forms.fields.text', [
-                            'label_req' => true,
-                            'label_name' => __('Full Name'),
-                            'text_name' => 'full_name',
-                        ])
-                    </div>
-                    <div class="col-sm-6">
-                        @include('admin.layouts.forms.fields.text', [
-                            'not_req' => true,
-                            'label_name' => __('Email'),
-                            'text_name' => 'email',
-                            'text_type' => 'email',
-                        ])
-                        @include('admin.layouts.forms.users.password')
-                        @include('admin.layouts.forms.fields.select')
-                    </div>
-                    <div class="col-sm-6">
-                        @include('admin.layouts.forms.fields.phone')
-                        @include('admin.layouts.forms.users.password-confirm')
-                        @include('admin.layouts.forms.selects.locale')
-                    </div>
-                    <div class="content-header mb-3"></div>
-                    <div class="col-sm-12">
-                        @include('admin.layouts.forms.dropzone.dropzone', [
-                            'name' => 'image',
-                            'existingImageUrl' => isset($user) && $user->image ? asset($user->image) : null,
-                        ]) </div>
-                    <div class="col-sm-12">
-                        {{-- Every panel user gets the same fields; only an admin may set someone's type. --}}
-                        @if ($new > 0 || in_array(auth()->user()->type, $user_admins))
-                            <div class="form-group">
-                                @include('admin.layouts.forms.fields.label', [
-                                    'label_default' => __('Type'),
-                                ])
-                                {!! html()->select('type', userType('yes', 'no'), $new > 0 ? null : $user->type)->class('select2 user-type-role')->required() !!}
-                            </div>
-                            <div class="user-all-role">
-                                @include('admin.layouts.forms.users.role')
-                            </div>
-                            @include('admin.layouts.forms.fields.select', [
-                                'select_name' => 'vip',
-                                'label_name' => __('Vip'),
-                                'select_function' => statusShow(),
-                            ])
-                            @include('admin.layouts.forms.fields.select', [
-                                'select_name' => 'is_notify',
-                                'label_name' => __('Admin Notify'),
-                                'select_function' => statusShow(),
-                            ])
-                        @endif
-                    </div>
-                    <div class="content-header mb-3"></div>
-                    <div class="col-12 d-flex justify-content-between">
-                        <div class="col-12"> @include('admin.layouts.forms.buttons.form-save')</div>
-                    </div>
-            </form>
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    @include('admin.layouts.forms.fields.text', [
+                        'label_req' => true,
+                        'label_name' => __('Full Name'),
+                        'text_name' => 'full_name',
+                    ])
+                </div>
+                <div class="col-sm-6">
+                    @include('admin.layouts.forms.fields.phone', [
+                        'label_req' => true,
+                        'label_name' => __('Phone'),
+                        'not_pattern' => true,
+                    ])
+                </div>
+                <div class="col-sm-6">
+                    @include('admin.layouts.forms.fields.text', [
+                        'not_req' => true,
+                        'label_name' => __('Email'),
+                        'text_name' => 'email',
+                        'text_type' => 'email',
+                    ])
+                    <small class="text-muted">{{ __('Required for admins') }}</small>
+                </div>
+                <div class="col-sm-6">
+                    @include('admin.layouts.forms.fields.select', [
+                        'label' => __('Type'),
+                        'select_name' => 'type',
+                        'select_id' => 'user-type',
+                        'select_function' => $typeOptions,
+                    ])
+                </div>
+                <div class="col-sm-12" id="user-roles-wrap" data-role-types='@json($rolesForTypes)'>
+                    @include('admin.layouts.forms.fields.select', [
+                        'not_req' => true,
+                        'label' => __('Roles'),
+                        'select_name' => 'roles',
+                        'is_multiple' => true,
+                        'select_function' => $roleOptions,
+                        'select_value' => old('roles', isset($user) ? $user->roles->pluck('id')->all() : []),
+                    ])
+                </div>
+                <div class="col-sm-6">
+                    @include('admin.layouts.forms.fields.password', [
+                        'label_name' => __('Password'),
+                        'text_id' => 'password',
+                        'not_req' => isset($user) ? true : null,
+                    ])
+                </div>
+                <div class="col-sm-6">
+                    @include('admin.layouts.forms.fields.password', [
+                        'label_name' => __('Confirm Password'),
+                        'text_name' => 'confirm_password',
+                        'text_id' => 'confirm_password',
+                        'equalto' => '#password',
+                        'not_req' => isset($user) ? true : null,
+                    ])
+                </div>
+                <div class="col-sm-4">
+                    @include('admin.layouts.forms.fields.select', [
+                        'label' => __('Language'),
+                        'select_name' => 'locale',
+                        'select_function' => $localeOptions,
+                    ])
+                </div>
+                <div class="col-sm-4">
+                    @include('admin.layouts.forms.fields.select', [
+                        'not_req' => true,
+                        'label' => __('Gender'),
+                        'select_name' => 'gender',
+                        'select_function' => $genderOptions,
+                    ])
+                </div>
+                <div class="col-sm-4">
+                    @include('admin.layouts.forms.fields.date', [
+                        'not_req' => true,
+                        'label_name' => __('Birth Date'),
+                        'date_name' => 'birth_date',
+                        'date_value' => old('birth_date', isset($user) ? $user->birth_date?->format('Y-m-d') : null),
+                    ])
+                </div>
+                <div class="col-sm-6">
+                    @include('admin.layouts.forms.fields.select', [
+                        'label' => __('Status'),
+                        'select_name' => 'active',
+                    ])
+                </div>
+                <div class="col-sm-6">
+                    @include('admin.layouts.forms.fields.select', [
+                        'label' => __('Notifications'),
+                        'select_name' => 'is_notify',
+                        'select_function' => statusShow(),
+                    ])
+                </div>
+                <div class="col-sm-12">
+                    @include('admin.layouts.forms.dropzone.dropzone', [
+                        'name' => 'image',
+                        'existingImageUrl' => isset($user) && $user->image ? upload_url($user->image) : null,
+                    ])
+                </div>
+                <div class="col-12">
+                    @include('admin.layouts.forms.buttons.form-save')
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<!-- /Default Wizard -->

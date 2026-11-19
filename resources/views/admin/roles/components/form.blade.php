@@ -5,39 +5,27 @@
                 <div class="col-lg-8">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            @include('admin.layouts.forms.fields.select', [
+                            @include('admin.layouts.forms.fields.text', [
+                                'label_req' => true,
                                 'label_name' => __('Name'),
-                                'select_name' => 'name',
-                                'select_function' => $roleNameOptions,
+                                'text_name' => 'name',
+                                'placeholder' => 'e.g. city_manager',
                             ])
+                            <small class="text-muted">{{ __('Lowercase letters, numbers and underscores only') }}</small>
                         </div>
                         <div class="col-md-6">
-                            @include('admin.layouts.forms.texts.name', [
-                                'name' => __('Display Name'),
-                                'name_text' => 'display_name',
-                                'not_req' => true,
+                            @include('admin.layouts.forms.fields.text', [
+                                'label_req' => true,
+                                'label_name' => __('Display Name'),
+                                'text_name' => 'display_name',
                             ])
                         </div>
                         <div class="col-12">
                             @include('admin.layouts.forms.fields.textarea', [
-                                'text_name' => 'description',
-                                'label_name' => __('Description'),
                                 'not_req' => true,
+                                'label_name' => __('Description'),
+                                'text_name' => 'description',
                             ])
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label d-block">{{ __('Users with this role can sign in on') }}</label>
-                            @foreach (['can_login_web' => [__('Web dashboard'), false], 'can_login_mobile' => [__('Mobile app'), true]] as $platformField => [$platformLabel, $platformDefault])
-                                <input type="hidden" name="{{ $platformField }}" value="0">
-                                <label class="switch switch-success me-4">
-                                    <input type="checkbox" class="switch-input" name="{{ $platformField }}" value="1" @checked(old($platformField, isset($role) ? $role->{$platformField} : $platformDefault))>
-                                    <span class="switch-toggle-slider">
-                                        <span class="switch-on"><i class="ti ti-check"></i></span>
-                                        <span class="switch-off"><i class="ti ti-x"></i></span>
-                                    </span>
-                                    <span class="switch-label">{{ $platformLabel }}</span>
-                                </label>
-                            @endforeach
                         </div>
                     </div>
                 </div>

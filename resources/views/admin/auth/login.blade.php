@@ -43,7 +43,11 @@
                     <h3 class="mb-1">{{ __('Welcome to') }} {{ $company_name }} ! 👋</h3>
                     <p class=" mb-4">{{ __('Please sign-in to your account and start the adventure') }}</p>
 
-                    <form id="formAuthentication" class="mb-3" action="{{ route('admin.login') }}" method="POST"
+                    @if ($message_error = session('error'))
+                        <div class="alert alert-danger" role="alert">{{ $message_error }}</div>
+                    @endif
+
+                    <form id="formAuthentication" class="mb-3" action="{{ route('admin.login.save') }}" method="POST"
                         role="form">
                         {{ csrf_field() }}
                         <div class="mb-3">
@@ -52,7 +56,7 @@
                                 placeholder="{{ __('Phone or Email') }}" required autofocus />
                             @if ($errors->has('email'))
                                 <div
-                                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback d-block">
                                     <div data-field="email" data-validator="emailAddress">{{ $errors->first('email') }}
                                     </div>
                                 </div>
@@ -78,7 +82,7 @@
                         </div>
                         <div class="mb-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="remember-me" />
+                                <input class="form-check-input" type="checkbox" id="remember-me" name="remember" value="1" />
                                 <label class="form-check-label" for="remember-me"> {{ __('Remember Me') }} </label>
                             </div>
                         </div>

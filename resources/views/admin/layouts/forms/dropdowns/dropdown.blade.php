@@ -28,7 +28,7 @@
 
             @if (($showRestore ?? false)
                 && in_array($row_table, $admin_restore_models ?? [])
-                && auth()->user()->can($row_table . '.destroy'))
+                && auth()->user()->can($row_table . '.restore'))
                 @include('admin.layouts.tables.restore', [
                     'btn_class' => 'btn btn-primary',
                     'table' => $row_table,

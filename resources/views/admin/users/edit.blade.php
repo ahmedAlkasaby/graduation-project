@@ -2,7 +2,7 @@
 @section('title') {{ __('Edit User') }}
 @stop
 @section('head_content')
-    @include('admin.layouts.components.head', ['back_url' => $previous_url ?? route('admin.users.index')])
+    @include('admin.layouts.components.head', ['back_url' => route('admin.users.index')])
 @stop
 @section('content')
     @include('admin.errors.errors')
@@ -10,15 +10,10 @@
         'model' => $user,
         'model_id' => $user->id,
         'table' => $user->getTable(),
-        'enctype' => 'multipart/form-data',
     ])
     @include('admin.users.components.form')
     @include('admin.layouts.forms.close')
-
 @stop
 @section('after_foot')
-    {{-- @include('admin.layouts.image') --}}
-
-    @include('admin.users.components.repeater')
-    @include('admin.users.components.change-type')
+    @include('admin.users.components.form-js')
 @stop

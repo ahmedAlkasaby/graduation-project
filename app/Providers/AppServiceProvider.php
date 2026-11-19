@@ -20,11 +20,15 @@ use App\Services\ActivityLogger;
 use App\Services\AppSettingsService;
 use App\Services\FirebaseService;
 use App\Services\ModelChangeLogger;
+use App\Traits\AdminHelperTrait;
+use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -70,6 +74,72 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerUserValidators();
         $this->registerRoutePermissionMacro();
+        $this->registerViewComposers();
+    }
+
+    /**
+     * What every Blade admin view reads: the panel language and direction,
+     * the signed in admin's theme, the logo and the shared admin lists.
+     */
+    protected function registerViewComposers(): void
+    {
+        // Every @include of an admin partial runs this, so the data is worked
+        // out once per request and kept on the request.
+        View::composer('admin.*', function (ViewContract $view): void {
+            $attributes = request()->attributes;
+
+            if (! $attributes->has('admin_view_data')) {
+                $attributes->set('admin_view_data', $this->adminViewData());
+            }
+
+            $view->with($attributes->get('admin_view_data'));
+        });
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function adminViewData(): array
+    {
+        $settings = settings();
+        $user = Auth::guard('web')->user();
+        $helper = new class
+        {
+            use AdminHelperTrait;
+
+            /** @return array<string, mixed> */
+            public function lists(): array
+            {
+                return [
+                    'limit_array_admin' => $this->limit_array_admin,
+                    'access_all_type' => $this->access_all_type,
+                    'access_all_id' => $this->access_all_id,
+                    'access_all_perms' => $this->access_all_perms,
+                    'admin_perms_models' => $this->admin_models,
+                    'admin_delete_models' => $this->admin_delete_models,
+                    'admin_restore_models' => $this->admin_restore_models,
+                    'user_admins' => $this->user_admins,
+                ];
+            }
+        };
+
+        $language = app()->getLocale();
+        $theme = in_array($user?->theme, ['light', 'dark', 'semi-dark'], true) ? $user->theme : 'light';
+        $logo = $settings->get('logo_image');
+
+        return [
+            'company_name' => $settings->get('site_title') ?: config('app.name'),
+            'admin_language' => $language,
+            'admin_dir' => $language === 'ar' ? 'rtl' : 'ltr',
+            'admin_theme_style' => $theme,
+            'admin_url' => $settings->getAdminUrl(),
+            'user_account' => $user,
+            'user_id' => $user?->id,
+            'limit' => $settings->getTableLimit(),
+            'table_limit' => $settings->getTableLimit(),
+            'phone_regex' => $settings->getPhoneRegex(),
+            'siteLogo' => $logo && upload_exists($logo) ? upload_url($logo) : null,
+        ] + $helper->lists();
     }
 
     /**

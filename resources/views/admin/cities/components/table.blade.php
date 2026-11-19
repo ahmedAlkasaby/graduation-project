@@ -8,20 +8,25 @@
     </tr>
 </thead>
 <tbody>
-@foreach ($data as $key => $model)
+@foreach ($data as $model)
     <tr>
         <td>{{ $model->nameLang($admin_language) }}</td>
-        <td>{{ optional($model->country)->nameLang($admin_language) }}</td>
+        <td>{{ $model->country?->nameLang($admin_language) }}</td>
         <td>{{ $model->order_id }}</td>
         <td>
-            @include('admin.layouts.tables.status', [
-                'active' => $model->active,
-                'ajax_class' => $model->getTable() . '-status',
-                'id' => $model->id,
-            ])
+            @can('cities.status')
+                @include('admin.layouts.tables.status', [
+                    'active' => $model->active,
+                    'ajax_class' => $model->getTable() . '-status',
+                    'id' => $model->id,
+                ])
+            @else
+                {{ statusName((int) $model->active) }}
+            @endcan
         </td>
         <td>
             @include('admin.layouts.forms.dropdowns.dropdown', [
+                'show' => true,
                 'showEdit' => true,
                 'showDelete' => true,
             ])
