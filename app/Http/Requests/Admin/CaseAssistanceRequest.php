@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\AssistanceTypeEnum;
 use App\Services\CharityCase\CaseAssistanceService;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -17,6 +18,9 @@ use Illuminate\Validation\Validator;
  *
  * A field of the other type is prohibited rather than ignored, so a client
  * sending both amounts gets told instead of silently losing one.
+ *
+ * Nothing is scheduled in the past: the due date is today or later, and the
+ * start month is this month or later.
  */
 class CaseAssistanceRequest extends FormRequest
 {
@@ -36,16 +40,19 @@ class CaseAssistanceRequest extends FormRequest
 
         return [
             'case_id' => ['required', 'integer', Rule::exists('charity_cases', 'id')->whereNull('deleted_at')],
+            'category_id' => ['required', 'integer', Rule::exists('case_categories', 'id')->where('active', 1)->whereNull('deleted_at')],
             'assistance_type' => ['required', Rule::enum(AssistanceTypeEnum::class)],
             'title' => ['required', 'array'],
             'title.en' => ['required', 'string', 'max:255'],
             'title.ar' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:5000'],
+            'description' => ['nullable', 'array'],
+            'description.en' => ['nullable', 'string', 'max:5000'],
+            'description.ar' => ['nullable', 'string', 'max:5000'],
             'order_id' => ['nullable', 'integer', 'min:1', 'max:127'],
             'active' => ['required', 'boolean'],
 
             'requested_amount' => ["required_if:assistance_type,{$oneTime}", "prohibited_unless:assistance_type,{$oneTime}", ...$amount],
-            'due_at' => ["required_if:assistance_type,{$oneTime}", "prohibited_unless:assistance_type,{$oneTime}", 'nullable', 'date_format:Y-m-d'],
+            'due_at' => ["required_if:assistance_type,{$oneTime}", "prohibited_unless:assistance_type,{$oneTime}", 'nullable', 'date_format:Y-m-d', 'after_or_equal:today'],
 
             'amount_per_period' => ["required_if:assistance_type,{$recurring}", "prohibited_unless:assistance_type,{$recurring}", ...$amount],
             'start_month' => ["required_if:assistance_type,{$recurring}", "prohibited_unless:assistance_type,{$recurring}", 'nullable', 'date_format:Y-m'],
@@ -62,6 +69,11 @@ class CaseAssistanceRequest extends FormRequest
             function (Validator $validator): void {
                 $start = $this->input('start_month');
                 $end = $this->input('end_month');
+
+                if (! $validator->errors()->has('start_month') && filled($start)
+                    && CarbonImmutable::createFromFormat('!Y-m', $start)->lessThan(CarbonImmutable::today()->startOfMonth())) {
+                    $validator->errors()->add('start_month', __('The start month cannot be in the past.'));
+                }
 
                 if ($validator->errors()->hasAny(['start_month', 'end_month']) || blank($start) || blank($end)) {
                     return;
@@ -88,6 +100,7 @@ class CaseAssistanceRequest extends FormRequest
             'title.ar.required' => __('validation.required', ['attribute' => __('Arabic Title')]),
             'requested_amount.required_if' => __('The amount is required for a one-time assistance.'),
             'due_at.required_if' => __('The due date is required for a one-time assistance.'),
+            'due_at.after_or_equal' => __('The due date cannot be in the past.'),
             'amount_per_period.required_if' => __('The monthly amount is required for a monthly assistance.'),
             'start_month.required_if' => __('The start month is required for a monthly assistance.'),
             'end_month.after_or_equal' => __('The end month must be the start month or later.'),

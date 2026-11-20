@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\AssistanceTypeEnum;
 use App\Models\CaseAssistance;
+use App\Models\CaseCategory;
 use App\Models\CharityCase;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,6 +26,7 @@ class CaseAssistanceFactory extends Factory
 
         return [
             'case_id' => CharityCase::factory(),
+            'category_id' => CaseCategory::factory(),
             'assistance_type' => AssistanceTypeEnum::OneTime,
             'title' => ['en' => $title, 'ar' => $title],
             'description' => null,

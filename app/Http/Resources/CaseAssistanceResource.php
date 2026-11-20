@@ -14,11 +14,13 @@ class CaseAssistanceResource extends MainResource
         return [
             'id' => $this->id,
             'case_id' => $this->case_id,
+            'category_id' => $this->category_id,
             'assistance_type' => $this->assistance_type->value,
             'assistance_type_label' => $this->assistance_type->label(),
             'title' => $this->translated($this->title),
             'title_translations' => $this->title,
-            'description' => $this->description,
+            'description' => $this->translated($this->description),
+            'description_translations' => $this->description,
             'requested_amount' => $this->requested_amount,
             'amount_per_period' => $this->amount_per_period,
             'currency' => settings()->get('currency', 'EGP'),
@@ -37,6 +39,7 @@ class CaseAssistanceResource extends MainResource
 
             // relations
             'charity_case' => new CharityCaseResource($this->whenLoaded('charityCase')),
+            'category' => new CaseCategoryResource($this->whenLoaded('category')),
             'installments' => AssistanceInstallmentResource::collection($this->whenLoaded('installments')),
         ];
     }

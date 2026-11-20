@@ -5,32 +5,7 @@
 --}}
 
 {{-- 1. Beneficiary --}}
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="card-title mb-0">{{ __('Beneficiary') }}</h5>
-    </div>
-    <div class="card-body">
-        <div class="d-flex flex-wrap align-items-end gap-3">
-            <div class="flex-grow-1">
-                @include('admin.layouts.forms.fields.select', [
-                    'label_req' => true,
-                    'label' => __('Shared Case'),
-                    'select_name' => 'case_id',
-                    'select_id' => 'beneficiary-select',
-                    'select_class' => 'form-select',
-                    'select_function' => $selectedCase ? [$selectedCase->id => $selectedCase->selectLabel()] : [],
-                    'select_value' => $selectedCase?->id,
-                ])
-            </div>
-            @if ($canQuickCreateCase)
-                <button type="button" class="btn btn-outline-primary waves-effect mb-1" data-bs-toggle="modal" data-bs-target="#quick-case-modal">
-                    <i class="ti ti-user-plus me-1"></i>{{ __('New Beneficiary') }}
-                </button>
-            @endif
-        </div>
-        <small class="text-muted">{{ __('Search by name, national ID or phone.') }}</small>
-    </div>
-</div>
+@include('admin.case_assistances.components.beneficiary-field')
 
 {{-- 2. Type --}}
 <div class="card mb-4">
@@ -87,6 +62,7 @@
                     'label_name' => __('Due Date'),
                     'text_name' => 'due_at',
                     'date_type' => 'date',
+                    'text_min' => $minDueAt,
                 ])
             </div>
         </div>
@@ -109,6 +85,7 @@
                     'label_name' => __('Installments Start Month'),
                     'text_name' => 'start_month',
                     'date_type' => 'month',
+                    'text_min' => $minMonth,
                     'placeholder' => 'YYYY-MM',
                 ])
             </div>
@@ -118,6 +95,7 @@
                     'label_name' => __('Installments End Month'),
                     'text_name' => 'end_month',
                     'date_type' => 'month',
+                    'text_min' => $minMonth,
                     'placeholder' => 'YYYY-MM',
                 ])
                 <small class="text-muted">{{ __('Optional. Leave empty for :count monthly installments.', ['count' => $defaultInstallments]) }}</small>

@@ -28,6 +28,9 @@
     if (isset($placeholder)) {
         $array_control['placeholder'] = $placeholder;
     }
+    if (isset($text_min)) {
+        $array_control['min'] = $text_min;
+    }
     if (isset($text_id)) {
         $array_control['id'] = $text_id;
     }

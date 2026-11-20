@@ -38,17 +38,14 @@ class CharityCaseController extends AdminController
         $filters = $request->validated();
 
         $cases = CharityCase::query()
-            ->with(['category', 'volunteer'])
+            ->with('volunteer')
             ->withCount('assistances')
             ->filter($filters)
             ->paginate($this->perPage($filters))
             ->withQueryString();
 
-        $options = $this->charityCaseService->formOptions();
-
         return $this->listView('admin.charity_cases.index', $cases, 'charity_cases', [
-            'categories' => ['' => __('All')] + $options['categories'],
-            'volunteers' => ['' => __('All')] + $options['volunteers'],
+            'volunteers' => ['' => __('All')] + $this->charityCaseService->formOptions()['volunteers'],
         ]);
     }
 
@@ -82,9 +79,10 @@ class CharityCaseController extends AdminController
 
     public function show(CharityCase $charityCase): View
     {
-        $charityCase->load(['category', 'volunteer']);
+        $charityCase->load('volunteer');
 
         $assistances = $charityCase->assistances()
+            ->with('category')
             ->withInstallmentSummary()
             ->latest('id')
             ->get();

@@ -35,7 +35,6 @@ class CharityCaseRequest extends FormRequest
                 Rule::unique('charity_cases', 'national_id')->ignore($this->route('charityCase')?->id),
             ],
             'phone' => ['required', 'string', 'max:30', "regex:/{$phoneRegex}/"],
-            'category_id' => ['required', 'integer', Rule::exists('case_categories', 'id')->where('active', 1)->whereNull('deleted_at')],
             'volunteer_id' => [
                 'required',
                 'integer',

@@ -21,12 +21,21 @@
                     'text_value' => isset($assistance) ? $assistance->titleLang('ar') : null,
                 ])
             </div>
-            <div class="col-12">
+            <div class="col-sm-6">
                 @include('admin.layouts.forms.fields.textarea', [
                     'not_req' => true,
-                    'label_name' => __('Description'),
-                    'text_name' => 'description',
-                    'text_value' => $assistance->description ?? null,
+                    'label_name' => __('English Description'),
+                    'text_name' => 'description[en]',
+                    'text_value' => isset($assistance) ? $assistance->descriptionLang('en') : null,
+                    'rows' => 3,
+                ])
+            </div>
+            <div class="col-sm-6">
+                @include('admin.layouts.forms.fields.textarea', [
+                    'not_req' => true,
+                    'label_name' => __('Arabic Description'),
+                    'text_name' => 'description[ar]',
+                    'text_value' => isset($assistance) ? $assistance->descriptionLang('ar') : null,
                     'rows' => 3,
                 ])
             </div>

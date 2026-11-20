@@ -117,7 +117,10 @@ class UserTest extends TestCase
             ->assertJsonPath('data.roles_for_types', [UserTypeEnum::Admin->value])
             ->assertJsonPath('data.email_required_for', UserTypeEnum::adminValues());
 
-        $this->assertEqualsCanonicalizing(['admin', 'editor'], array_column($response->json('data.roles'), 'name'));
+        $this->assertEqualsCanonicalizing(
+            [...array_keys(config('laratrust_seeder.roles_structure')), 'editor'],
+            array_column($response->json('data.roles'), 'name'),
+        );
 
         $this->assertSame(
             [UserTypeEnum::Donor->value, UserTypeEnum::Volunteer->value, UserTypeEnum::Admin->value],

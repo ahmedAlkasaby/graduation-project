@@ -36,6 +36,31 @@ class LaratrustSeederTest extends TestCase
     }
 
     #[Test]
+    public function every_other_role_holds_exactly_the_permissions_listed_for_it(): void
+    {
+        $this->seed(LaratrustSeeder::class);
+
+        foreach (config('laratrust_seeder.roles_structure') as $name => $definition) {
+            if ($definition['permissions'] === '*') {
+                continue;
+            }
+
+            $expected = collect($definition['permissions'])
+                ->flatMap(fn (array $actions, string $module) => array_map(
+                    fn (string $action) => $action === '' ? $module : "{$module}.{$action}",
+                    $actions,
+                ))
+                ->all();
+
+            $this->assertEqualsCanonicalizing(
+                $expected,
+                Role::where('name', $name)->firstOrFail()->permissions()->pluck('name')->all(),
+                "Role {$name} lists a permission that is not in permissions_structure.",
+            );
+        }
+    }
+
+    #[Test]
     public function running_it_again_resets_a_role_changed_from_the_dashboard(): void
     {
         $this->seed(LaratrustSeeder::class);

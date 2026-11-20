@@ -5,6 +5,7 @@ namespace Tests\Feature\Api\V1\Admin;
 use App\Enums\AssistanceTypeEnum;
 use App\Enums\TokenAbilityEnum;
 use App\Models\CaseAssistance;
+use App\Models\CaseCategory;
 use App\Models\CharityCase;
 use App\Models\User;
 use Database\Seeders\LaratrustSeeder;
@@ -21,6 +22,8 @@ class CaseAssistanceTest extends TestCase
     {
         parent::setUp();
 
+        // The payloads use fixed dates; pin today so they stay in the future.
+        $this->travelTo('2026-11-20 12:00:00');
         $this->seed(LaratrustSeeder::class);
     }
 
@@ -43,6 +46,7 @@ class CaseAssistanceTest extends TestCase
     {
         $this->postJson(route('api.v1.admin.case_assistances.store'), [
             'case_id' => CharityCase::factory()->create()->id,
+            'category_id' => CaseCategory::factory()->create()->id,
             'assistance_type' => AssistanceTypeEnum::Recurring->value,
             'title' => ['en' => 'Monthly support', 'ar' => 'دعم شهري'],
             'amount_per_period' => '1000',
@@ -68,13 +72,17 @@ class CaseAssistanceTest extends TestCase
 
         $this->postJson(route('api.v1.admin.case_assistances.store'), [
             'case_id' => CharityCase::factory()->create()->id,
+            'category_id' => CaseCategory::factory()->create()->id,
             'assistance_type' => AssistanceTypeEnum::Recurring->value,
             'title' => ['en' => 'Monthly support', 'ar' => 'دعم شهري'],
             'amount_per_period' => '1000',
             'start_month' => '2027-01',
+            'description' => ['en' => 'Rent support', 'ar' => 'دعم الإيجار'],
             'active' => 1,
         ])
             ->assertCreated()
+            ->assertJsonPath('data.assistance.description_translations.en', 'Rent support')
+            ->assertJsonPath('data.assistance.description_translations.ar', 'دعم الإيجار')
             ->assertJsonPath('data.assistance.amount_per_period', '1000.00')
             ->assertJsonPath('data.assistance.requested_amount', null)
             ->assertJsonPath('data.assistance.currency', 'EGP')
@@ -91,6 +99,7 @@ class CaseAssistanceTest extends TestCase
 
         $this->postJson(route('api.v1.admin.case_assistances.store'), [
             'case_id' => CharityCase::factory()->create()->id,
+            'category_id' => CaseCategory::factory()->create()->id,
             'assistance_type' => AssistanceTypeEnum::OneTime->value,
             'title' => ['en' => 'Surgery', 'ar' => 'عملية'],
             'requested_amount' => '5000',
@@ -114,7 +123,12 @@ class CaseAssistanceTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['assistance_type', 'requested_amount']);
 
-        $this->putJson(route('api.v1.admin.case_assistances.update', $assistance), ['title' => $title, 'active' => 1])
+        $this->putJson(route('api.v1.admin.case_assistances.update', $assistance), [
+            'case_id' => $assistance->case_id,
+            'category_id' => $assistance->category_id,
+            'title' => $title,
+            'active' => 1,
+        ])
             ->assertOk()
             ->assertJsonPath('data.assistance.title_translations.en', 'Renamed')
             ->assertJsonPath('data.assistance.amount_per_period', '1000.00')

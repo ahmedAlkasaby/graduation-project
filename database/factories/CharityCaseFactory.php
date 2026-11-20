@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\CaseCategory;
 use App\Models\CharityCase;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -21,7 +20,6 @@ class CharityCaseFactory extends Factory
             'full_name' => fake()->name(),
             'national_id' => fake()->unique()->numerify('2#############'),
             'phone' => '010'.fake()->numerify('########'),
-            'category_id' => CaseCategory::factory(),
             'volunteer_id' => User::factory()->volunteer(),
         ];
     }

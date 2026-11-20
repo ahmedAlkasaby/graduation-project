@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Builders\CaseAssistanceBuilder;
+use App\Casts\UnescapedJson;
 use App\Enums\AssistanceStatusEnum;
 use App\Enums\AssistanceTypeEnum;
 use Carbon\CarbonImmutable;
@@ -14,7 +15,7 @@ use LogicException;
 /**
  * A support plan for a beneficiary, paid out through its installments.
  *
- * Its financial setup (beneficiary, type, amounts) is fixed once created:
+ * Its financial setup (type, amounts) is fixed once created:
  * changing it would make the plan disagree with its installments. The
  * requests reject such changes, and this model refuses to save them as the
  * last line of defence.
@@ -23,26 +24,31 @@ class CaseAssistance extends SiteModelSoftDelete
 {
     use HasFactory;
 
-    /** Columns that may never change after creation. */
-    public const IMMUTABLE = ['case_id', 'assistance_type', 'requested_amount', 'amount_per_period', 'created_by'];
+    /**
+     * Columns that may never change after creation. The beneficiary and the
+     * category may: they say who and what the plan is for, not how much.
+     */
+    public const IMMUTABLE = ['assistance_type', 'requested_amount', 'amount_per_period', 'created_by'];
 
     protected $table = 'case_assistances';
 
     protected $fillable = [
-        'case_id', 'assistance_type', 'title', 'description', 'requested_amount', 'amount_per_period',
+        'case_id', 'category_id', 'assistance_type', 'title', 'description', 'requested_amount', 'amount_per_period',
         'order_id', 'active', 'created_by',
     ];
 
     protected $searchable = ['title'];
 
     /**
-     * Merged with SiteModelDefault's $casts, which make `title` translated JSON.
+     * Merged with SiteModelDefault's $casts, which make `title` translated JSON;
+     * `description` is translated JSON ({en, ar}) too.
      *
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
+            'description' => UnescapedJson::class,
             'assistance_type' => AssistanceTypeEnum::class,
             'requested_amount' => 'decimal:2',
             'amount_per_period' => 'decimal:2',
@@ -67,6 +73,11 @@ class CaseAssistance extends SiteModelSoftDelete
         return $this->belongsTo(CharityCase::class, 'case_id');
     }
 
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(CaseCategory::class, 'category_id');
+    }
+
     public function canceller(): BelongsTo
     {
         return $this->belongsTo(User::class, 'cancelled_by')->withTrashed();
@@ -80,6 +91,18 @@ class CaseAssistance extends SiteModelSoftDelete
     public function installments(): HasMany
     {
         return $this->hasMany(AssistanceInstallment::class);
+    }
+
+    /** The description in one language, the app's locale by default. A legacy single string is returned as is. */
+    public function descriptionLang(?string $lang = null): ?string
+    {
+        $description = $this->description;
+
+        if (! is_array($description)) {
+            return $description;
+        }
+
+        return $description[$lang ?? app()->getLocale()] ?? null;
     }
 
     public function isRecurring(): bool

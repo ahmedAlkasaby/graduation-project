@@ -1,8 +1,8 @@
 @include('admin.layouts.components.filter.header', [
-    'filterKeys' => ['search', 'category_id', 'volunteer_id'],
+    'filterKeys' => ['search', 'volunteer_id'],
 ])
 
-    <div class="col-sm-4">
+    <div class="col-sm-6">
         <div class="box">
             <div class="box-body">
                 @include('admin.layouts.forms.fields.text', [
@@ -15,21 +15,7 @@
         </div>
     </div>
 
-    <div class="col-sm-4">
-        <div class="box">
-            <div class="box-body">
-                @include('admin.layouts.forms.fields.select', [
-                    'not_req' => true,
-                    'label' => __('Category'),
-                    'select_name' => 'category_id',
-                    'select_value' => request()->input('category_id'),
-                    'select_function' => $categories,
-                ])
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-4">
+    <div class="col-sm-6">
         <div class="box">
             <div class="box-body">
                 @include('admin.layouts.forms.fields.select', [

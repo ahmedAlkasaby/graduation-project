@@ -22,10 +22,7 @@ class CaseAssistanceBuilder extends BaseBuilder
                     ->orWhereHas('charityCase', fn (Builder $case) => $case->search($term));
             }))
             ->when($filters['case_id'] ?? null, fn (Builder $query, $caseId) => $query->where('case_id', $caseId))
-            ->when($filters['category_id'] ?? null, fn (Builder $query, $categoryId) => $query->whereHas(
-                'charityCase',
-                fn (Builder $case) => $case->where('category_id', $categoryId),
-            ))
+            ->when($filters['category_id'] ?? null, fn (Builder $query, $categoryId) => $query->where('category_id', $categoryId))
             ->when($filters['assistance_type'] ?? null, fn (Builder $query, $type) => $query->where('assistance_type', $type))
             ->defaultOrder();
     }

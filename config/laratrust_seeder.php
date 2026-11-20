@@ -28,6 +28,7 @@ return [
         'resources' => [
             'cities' => $crud,
             'regions' => $crud,
+            'case_categories' => $crud,
             'charity_cases' => ['index', 'show', 'store', 'update'],
             'case_assistances' => ['index', 'show', 'store', 'update', 'status', 'cancel_installment'],
             'roles' => ['index', 'show', 'store', 'update', 'destroy'],
@@ -68,6 +69,94 @@ return [
             'display_name' => 'Admin',
             'description' => 'Full dashboard access',
             'permissions' => '*',
+        ],
+
+        // Runs the charity work end to end: categories, cases and every assistance action.
+        'case_manager' => [
+            'display_name' => 'Case Manager',
+            'description' => 'Manages case categories, charity cases and their assistances',
+            'permissions' => [
+                'dashboard' => [''],
+                'statistics' => [''],
+                'case_categories' => $crud,
+                'charity_cases' => ['index', 'show', 'store', 'update'],
+                'case_assistances' => ['index', 'show', 'store', 'update', 'status', 'cancel_installment'],
+                'cities' => ['index', 'show'],
+                'regions' => ['index', 'show'],
+            ],
+        ],
+
+        // Visits families and records their cases; sees assistances but cannot grant them.
+        'social_researcher' => [
+            'display_name' => 'Social Researcher',
+            'description' => 'Registers and updates charity cases after field research',
+            'permissions' => [
+                'dashboard' => [''],
+                'case_categories' => ['index', 'show'],
+                'charity_cases' => ['index', 'show', 'store', 'update'],
+                'case_assistances' => ['index', 'show'],
+                'cities' => ['index', 'show'],
+                'regions' => ['index', 'show'],
+            ],
+        ],
+
+        // Handles the money side: assistances, their status and installments.
+        'accountant' => [
+            'display_name' => 'Accountant',
+            'description' => 'Records assistances, changes their status and cancels installments',
+            'permissions' => [
+                'dashboard' => [''],
+                'statistics' => [''],
+                'charity_cases' => ['index', 'show'],
+                'case_assistances' => ['index', 'show', 'store', 'update', 'status', 'cancel_installment'],
+            ],
+        ],
+
+        // Types in new records; cannot change statuses, cancel or delete anything.
+        'data_entry' => [
+            'display_name' => 'Data Entry',
+            'description' => 'Adds charity cases, assistances, cities and regions',
+            'permissions' => [
+                'dashboard' => [''],
+                'case_categories' => ['index', 'show'],
+                'charity_cases' => ['index', 'show', 'store'],
+                'case_assistances' => ['index', 'show', 'store'],
+                'cities' => ['index', 'show', 'store', 'update'],
+                'regions' => ['index', 'show', 'store', 'update'],
+            ],
+        ],
+
+        // Read-only access to everything the charity work produces, plus the audit trail.
+        'auditor' => [
+            'display_name' => 'Auditor',
+            'description' => 'Views cases, assistances, statistics and the activity log without editing',
+            'permissions' => [
+                'dashboard' => [''],
+                'statistics' => [''],
+                'case_categories' => ['index', 'show'],
+                'charity_cases' => ['index', 'show'],
+                'case_assistances' => ['index', 'show'],
+                'cities' => ['index', 'show'],
+                'regions' => ['index', 'show'],
+                'activity_logs' => ['index'],
+            ],
+        ],
+
+        // Looks after accounts and the system itself, not the charity work.
+        'system_manager' => [
+            'display_name' => 'System Manager',
+            'description' => 'Manages users, roles, settings, locations and system logs',
+            'permissions' => [
+                'dashboard' => [''],
+                'users' => [...$crud, 'restore'],
+                'roles' => ['index', 'show', 'store', 'update', 'destroy'],
+                'settings' => ['index'],
+                'cities' => $crud,
+                'regions' => $crud,
+                'activity_logs' => ['index'],
+                'logs' => ['index'],
+                'images' => ['index'],
+            ],
         ],
 
     ],

@@ -21,8 +21,9 @@ use Illuminate\Validation\ValidationException;
  *
  * The schedule is generated once, in the same transaction as the assistance,
  * and never regenerated: amounts, type and installment dates are fixed. After
- * creation only the title, description, order and status change, and a
- * pending installment can be cancelled. Nothing here records a payment.
+ * creation only the beneficiary, category, title, description, order and
+ * status change, and a pending installment can be cancelled. Nothing here
+ * records a payment.
  */
 class CaseAssistanceService
 {
@@ -32,7 +33,7 @@ class CaseAssistanceService
     public const MAX_INSTALLMENTS = 120;
 
     /** What may change after creation. */
-    public const EDITABLE = ['title', 'description', 'order_id', 'active'];
+    public const EDITABLE = ['case_id', 'category_id', 'title', 'description', 'order_id', 'active'];
 
     /**
      * @param  array<string, mixed>  $data  validated CaseAssistanceRequest data
@@ -45,6 +46,7 @@ class CaseAssistanceService
         return DB::transaction(function () use ($data, $type, $amount, $creator): CaseAssistance {
             $assistance = CaseAssistance::create([
                 'case_id' => $data['case_id'],
+                'category_id' => $data['category_id'],
                 'assistance_type' => $type,
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,

@@ -2,7 +2,6 @@
     <tr>
         <th>{{ __('Beneficiary') }}</th>
         <th>{{ __('National ID') }}</th>
-        <th>{{ __('Category') }}</th>
         <th>{{ __('Volunteer') }}</th>
         <th>{{ __('Assistances') }}</th>
         <th>{{ __('Created At') }}</th>
@@ -17,7 +16,6 @@
             <small class="text-muted">{{ $model->phone ?? '—' }}</small>
         </td>
         <td>{{ $model->national_id ?? '—' }}</td>
-        <td><span class="badge bg-label-info">{{ $model->category?->nameLang($admin_language) }}</span></td>
         <td>{{ $model->volunteer?->full_name ?? __('Unassigned') }}</td>
         <td>{{ $model->assistances_count }}</td>
         <td>{{ $model->created_at?->toDateString() }}</td>

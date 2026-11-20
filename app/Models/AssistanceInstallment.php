@@ -95,6 +95,12 @@ class AssistanceInstallment extends SiteModelSoftDelete
         return ! $this->isPaid() && ! $this->isCancelled();
     }
 
+    /** Pending and its due date has passed. Passing the due date never makes it paid. */
+    public function isOverdue(): bool
+    {
+        return $this->status() === InstallmentStatusEnum::Overdue;
+    }
+
     public function status(): InstallmentStatusEnum
     {
         return match (true) {

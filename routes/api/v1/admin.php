@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\CaseAssistanceController;
+use App\Http\Controllers\Api\V1\Admin\CaseCategoryController;
 use App\Http\Controllers\Api\V1\Admin\CharityCaseController;
 use App\Http\Controllers\Api\V1\Admin\CityController;
 use App\Http\Controllers\Api\V1\Admin\PermissionController;
@@ -46,6 +47,10 @@ Route::apiResource('roles', RoleController::class);
 Route::get('permissions', [PermissionController::class, 'index'])
     ->name('permissions.index')
     ->permission('roles.index');
+
+Route::patch('case_categories/{caseCategory}/status', [CaseCategoryController::class, 'status'])->name('case_categories.status');
+Route::apiResource('case_categories', CaseCategoryController::class)
+    ->parameters(['case_categories' => 'caseCategory']);
 
 Route::get('charity_cases/form-options', [CharityCaseController::class, 'formOptions'])
     ->name('charity_cases.form-options')

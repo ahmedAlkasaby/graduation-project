@@ -58,10 +58,10 @@ trait AdminHelperTrait
     protected $access_all_perms = ['roles.destroy'];
 
     /** Admin panel modules, by table name. Each one has `<table>.*` permissions in config/laratrust_seeder.php. */
-    protected $admin_models = ['cities', 'regions', 'users', 'roles', 'charity_cases', 'case_assistances'];
+    protected $admin_models = ['cities', 'regions', 'users', 'roles', 'case_categories', 'charity_cases', 'case_assistances'];
 
     /** Modules whose list rows offer a delete button. */
-    protected $admin_delete_models = ['cities', 'regions', 'users', 'roles'];
+    protected $admin_delete_models = ['cities', 'regions', 'users', 'roles', 'case_categories'];
 
     /** Soft-deleting modules whose deleted rows offer a restore button. */
     protected $admin_restore_models = ['users'];

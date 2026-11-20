@@ -19,7 +19,6 @@ class CharityCaseFilterRequest extends FormRequest
     {
         return [
             'search' => ['nullable', 'string', 'max:255'],
-            'category_id' => ['nullable', 'integer', 'exists:case_categories,id'],
             'volunteer_id' => ['nullable', 'integer'],
             'page' => ['nullable', 'integer', 'min:1'],
         ];

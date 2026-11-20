@@ -30,7 +30,7 @@ class CharityCaseController extends ApiHomeController
     public function index(CharityCaseFilterRequest $request): JsonResponse
     {
         $query = CharityCase::query()
-            ->with(['category', 'volunteer'])
+            ->with('volunteer')
             ->withCount('assistances')
             ->filter($request->validated());
 
@@ -44,13 +44,12 @@ class CharityCaseController extends ApiHomeController
         );
     }
 
-    /** The category and volunteer lists the profile form needs. */
+    /** The volunteer list the profile form needs. */
     public function formOptions(): JsonResponse
     {
         $options = $this->charityCaseService->formOptions();
 
         return $this->successResponse([
-            'categories' => $this->asOptions($options['categories']),
             'volunteers' => $this->asOptions($options['volunteers']),
         ]);
     }
@@ -68,7 +67,7 @@ class CharityCaseController extends ApiHomeController
         $charityCase = $this->charityCaseService->create($request->validated());
 
         return $this->successResponse(
-            ['case' => new CharityCaseResource($charityCase->load(['category', 'volunteer']))],
+            ['case' => new CharityCaseResource($charityCase->load('volunteer'))],
             'Success',
             Response::HTTP_CREATED,
         );
@@ -77,9 +76,8 @@ class CharityCaseController extends ApiHomeController
     public function show(CharityCase $charityCase): JsonResponse
     {
         $charityCase->load([
-            'category',
             'volunteer',
-            'assistances' => fn ($query) => $query->withInstallmentSummary()->latest('id'),
+            'assistances' => fn ($query) => $query->with('category')->withInstallmentSummary()->latest('id'),
         ]);
 
         return $this->successResponse(['case' => new CharityCaseResource($charityCase)]);
@@ -89,7 +87,7 @@ class CharityCaseController extends ApiHomeController
     {
         $this->charityCaseService->update($charityCase, $request->validated());
 
-        return $this->successResponse(['case' => new CharityCaseResource($charityCase->load(['category', 'volunteer']))]);
+        return $this->successResponse(['case' => new CharityCaseResource($charityCase->load('volunteer'))]);
     }
 
     /**

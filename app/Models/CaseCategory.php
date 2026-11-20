@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Builders\CaseCategoryBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/** What kind of need a beneficiary has (food, housing, medical...). `name` is {en, ar}. */
+/** What kind of need an assistance covers (food, housing, medical...). `name` is {en, ar}. */
 class CaseCategory extends SiteModelSoftDelete
 {
     use HasFactory;
@@ -16,9 +17,15 @@ class CaseCategory extends SiteModelSoftDelete
 
     protected $searchable = ['name'];
 
-    public function cases(): HasMany
+    public function assistances(): HasMany
     {
-        return $this->hasMany(CharityCase::class, 'category_id');
+        return $this->hasMany(CaseAssistance::class, 'category_id');
+    }
+
+    /** A category still holding assistances cannot be deleted: they would lose their category. */
+    public function isInUse(): bool
+    {
+        return $this->assistances()->exists();
     }
 
     /**
@@ -29,5 +36,10 @@ class CaseCategory extends SiteModelSoftDelete
     public static function options(): array
     {
         return static::listForSelect(null, 'id', 'nameLang', ['active'], ['id', 'name'], static::query()->orderBy('order_id'));
+    }
+
+    public function newEloquentBuilder($query): CaseCategoryBuilder
+    {
+        return new CaseCategoryBuilder($query);
     }
 }

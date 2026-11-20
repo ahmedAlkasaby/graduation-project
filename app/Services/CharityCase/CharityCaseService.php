@@ -3,7 +3,6 @@
 namespace App\Services\CharityCase;
 
 use App\Enums\UserTypeEnum;
-use App\Models\CaseCategory;
 use App\Models\CharityCase;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -17,7 +16,7 @@ class CharityCaseService
     private const LOOKUP_LIMIT = 20;
 
     /**
-     * @param  array{full_name: string, national_id: string, phone: string, category_id: int, volunteer_id: int}  $data
+     * @param  array{full_name: string, national_id: string, phone: string, volunteer_id: int}  $data
      */
     public function create(array $data): CharityCase
     {
@@ -25,7 +24,7 @@ class CharityCaseService
     }
 
     /**
-     * @param  array{full_name: string, national_id: string, phone: string, category_id: int, volunteer_id: int}  $data
+     * @param  array{full_name: string, national_id: string, phone: string, volunteer_id: int}  $data
      */
     public function update(CharityCase $charityCase, array $data): CharityCase
     {
@@ -50,10 +49,9 @@ class CharityCaseService
     }
 
     /**
-     * What the profile form's selects offer: the active categories and the
-     * active volunteers.
+     * What the profile form's selects offer: the active volunteers.
      *
-     * @return array{categories: array<int, string>, volunteers: array<int, string>}
+     * @return array{volunteers: array<int, string>}
      */
     public function formOptions(): array
     {
@@ -65,9 +63,6 @@ class CharityCaseService
             ->mapWithKeys(fn (User $user): array => [$user->id => trim($user->full_name.' '.$user->phone)])
             ->all();
 
-        return [
-            'categories' => CaseCategory::options(),
-            'volunteers' => $volunteers,
-        ];
+        return ['volunteers' => $volunteers];
     }
 }

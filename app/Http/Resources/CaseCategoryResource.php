@@ -9,6 +9,10 @@ class CaseCategoryResource extends MainResource
         return [
             'id' => $this->id,
             'name' => $this->translated($this->name),
+            'order_id' => $this->order_id,
+            'active' => (int) $this->active,
+            'assistances_count' => $this->whenCounted('assistances'),
+            'created_at' => $this->created_at?->timezone(config('app.timezone'))->toDateTimeString(),
         ];
     }
 }

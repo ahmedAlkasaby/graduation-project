@@ -18,7 +18,6 @@
             <div class="flex-grow-1">
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                     <h4 class="mb-0">{{ $charityCase->full_name }}</h4>
-                    <span class="badge bg-label-info">{{ $charityCase->category?->nameLang($admin_language) }}</span>
                 </div>
                 <dl class="row mb-0">
                     <dt class="col-sm-3">{{ __('National ID') }}</dt>

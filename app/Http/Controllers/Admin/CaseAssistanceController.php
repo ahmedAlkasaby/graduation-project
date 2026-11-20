@@ -41,7 +41,7 @@ class CaseAssistanceController extends AdminController
         $filters = $request->validated();
 
         $assistances = CaseAssistance::query()
-            ->with('charityCase.category')
+            ->with(['charityCase', 'category'])
             ->withInstallmentSummary()
             ->filter($filters)
             ->paginate($this->perPage($filters))
@@ -61,8 +61,11 @@ class CaseAssistanceController extends AdminController
 
         return view('admin.case_assistances.create', [
             'selectedCase' => filled($caseId) ? CharityCase::find($caseId) : null,
+            'categories' => CaseCategory::options(),
             'types' => AssistanceTypeEnum::cases(),
             'selectedType' => old('assistance_type', AssistanceTypeEnum::OneTime->value),
+            'minDueAt' => today()->toDateString(),
+            'minMonth' => today()->format('Y-m'),
             'defaultInstallments' => CaseAssistanceService::DEFAULT_INSTALLMENTS,
             'maxInstallments' => CaseAssistanceService::MAX_INSTALLMENTS,
             'canQuickCreateCase' => $this->can('charity_cases.store'),
@@ -80,7 +83,7 @@ class CaseAssistanceController extends AdminController
     public function show(CaseAssistance $caseAssistance): View
     {
         $caseAssistance->load([
-            'charityCase.category',
+            'category',
             'charityCase.volunteer',
             'creator',
             'installments' => fn ($query) => $query->orderBy('due_at'),
@@ -89,18 +92,23 @@ class CaseAssistanceController extends AdminController
         $installments = $caseAssistance->installments;
         $statuses = $installments->map(fn (AssistanceInstallment $installment) => $installment->status());
         $countOf = fn (InstallmentStatusEnum $status): int => $statuses->filter(fn ($value) => $value === $status)->count();
+        $paid = $countOf(InstallmentStatusEnum::Paid);
 
         return view('admin.case_assistances.show', [
             'assistance' => $caseAssistance,
             'installments' => $installments,
+            // A one-time assistance has exactly one installment: its page shows it as a single payment.
+            'installment' => $installments->first(),
             'currency' => $this->currency(),
             'stats' => [
                 'total' => $installments->count(),
-                'paid' => $countOf(InstallmentStatusEnum::Paid),
+                'paid' => $paid,
                 'pending' => $countOf(InstallmentStatusEnum::Pending),
                 'overdue' => $countOf(InstallmentStatusEnum::Overdue),
                 'cancelled' => $countOf(InstallmentStatusEnum::Cancelled),
                 'planned_amount' => $installments->whereNull('cancelled_at')->sum('amount'),
+                'paid_amount' => $installments->whereNotNull('paid_at')->sum('amount'),
+                'paid_percent' => $installments->isEmpty() ? 0 : (int) round($paid / $installments->count() * 100),
                 'first_due_at' => $installments->first()?->due_at,
                 'last_due_at' => $installments->last()?->due_at,
             ],
@@ -110,10 +118,16 @@ class CaseAssistanceController extends AdminController
         ]);
     }
 
+    /** The beneficiary and category stay editable; the amounts and schedule are shown read-only. */
     public function edit(CaseAssistance $caseAssistance): View
     {
+        $caseId = old('case_id', $caseAssistance->case_id);
+
         return view('admin.case_assistances.edit', [
             'assistance' => $caseAssistance->load('charityCase')->loadCount('installments'),
+            'selectedCase' => CharityCase::find($caseId),
+            'categories' => CaseCategory::options(),
+            'canQuickCreateCase' => false,
             'currency' => $this->currency(),
         ]);
     }

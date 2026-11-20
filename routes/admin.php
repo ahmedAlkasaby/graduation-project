@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CaseAssistanceController;
+use App\Http\Controllers\Admin\CaseCategoryController;
 use App\Http\Controllers\Admin\CharityCaseController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -62,6 +63,10 @@ Route::prefix('admin')->as('admin.')->group(function () {
             Route::resource('roles', RoleController::class);
 
             // Case management: beneficiary profiles and the assistances paid out to them.
+            Route::patch('case_categories/{caseCategory}/status', [CaseCategoryController::class, 'status'])->name('case_categories.status');
+            Route::resource('case_categories', CaseCategoryController::class)
+                ->parameters(['case_categories' => 'caseCategory']);
+
             Route::get('charity_cases/lookup', [CharityCaseController::class, 'lookup'])
                 ->name('charity_cases.lookup')
                 ->permission('case_assistances.index', 'case_assistances.store');

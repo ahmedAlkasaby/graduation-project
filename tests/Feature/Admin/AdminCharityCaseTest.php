@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\CaseCategory;
 use App\Models\CharityCase;
 use App\Models\User;
 use Database\Seeders\LaratrustSeeder;
@@ -42,7 +41,6 @@ class AdminCharityCaseTest extends TestCase
             'full_name' => 'Mona Ahmed Hassan',
             'national_id' => '29001011234567',
             'phone' => '01012345678',
-            'category_id' => CaseCategory::factory()->create()->id,
             'volunteer_id' => User::factory()->volunteer()->create()->id,
         ], $overrides);
     }
@@ -89,7 +87,7 @@ class AdminCharityCaseTest extends TestCase
         $this->signInAdmin(['charity_cases.store']);
 
         $this->post(route('admin.charity_cases.store'), [])
-            ->assertSessionHasErrors(['full_name', 'national_id', 'phone', 'category_id', 'volunteer_id']);
+            ->assertSessionHasErrors(['full_name', 'national_id', 'phone', 'volunteer_id']);
 
         $this->assertSame(0, CharityCase::count());
     }

@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Enums\AssistanceTypeEnum;
 use App\Models\AssistanceInstallment;
 use App\Models\CaseAssistance;
+use App\Models\CaseCategory;
 use App\Models\CharityCase;
 use App\Models\User;
 use Database\Seeders\LaratrustSeeder;
@@ -24,6 +25,8 @@ class AdminCaseAssistanceTest extends TestCase
     {
         parent::setUp();
 
+        // The payloads use fixed dates; pin today so they stay in the future.
+        $this->travelTo('2026-11-20 12:00:00');
         $this->seed(LaratrustSeeder::class);
     }
 
@@ -46,6 +49,7 @@ class AdminCaseAssistanceTest extends TestCase
     {
         return array_merge([
             'case_id' => CharityCase::factory()->create()->id,
+            'category_id' => CaseCategory::factory()->create()->id,
             'assistance_type' => AssistanceTypeEnum::OneTime->value,
             'title' => ['en' => 'Surgery', 'ar' => 'عملية جراحية'],
             'requested_amount' => '5000',
@@ -61,6 +65,7 @@ class AdminCaseAssistanceTest extends TestCase
     {
         return array_merge([
             'case_id' => CharityCase::factory()->create()->id,
+            'category_id' => CaseCategory::factory()->create()->id,
             'assistance_type' => AssistanceTypeEnum::Recurring->value,
             'title' => ['en' => 'Monthly support', 'ar' => 'دعم شهري'],
             'amount_per_period' => '1000',
@@ -165,6 +170,28 @@ class AdminCaseAssistanceTest extends TestCase
     }
 
     #[Test]
+    public function a_one_time_due_date_cannot_be_in_the_past(): void
+    {
+        $this->signInAdmin(['case_assistances.store']);
+
+        $this->post(route('admin.case_assistances.store'), $this->oneTime(['due_at' => '2026-11-19']))
+            ->assertSessionHasErrors('due_at');
+
+        $this->createAssistance($this->oneTime(['due_at' => '2026-11-20']));
+    }
+
+    #[Test]
+    public function a_monthly_start_month_cannot_be_in_the_past(): void
+    {
+        $this->signInAdmin(['case_assistances.store']);
+
+        $this->post(route('admin.case_assistances.store'), $this->recurring(['start_month' => '2026-10']))
+            ->assertSessionHasErrors('start_month');
+
+        $this->createAssistance($this->recurring(['start_month' => '2026-11', 'end_month' => '2026-12']));
+    }
+
+    #[Test]
     public function the_end_month_cannot_precede_the_start_or_exceed_the_ceiling(): void
     {
         $this->signInAdmin(['case_assistances.store']);
@@ -178,21 +205,26 @@ class AdminCaseAssistanceTest extends TestCase
     }
 
     #[Test]
-    public function editing_changes_the_title_description_order_and_status(): void
+    public function editing_changes_the_category_title_description_order_and_status(): void
     {
         $this->signInAdmin(['case_assistances.store', 'case_assistances.update']);
         $assistance = $this->createAssistance($this->oneTime());
+        $newCategory = CaseCategory::factory()->create();
 
         $this->put(route('admin.case_assistances.update', $assistance), [
+            'case_id' => $assistance->case_id,
+            'category_id' => $newCategory->id,
             'title' => ['en' => 'Heart surgery', 'ar' => 'عملية قلب'],
-            'description' => 'Updated notes',
+            'description' => ['en' => 'Updated notes', 'ar' => 'ملاحظات محدثة'],
             'order_id' => 3,
             'active' => 0,
         ])->assertRedirect(route('admin.case_assistances.show', $assistance))->assertSessionHasNoErrors();
 
         $assistance->refresh();
+        $this->assertSame($newCategory->id, $assistance->category_id);
         $this->assertSame('Heart surgery', $assistance->titleLang('en'));
-        $this->assertSame('Updated notes', $assistance->description);
+        $this->assertSame('Updated notes', $assistance->descriptionLang('en'));
+        $this->assertSame('ملاحظات محدثة', $assistance->descriptionLang('ar'));
         $this->assertSame(3, (int) $assistance->order_id);
         $this->assertSame(0, (int) $assistance->active);
         $this->assertSame('5000.00', $assistance->requested_amount);
@@ -252,6 +284,27 @@ class AdminCaseAssistanceTest extends TestCase
         $this->get(route('admin.case_assistances.create', ['case_id' => $charityCase->id]))->assertOk()->assertSee($charityCase->full_name);
         $this->get(route('admin.case_assistances.show', $assistance))->assertOk()->assertSee('2027-12-01')->assertSee($charityCase->full_name);
         $this->get(route('admin.case_assistances.edit', $assistance))->assertOk()->assertSee('Monthly support');
+    }
+
+    #[Test]
+    public function the_details_page_shows_a_single_payment_or_a_schedule_by_type(): void
+    {
+        $this->signInAdmin(['case_assistances.store', 'case_assistances.show']);
+        $oneTime = $this->createAssistance($this->oneTime());
+        $recurring = $this->createAssistance($this->recurring());
+
+        $this->get(route('admin.case_assistances.show', $oneTime))
+            ->assertOk()
+            ->assertSee('Payment')
+            ->assertSee('2026-12-01')
+            ->assertSee('5,000.00')
+            ->assertDontSee('Last Installment');
+
+        $this->get(route('admin.case_assistances.show', $recurring))
+            ->assertOk()
+            ->assertSee('Last Installment')
+            ->assertSee('2027-12-01')
+            ->assertSee('12,000.00');
     }
 
     #[Test]

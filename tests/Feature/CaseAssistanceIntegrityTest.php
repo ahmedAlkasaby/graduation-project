@@ -95,7 +95,7 @@ class CaseAssistanceIntegrityTest extends TestCase
     {
         $assistance = CaseAssistance::factory()->create();
 
-        $assistance->update(['title' => ['en' => 'New', 'ar' => 'جديد'], 'description' => 'Notes']);
+        $assistance->update(['title' => ['en' => 'New', 'ar' => 'جديد'], 'description' => ['en' => 'Notes', 'ar' => 'ملاحظات']]);
 
         $this->assertSame('New', $assistance->fresh()->titleLang('en'));
     }

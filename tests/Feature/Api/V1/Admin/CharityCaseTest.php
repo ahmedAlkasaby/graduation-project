@@ -3,7 +3,6 @@
 namespace Tests\Feature\Api\V1\Admin;
 
 use App\Enums\TokenAbilityEnum;
-use App\Models\CaseCategory;
 use App\Models\CharityCase;
 use App\Models\User;
 use Database\Seeders\LaratrustSeeder;
@@ -45,7 +44,6 @@ class CharityCaseTest extends TestCase
             'full_name' => 'Mona Ahmed Hassan',
             'national_id' => '29001011234567',
             'phone' => '01012345678',
-            'category_id' => CaseCategory::factory()->create()->id,
             'volunteer_id' => User::factory()->volunteer()->create()->id,
         ], $overrides);
     }
@@ -59,7 +57,7 @@ class CharityCaseTest extends TestCase
     }
 
     #[Test]
-    public function admin_lists_cases_with_their_category(): void
+    public function admin_lists_cases_with_their_volunteer(): void
     {
         CharityCase::factory()->count(2)->create();
         $this->actingAsAdmin(['charity_cases.index']);
@@ -67,7 +65,7 @@ class CharityCaseTest extends TestCase
         $this->getJson(route('api.v1.admin.charity_cases.index'))
             ->assertOk()
             ->assertJsonCount(2, 'data.data')
-            ->assertJsonStructure(['data' => ['data' => [['id', 'full_name', 'national_id', 'phone', 'category' => ['id', 'name']]], 'permissions']]);
+            ->assertJsonStructure(['data' => ['data' => [['id', 'full_name', 'national_id', 'phone', 'volunteer' => ['id', 'full_name']]], 'permissions']]);
     }
 
     #[Test]
@@ -95,16 +93,15 @@ class CharityCaseTest extends TestCase
     }
 
     #[Test]
-    public function form_options_list_categories_and_active_volunteers(): void
+    public function form_options_list_only_active_volunteers(): void
     {
-        CaseCategory::factory()->create();
         User::factory()->volunteer()->create();
         User::factory()->volunteer()->inactive()->create();
         $this->actingAsAdmin(['charity_cases.store']);
 
         $this->getJson(route('api.v1.admin.charity_cases.form-options'))
             ->assertOk()
-            ->assertJsonCount(1, 'data.categories')
+            ->assertJsonMissingPath('data.categories')
             ->assertJsonCount(1, 'data.volunteers');
     }
 

@@ -1,6 +1,6 @@
 {{--
-    The new-assistance form's behaviour:
-    - the beneficiary select searches profiles by name, national ID or phone;
+    The new-assistance form's behaviour (the beneficiary select itself is set
+    up by beneficiary-js):
     - choosing a type shows (and enables) only that type's fields, so the
       other type's fields are never submitted;
     - a live summary shows the installments that will be generated, mirroring
@@ -11,7 +11,6 @@
 <script>
     $(function () {
         const strings = {
-            placeholder: @json(__('Search by name, national ID or phone.')),
             oneTime: @json(__('1 installment of :amount :currency, due on :date.')),
             recurring: @json(__(':count monthly installments × :amount :currency = :total :currency, from :start to :end (on the 1st of each month).')),
             endBeforeStart: @json(__('The end month must be the start month or later.')),
@@ -23,19 +22,8 @@
         const maxInstallments = {{ (int) $maxInstallments }};
         const locale = document.documentElement.lang || undefined;
 
-        // Beneficiary select
+        // The beneficiary select (set up by beneficiary-js), for the quick-create dialog below.
         const $beneficiary = $('#beneficiary-select');
-        $beneficiary.select2({
-            width: '100%',
-            placeholder: strings.placeholder,
-            ajax: {
-                url: @json(route('admin.charity_cases.lookup')),
-                dataType: 'json',
-                delay: 250,
-                data: (params) => ({ search: params.term || '' }),
-                processResults: (data) => data,
-            },
-        });
 
         // Type switch
         const form = document.querySelector('form.assistance-form');

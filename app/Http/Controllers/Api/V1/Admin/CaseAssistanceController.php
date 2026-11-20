@@ -35,7 +35,7 @@ class CaseAssistanceController extends ApiHomeController
     public function index(CaseAssistanceFilterRequest $request): JsonResponse
     {
         $query = CaseAssistance::query()
-            ->with('charityCase.category')
+            ->with(['charityCase', 'category'])
             ->withInstallmentSummary()
             ->filter($request->validated());
 
@@ -52,14 +52,20 @@ class CaseAssistanceController extends ApiHomeController
     /** The types and categories the assistance form and list filter offer. */
     public function formOptions(): JsonResponse
     {
+        $categories = CaseCategory::options();
+
         return $this->successResponse([
             'types' => array_map(
                 fn (AssistanceTypeEnum $type): array => ['value' => $type->value, 'label' => $type->label()],
                 AssistanceTypeEnum::cases(),
             ),
-            'categories' => CaseCategory::query()->orderBy('id')->get()
-                ->map(fn (CaseCategory $category): array => ['value' => $category->id, 'label' => $category->nameLang()])
-                ->all(),
+            'categories' => array_map(
+                fn (int $id, string $label): array => ['value' => $id, 'label' => $label],
+                array_keys($categories),
+                $categories,
+            ),
+            'min_due_at' => today()->toDateString(),
+            'min_month' => today()->format('Y-m'),
             'default_installments' => CaseAssistanceService::DEFAULT_INSTALLMENTS,
             'max_installments' => CaseAssistanceService::MAX_INSTALLMENTS,
             'currency' => settings()->get('currency', 'EGP'),
@@ -110,7 +116,8 @@ class CaseAssistanceController extends ApiHomeController
     private function loadDetails(CaseAssistance $assistance): CaseAssistance
     {
         return $assistance->load([
-            'charityCase.category',
+            'charityCase',
+            'category',
             'installments' => fn ($query) => $query->orderBy('due_at'),
         ]);
     }

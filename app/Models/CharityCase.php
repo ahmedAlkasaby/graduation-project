@@ -18,14 +18,9 @@ class CharityCase extends SiteModelSoftDelete
 
     protected $table = 'charity_cases';
 
-    protected $fillable = ['full_name', 'national_id', 'phone', 'category_id', 'volunteer_id'];
+    protected $fillable = ['full_name', 'national_id', 'phone', 'volunteer_id'];
 
     protected $searchable = ['full_name', 'national_id', 'phone'];
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(CaseCategory::class, 'category_id');
-    }
 
     /** A soft deleted volunteer is still shown on the cases they followed. */
     public function volunteer(): BelongsTo

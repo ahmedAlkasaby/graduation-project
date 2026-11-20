@@ -14,7 +14,7 @@
     $menuGroups = [
         'administration' => ['user', 'role', 'permission'],
         'locations' => ['city', 'region'],
-        'case_management' => ['charity_case', 'case_assistance'],
+        'case_management' => ['case_category', 'charity_case', 'case_assistance'],
     ];
     $activeClass = $class ?? null;
     $openGroup = fn (string $group) => in_array($activeClass, $menuGroups[$group] ?? [], true);
@@ -114,7 +114,7 @@
         @endif
 
         {{-- Case management: beneficiary profiles and their assistances --}}
-        @if (auth()->user()->can('charity_cases.index') || auth()->user()->can('case_assistances.index'))
+        @if (auth()->user()->can('case_categories.index') || auth()->user()->can('charity_cases.index') || auth()->user()->can('case_assistances.index'))
             <li class="menu-item @if ($openGroup('case_management')) active open @endif">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-heart-handshake"></i>
@@ -132,6 +132,13 @@
                         <li class="menu-item @if ($activeClass == 'charity_case') active @endif">
                             <a href="{{ route('admin.charity_cases.index') }}" class="menu-link">
                                 <div>{{ __('Shared Cases') }}</div>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('case_categories.index')
+                        <li class="menu-item @if ($activeClass == 'case_category') active @endif">
+                            <a href="{{ route('admin.case_categories.index') }}" class="menu-link">
+                                <div>{{ __('Case Categories') }}</div>
                             </a>
                         </li>
                     @endcan
