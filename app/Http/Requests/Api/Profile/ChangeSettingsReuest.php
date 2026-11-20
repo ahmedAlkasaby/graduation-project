@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Api\Profile;
 
 use App\Http\Requests\Api\BaseRequest;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
 class ChangeSettingsReuest extends BaseRequest
 {
@@ -18,7 +18,7 @@ class ChangeSettingsReuest extends BaseRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -28,7 +28,6 @@ class ChangeSettingsReuest extends BaseRequest
             'is_offer' => 'required|in:0,1',
         ];
     }
-
     public function messages(): array
     {
         return [

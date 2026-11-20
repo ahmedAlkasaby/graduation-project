@@ -21,23 +21,21 @@ use Illuminate\Support\Facades\Log;
 class TwilioSmsService implements SmsServiceInterface
 {
     protected string $accountSid;
-
     protected string $authToken;
-
     protected string $fromNumber;
 
     public function __construct()
     {
         $this->accountSid = (string) config('twilio.account_sid');
-        $this->authToken = (string) config('twilio.auth_token');
+        $this->authToken  = (string) config('twilio.auth_token');
         $this->fromNumber = (string) config('twilio.from_number');
     }
 
     public function send(string $mobile, string $message): SmsResponseDTO
     {
         // Twilio requires E.164 format (+<country_code><number>)
-        if (! str_starts_with($mobile, '+')) {
-            $mobile = '+'.$mobile;
+        if (!str_starts_with($mobile, '+')) {
+            $mobile = '+' . $mobile;
         }
 
         $url = "https://api.twilio.com/2010-04-01/Accounts/{$this->accountSid}/Messages.json";
@@ -48,7 +46,7 @@ class TwilioSmsService implements SmsServiceInterface
                 ->timeout(15)
                 ->retry(2, 500)
                 ->post($url, [
-                    'To' => $mobile,
+                    'To'   => $mobile,
                     'From' => $this->fromNumber,
                     'Body' => $message,
                 ]);
@@ -56,7 +54,7 @@ class TwilioSmsService implements SmsServiceInterface
             if ($response->successful()) {
                 Log::channel('sms')->info('Twilio SMS sent', [
                     'mobile' => $mobile,
-                    'sid' => $response->json('sid'),
+                    'sid'    => $response->json('sid'),
                 ]);
 
                 return SmsResponseDTO::success(
@@ -85,7 +83,7 @@ class TwilioSmsService implements SmsServiceInterface
             if ($errorCode === 21211 || $errorCode === 21614) {
                 Log::channel('sms')->warning('Twilio invalid number', [
                     'mobile' => $mobile,
-                    'code' => $errorCode,
+                    'code'   => $errorCode,
                 ]);
 
                 throw new SmsInvalidNumberException(
@@ -98,11 +96,11 @@ class TwilioSmsService implements SmsServiceInterface
 
             Log::channel('sms')->error('Twilio provider error', [
                 'status' => $response->status(),
-                'body' => $response->body(),
+                'body'   => $response->body(),
             ]);
 
             throw new SmsProviderException(
-                'Twilio returned an error: '.$response->json('message', $response->body()),
+                'Twilio returned an error: ' . $response->json('message', $response->body()),
                 $this->getProviderKey(),
                 $response->status(),
                 ['response' => $response->json()]
@@ -111,7 +109,7 @@ class TwilioSmsService implements SmsServiceInterface
         } catch (ConnectionException $e) {
             Log::channel('sms')->critical('Twilio network failure', [
                 'mobile' => $mobile,
-                'error' => $e->getMessage(),
+                'error'  => $e->getMessage(),
             ]);
 
             throw new SmsNetworkException(

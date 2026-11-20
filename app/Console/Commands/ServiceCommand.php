@@ -3,13 +3,12 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class ServiceCommand extends Command
 {
     protected $signature = 'make:service {name}';
-
     protected $description = 'Create a new service class';
 
     public function handle()
@@ -20,14 +19,14 @@ class ServiceCommand extends Command
         $className = array_pop($parts);
         $subPath = implode('/', $parts);
 
-        $dirPath = app_path('Services'.($subPath ? '/'.$subPath : ''));
-        $path = $dirPath.'/'.$className.'.php';
+        $dirPath = app_path('Services' . ($subPath ? '/' . $subPath : ''));
+        $path = $dirPath . '/' . $className . '.php';
 
-        if (! File::isDirectory($dirPath)) {
+        if (!File::isDirectory($dirPath)) {
             File::makeDirectory($dirPath, 0755, true);
         }
 
-        $namespace = 'App\\Services'.($subPath ? '\\'.implode('\\', $parts) : '');
+        $namespace = 'App\\Services' . ($subPath ? '\\' . implode('\\', $parts) : '');
 
         $stub = <<<EOT
 <?php

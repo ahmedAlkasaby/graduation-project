@@ -4,24 +4,25 @@
  * Names the admin panel needs to route and label itself: which route prefix a
  * user type belongs under, and what to call a database table on screen.
  */
-function getRouteName($route_type = '')
+
+function getRouteName($route_type = "")
 {
-    $array = [
+    $array = array(
         'admin' => 'admin',
         'client' => 'client',
         'employee' => 'employee',
         'facilty' => 'facilty',
-    ];
+    );
     if (isset($array[$route_type])) {
         return $array[$route_type];
     } else {
-        return 'admin';
+        return "admin";
     }
 }
 
 function getModuleTableModelName($type)
 {
-    $array = [
+    $array = array(
         'activity_logs' => 'Activity Log',
         'additions' => 'Addition',
         'actions' => 'Action',
@@ -64,7 +65,7 @@ function getModuleTableModelName($type)
         'statistics' => 'Statistics',
         'order' => 'Order',
         'admin' => 'Admin',
-    ];
+    );
     if (isset($array[$type])) {
         return $array[$type];
     } else {
@@ -72,15 +73,15 @@ function getModuleTableModelName($type)
     }
 }
 
-function notificationModelName($type = '')
+function notificationModelName($type = "")
 {
-    $array = [
-        'admin' => 'AdminNotification',
-        'orders' => 'OrderNotification',
-    ];
+    $array = array(
+        'admin' => "AdminNotification",
+        'orders' => "OrderNotification",
+    );
     if (isset($array[$type])) {
         return $array[$type];
     } else {
-        return $array['admin'];
+        return $array["admin"];
     }
 }

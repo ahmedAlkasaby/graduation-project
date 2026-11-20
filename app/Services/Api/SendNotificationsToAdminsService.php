@@ -8,6 +8,7 @@ use App\Notifications\AdminNotification;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Notification;
 
+
 class SendNotificationsToAdminsService
 {
     public function __construct(
@@ -26,9 +27,11 @@ class SendNotificationsToAdminsService
             );
         }
 
+
         if (! $sendPushNotification || settings()->get('ssl_certificate') !== 'yes') {
             return;
         }
+
 
         foreach ($this->userRepository->getAdminNotifiableIds() as $adminId) {
             SendAdminPushNotification::dispatch((int) $adminId, $notification);

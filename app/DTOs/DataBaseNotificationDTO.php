@@ -1,20 +1,18 @@
 <?php
-
 namespace App\DTOs;
-
 class DataBaseNotificationDTO
 {
     public function __construct(
         public array $title,
         public array $message,
-        public string $type = 'admin',
-        public ?int $model_id = null,
-        public ?string $model = null,
-        public ?string $status = null,
-        public ?string $image = null,
+        public string $type='admin',
+        public ?int $model_id=null,
+        public ?string $model=null,
+        public ?string $status=null,
+        public ?string  $image=null,  
     ) {}
 
-    public function toArray(): array
+      public function toArray(): array
     {
         return [
             'title' => $this->title,
@@ -26,4 +24,7 @@ class DataBaseNotificationDTO
             'image' => $this->image,
         ];
     }
+
+   
+    
 }

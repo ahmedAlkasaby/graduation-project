@@ -13,7 +13,7 @@
     </tr>
 </thead>
 <tbody>
-@forelse ($data as $model)
+@foreach ($data as $model)
     <tr>
         <td class="fw-medium">{{ $model->titleLang($admin_language) }}</td>
         <td>
@@ -44,9 +44,5 @@
             ])
         </td>
     </tr>
-@empty
-    <tr>
-        <td colspan="10" class="text-center text-muted py-4">{{ __('No assistances found') }}</td>
-    </tr>
-@endforelse
+@endforeach
 </tbody>

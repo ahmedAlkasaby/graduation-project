@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class ImageResource extends MainResource
 {
@@ -15,7 +16,7 @@ class ImageResource extends MainResource
     {
         return [
             'id' => $this->id,
-            'image' => $this->image,
+            'image' => $this->image
         ];
     }
 }

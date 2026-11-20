@@ -3,9 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class PasswordResetSuccessNotification extends Notification implements ShouldQueue
 {
@@ -36,7 +36,7 @@ class PasswordResetSuccessNotification extends Notification implements ShouldQue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return MailMessage
+     * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
     {
@@ -45,7 +45,7 @@ class PasswordResetSuccessNotification extends Notification implements ShouldQue
         //             ->action('Notification Action', url('/'))
         //             ->line('Thank you for using our application!');
         return (new MailMessage)
-            ->subject(__('Reset Password'))
+        ->subject(__('Reset Password'))
             ->line(__('You are changed your password succeful.'))
             ->line(__('If you did change password, no further action is required.'))
             ->line(__('If you did not change password, protect your account.'));

@@ -17,15 +17,13 @@ class SettingRepository
             ->pluck('value', 'key')
             ->toArray();
     }
-
     public function checkOptions(string $option): string
     {
         $option_value = 0;
         $get_option_value = $this->getValue($option);
-        if ($get_option_value == 'yes') {
+        if ($get_option_value == "yes") {
             $option_value = 1;
-        }
-
+        } 
         return $option_value;
 
     }

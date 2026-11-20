@@ -3,13 +3,12 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class ActionCommand extends Command
 {
     protected $signature = 'make:action {name}';
-
     protected $description = 'Create a new action class';
 
     public function handle()
@@ -20,18 +19,18 @@ class ActionCommand extends Command
         $className = array_pop($parts);
         $subPath = implode('/', $parts);
 
-        $dirPath = app_path('Actions'.($subPath ? '/'.$subPath : ''));
-        $path = $dirPath.'/'.$className.'.php';
+        $dirPath = app_path('Actions' . ($subPath ? '/' . $subPath : ''));
+        $path = $dirPath . '/' . $className . '.php';
 
-        if (! File::isDirectory($dirPath)) {
+        if (!File::isDirectory($dirPath)) {
             File::makeDirectory($dirPath, 0755, true);
         }
 
-        $namespace = 'App\\Actions'.($subPath ? '\\'.implode('\\', $parts) : '');
+        $namespace = 'App\\Actions' . ($subPath ? '\\' . implode('\\', $parts) : '');
 
         // Base itself has nothing to extend.
         $isBase = $namespace === 'App\Actions\Base';
-        $import = $isBase ? '' : 'use App\Actions\Base\BaseAction;'.PHP_EOL.PHP_EOL;
+        $import = $isBase ? '' : 'use App\Actions\Base\BaseAction;' . PHP_EOL . PHP_EOL;
         $parent = $isBase ? '' : ' extends BaseAction';
 
         $stub = <<<EOT

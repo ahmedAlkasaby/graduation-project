@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiHomeController;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 
+
 class ApiController extends ApiHomeController
 {
     public function settings(Request $request)

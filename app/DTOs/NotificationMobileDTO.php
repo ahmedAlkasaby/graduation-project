@@ -2,9 +2,9 @@
 
 namespace App\DTOs;
 
-readonly class NotificationMobileDTO
+readonly class NotificationMobileDTO    
 {
-    public function __construct(
+     public function __construct(
         public int $badge = 1,
         public string $sound = 'default',
         public string $screen = 'screenA',
@@ -36,4 +36,8 @@ readonly class NotificationMobileDTO
             contentAvailable: $this->contentAvailable
         );
     }
+
+
+
+  
 }

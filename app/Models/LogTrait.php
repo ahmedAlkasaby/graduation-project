@@ -9,3 +9,4 @@ trait LogTrait
         return $this->morphMany(Log::class, 'loggable');
     }
 }
+

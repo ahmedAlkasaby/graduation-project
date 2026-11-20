@@ -43,6 +43,7 @@ class UserAction extends BaseAction
         $user->update(['password' => $newPassword]);
     }
 
+
     public function executeDeleteUser(User $authUser, int $id): void
     {
         if (in_array($id, $this->access_all_id) || in_array($authUser->id, $this->access_all_id)) {

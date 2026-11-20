@@ -9,3 +9,4 @@ trait AttachmentTrait
         return $this->morphMany(Attachment::class, 'attachmentable');
     }
 }
+

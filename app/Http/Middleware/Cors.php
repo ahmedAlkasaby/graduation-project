@@ -11,15 +11,14 @@ class Cors
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): (Response)  $next
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $request->headers->set('Access-Control-Allow-Origin', '*');
-        $request->headers->set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE');
-        $request->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Application');
-
-        //    $request->headers->set('Access-Control-Allow-Credentials',' true');
+       $request->headers->set('Access-Control-Allow-Origin', '*');
+       $request->headers->set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE');
+       $request->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Application');
+    //    $request->headers->set('Access-Control-Allow-Credentials',' true');
         return $next($request);
     }
 }

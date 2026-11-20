@@ -2,22 +2,21 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Http\Request;
+use App\Http\Resources\MainResource;
 
 class SettingLiteResource extends MainResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  Request  $request
-     * @return array|Arrayable|\JsonSerializable
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
         return [
-            'key' => $this->key,
-            'value' => $this->value,
+            'key'        => $this->key,
+            'value'      => $this->value,
         ];
     }
 }

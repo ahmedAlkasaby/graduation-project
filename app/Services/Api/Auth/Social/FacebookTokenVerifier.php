@@ -6,6 +6,7 @@ use App\Contracts\SocialTokenVerifierInterface;
 use App\DTOs\SocialUserDTO;
 use Illuminate\Support\Facades\Http;
 
+
 class FacebookTokenVerifier implements SocialTokenVerifierInterface
 {
     public function verify(string $token): ?SocialUserDTO

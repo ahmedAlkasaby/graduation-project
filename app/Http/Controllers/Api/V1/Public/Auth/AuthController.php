@@ -81,6 +81,7 @@ class AuthController extends ApiHomeController
         return $this->successResponse();
     }
 
+   
     public function refresh(Request $request): JsonResponse
     {
         $user = $request->user();

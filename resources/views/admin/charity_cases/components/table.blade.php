@@ -10,7 +10,7 @@
     </tr>
 </thead>
 <tbody>
-@forelse ($data as $model)
+@foreach ($data as $model)
     <tr>
         <td>
             <div class="fw-medium">{{ $model->full_name }}</div>
@@ -28,9 +28,5 @@
             ])
         </td>
     </tr>
-@empty
-    <tr>
-        <td colspan="7" class="text-center text-muted py-4">{{ __('No cases found') }}</td>
-    </tr>
-@endforelse
+@endforeach
 </tbody>

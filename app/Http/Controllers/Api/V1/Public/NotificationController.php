@@ -7,16 +7,16 @@ use App\Http\Resources\NotificationCollection;
 use App\Http\Resources\NotificationResource;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends ApiHomeController
 {
-    public function index(Request $request)
+     public function index(Request $request)
     {
         try {
             $readAll = (bool) $request->input('read_all', 0);
             $readOnly = (bool) $request->input('read_only', 0);
+
 
             $notifications = DatabaseNotification::latest()
                 ->where('notifiable_id', $this->authUserID())
@@ -46,7 +46,7 @@ class NotificationController extends ApiHomeController
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
@@ -58,7 +58,7 @@ class NotificationController extends ApiHomeController
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
@@ -67,7 +67,6 @@ class NotificationController extends ApiHomeController
             $this->authUser()->notifications->where('id', $id)->markAsRead();
             $notification = DatabaseNotification::where('id', $id)->where('notifiable_id', $this->authUserID())->where('notifiable_type', 'users')->first();
             $data = ['notification' => new NotificationResource($notification)];
-
             return $this->successResponse($data);
         } else {
             return $this->errorResponse();
@@ -78,7 +77,7 @@ class NotificationController extends ApiHomeController
      * Update the specified resource in storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
@@ -94,7 +93,7 @@ class NotificationController extends ApiHomeController
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {

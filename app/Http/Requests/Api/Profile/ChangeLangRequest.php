@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Api\Profile;
 
 use App\Http\Requests\Api\BaseRequest;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
 class ChangeLangRequest extends BaseRequest
 {
@@ -18,7 +18,7 @@ class ChangeLangRequest extends BaseRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -26,12 +26,11 @@ class ChangeLangRequest extends BaseRequest
             'locale' => 'required|in:ar,en',
         ];
     }
-
     public function messages(): array
     {
         return [
             'locale.required' => __('The locale field is required.'),
             'locale.in' => __('The locale must be ar or en.'),
         ];
-    }
+    }   
 }

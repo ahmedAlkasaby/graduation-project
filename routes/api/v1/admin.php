@@ -47,25 +47,23 @@ Route::get('permissions', [PermissionController::class, 'index'])
     ->name('permissions.index')
     ->permission('roles.index');
 
-Route::get('charity-cases/form-options', [CharityCaseController::class, 'formOptions'])
+Route::get('charity_cases/form-options', [CharityCaseController::class, 'formOptions'])
     ->name('charity_cases.form-options')
     ->permission('charity_cases.store', 'charity_cases.update');
-Route::get('charity-cases/lookup', [CharityCaseController::class, 'lookup'])
+Route::get('charity_cases/lookup', [CharityCaseController::class, 'lookup'])
     ->name('charity_cases.lookup')
     ->permission('case_assistances.index', 'case_assistances.store');
-Route::apiResource('charity-cases', CharityCaseController::class)
+Route::apiResource('charity_cases', CharityCaseController::class)
     ->except('destroy')
-    ->names('charity_cases')
-    ->parameters(['charity-cases' => 'charityCase']);
+    ->parameters(['charity_cases' => 'charityCase']);
 
-Route::get('case-assistances/form-options', [CaseAssistanceController::class, 'formOptions'])
+Route::get('case_assistances/form-options', [CaseAssistanceController::class, 'formOptions'])
     ->name('case_assistances.form-options')
     ->permission('case_assistances.index', 'case_assistances.store');
-Route::patch('case-assistances/{caseAssistance}/status', [CaseAssistanceController::class, 'status'])->name('case_assistances.status');
-Route::patch('case-assistances/{caseAssistance}/installments/{installment}/cancel', [CaseAssistanceController::class, 'cancelInstallment'])
+Route::patch('case_assistances/{caseAssistance}/status', [CaseAssistanceController::class, 'status'])->name('case_assistances.status');
+Route::patch('case_assistances/{caseAssistance}/installments/{installment}/cancel', [CaseAssistanceController::class, 'cancelInstallment'])
     ->name('case_assistances.cancel_installment')
     ->scopeBindings();
-Route::apiResource('case-assistances', CaseAssistanceController::class)
+Route::apiResource('case_assistances', CaseAssistanceController::class)
     ->except('destroy')
-    ->names('case_assistances')
-    ->parameters(['case-assistances' => 'caseAssistance']);
+    ->parameters(['case_assistances' => 'caseAssistance']);

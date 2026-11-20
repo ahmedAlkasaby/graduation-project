@@ -58,6 +58,7 @@ class UserCodeService
         return $this->pending(type: $type, code: $code, phone: $phone, email: $email);
     }
 
+    
     public function attachToUser(UserCode $userCode, int $userId): void
     {
         $userCode->update([
@@ -66,11 +67,13 @@ class UserCodeService
         ]);
     }
 
+    
     public function expire(UserCode $userCode): void
     {
         $userCode->update(['code_expire' => now()]);
     }
 
+   
     public function issueForUser(User $user, UserCodeTypeEnum $type): string
     {
         UserCode::query()->pendingForUser($user->id, $type)->update(['code_expire' => now()]);
@@ -85,6 +88,7 @@ class UserCodeService
         ])->code;
     }
 
+   
     public function pendingForUser(User $user, UserCodeTypeEnum $type, ?string $code = null): ?UserCode
     {
         return UserCode::query()
