@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\CaseAssistanceController;
+use App\Http\Controllers\Admin\CharityCaseController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LoginAdminController;
@@ -58,6 +60,26 @@ Route::prefix('admin')->as('admin.')->group(function () {
             Route::resource('users', UserController::class);
 
             Route::resource('roles', RoleController::class);
+
+            // Case management: beneficiary profiles and the assistances paid out to them.
+            Route::get('charity-cases/lookup', [CharityCaseController::class, 'lookup'])
+                ->name('charity_cases.lookup')
+                ->permission('case_assistances.index', 'case_assistances.store');
+            Route::get('charity-cases/duplicates', [CharityCaseController::class, 'duplicates'])
+                ->name('charity_cases.duplicates')
+                ->permission('charity_cases.store', 'charity_cases.update');
+            Route::resource('charity-cases', CharityCaseController::class)
+                ->except('destroy')
+                ->names('charity_cases')
+                ->parameters(['charity-cases' => 'charityCase']);
+
+            Route::patch('case-assistances/{caseAssistance}/installments/{installment}/cancel', [CaseAssistanceController::class, 'cancelInstallment'])
+                ->name('case_assistances.cancel_installment')
+                ->scopeBindings();
+            Route::resource('case-assistances', CaseAssistanceController::class)
+                ->except('destroy')
+                ->names('case_assistances')
+                ->parameters(['case-assistances' => 'caseAssistance']);
 
             Route::get('permissions', [PermissionController::class, 'index'])
                 ->name('permissions.index')

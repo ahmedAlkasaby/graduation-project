@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             LaratrustSeeder::class,
             AdminUserSeeder::class,
             SettingSeeder::class,
+            CaseCategorySeeder::class,
         ]);
 
         if (! app()->isProduction()) {

@@ -28,6 +28,8 @@ return [
         'resources' => [
             'cities' => $crud,
             'regions' => $crud,
+            'charity_cases' => ['index', 'show', 'store', 'update'],
+            'case_assistances' => ['index', 'show', 'store', 'update', 'cancel_installment'],
             'roles' => ['index', 'show', 'store', 'update', 'destroy'],
             'users' => [...$crud, 'restore'],
             'activity_logs' => ['index'],
@@ -57,6 +59,7 @@ return [
         'status' => 'status',
         'destroy' => 'delete',
         'restore' => 'restore',
+        'cancel_installment' => 'cancel installment',
     ],
 
     'roles_structure' => [

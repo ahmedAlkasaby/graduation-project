@@ -1,0 +1,40 @@
+<thead class="border-top">
+    <tr>
+        <th>{{ __('Title') }}</th>
+        <th>{{ __('Beneficiary') }}</th>
+        <th>{{ __('Category') }}</th>
+        <th>{{ __('Type') }}</th>
+        <th>{{ __('Amount') }}</th>
+        <th>{{ __('Installments') }}</th>
+        <th>{{ __('Next Due') }}</th>
+        <th>{{ __('Status') }}</th>
+        <th>{{ __('Setting') }}</th>
+    </tr>
+</thead>
+<tbody>
+@forelse ($data as $model)
+    <tr>
+        <td class="fw-medium">{{ $model->titleLang($admin_language) }}</td>
+        <td>
+            <div>{{ $model->charityCase?->full_name }}</div>
+            <small class="text-muted">{{ $model->charityCase?->national_id ?? $model->charityCase?->phone }}</small>
+        </td>
+        <td><span class="badge bg-label-info">{{ $model->charityCase?->category?->nameLang($admin_language) }}</span></td>
+        <td>@include('admin.case_assistances.components.type-badge', ['assistance' => $model])</td>
+        <td>@include('admin.case_assistances.components.amount', ['assistance' => $model])</td>
+        <td>{{ $model->paid_installments_count }} / {{ $model->installments_count }} {{ __('paid') }}</td>
+        <td>@include('admin.case_assistances.components.next-due', ['assistance' => $model])</td>
+        <td><span class="badge bg-label-{{ $model->status()->color() }}">{{ $model->status()->label() }}</span></td>
+        <td>
+            @include('admin.layouts.forms.dropdowns.dropdown', [
+                'show' => true,
+                'showEdit' => true,
+            ])
+        </td>
+    </tr>
+@empty
+    <tr>
+        <td colspan="9" class="text-center text-muted py-4">{{ __('No assistances found') }}</td>
+    </tr>
+@endforelse
+</tbody>

@@ -14,6 +14,7 @@
     $menuGroups = [
         'administration' => ['user', 'role', 'permission'],
         'locations' => ['city', 'region'],
+        'case_management' => ['charity_case', 'case_assistance'],
     ];
     $activeClass = $class ?? null;
     $openGroup = fn (string $group) => in_array($activeClass, $menuGroups[$group] ?? [], true);
@@ -105,6 +106,32 @@
                         <li class="menu-item @if ($activeClass == 'region') active @endif">
                             <a href="{{ route('admin.regions.index') }}" class="menu-link">
                                 <div>{{ __('Regions') }}</div>
+                            </a>
+                        </li>
+                    @endcan
+                </ul>
+            </li>
+        @endif
+
+        {{-- Case management: beneficiary profiles and their assistances --}}
+        @if (auth()->user()->can('charity_cases.index') || auth()->user()->can('case_assistances.index'))
+            <li class="menu-item @if ($openGroup('case_management')) active open @endif">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons ti ti-heart-handshake"></i>
+                    <div>{{ __('Case Management') }}</div>
+                </a>
+                <ul class="menu-sub">
+                    @can('case_assistances.index')
+                        <li class="menu-item @if ($activeClass == 'case_assistance') active @endif">
+                            <a href="{{ route('admin.case_assistances.index') }}" class="menu-link">
+                                <div>{{ __('Assistances') }}</div>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('charity_cases.index')
+                        <li class="menu-item @if ($activeClass == 'charity_case') active @endif">
+                            <a href="{{ route('admin.charity_cases.index') }}" class="menu-link">
+                                <div>{{ __('Shared Cases') }}</div>
                             </a>
                         </li>
                     @endcan
