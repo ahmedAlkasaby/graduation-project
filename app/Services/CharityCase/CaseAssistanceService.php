@@ -21,8 +21,8 @@ use Illuminate\Validation\ValidationException;
  *
  * The schedule is generated once, in the same transaction as the assistance,
  * and never regenerated: amounts, type and installment dates are fixed. After
- * creation only the title and description change, and a pending installment
- * can be cancelled. Nothing here records a payment.
+ * creation only the title, description, order and status change, and a
+ * pending installment can be cancelled. Nothing here records a payment.
  */
 class CaseAssistanceService
 {
@@ -32,7 +32,7 @@ class CaseAssistanceService
     public const MAX_INSTALLMENTS = 120;
 
     /** What may change after creation. */
-    public const EDITABLE = ['title', 'description'];
+    public const EDITABLE = ['title', 'description', 'order_id', 'active'];
 
     /**
      * @param  array<string, mixed>  $data  validated CaseAssistanceRequest data
@@ -48,6 +48,8 @@ class CaseAssistanceService
                 'assistance_type' => $type,
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
+                'order_id' => $data['order_id'] ?? 1,
+                'active' => $data['active'],
                 'requested_amount' => $type === AssistanceTypeEnum::OneTime ? $amount : null,
                 'amount_per_period' => $type === AssistanceTypeEnum::Recurring ? $amount : null,
                 'created_by' => $creator->id,
@@ -96,7 +98,7 @@ class CaseAssistanceService
     }
 
     /**
-     * Only the descriptive fields: the financial setup and the schedule are
+     * Only the descriptive fields and the visibility: the financial setup and the schedule are
      * fixed, whatever else the data holds.
      *
      * @param  array<string, mixed>  $data  validated CaseAssistanceUpdateRequest data
@@ -113,9 +115,9 @@ class CaseAssistanceService
      * The row is locked first, so a payment recorded at the same moment can
      * never end up on a cancelled installment.
      */
-    public function cancelInstallment(AssistanceInstallment $installment, ?string $notes): AssistanceInstallment
+    public function cancelInstallment(AssistanceInstallment $installment, ?string $notes, User $cancelledBy): AssistanceInstallment
     {
-        return DB::transaction(function () use ($installment, $notes): AssistanceInstallment {
+        return DB::transaction(function () use ($installment, $notes, $cancelledBy): AssistanceInstallment {
             $locked = AssistanceInstallment::query()->lockForUpdate()->findOrFail($installment->id);
 
             if (! $locked->isPending()) {
@@ -124,7 +126,11 @@ class CaseAssistanceService
                 ]);
             }
 
-            $locked->forceFill(['cancelled_at' => now(), 'notes' => $notes])->save();
+            $locked->forceFill([
+                'cancelled_at' => now(),
+                'cancelled_by' => $cancelledBy->id,
+                'notes' => $notes,
+            ])->save();
 
             return $locked;
         });

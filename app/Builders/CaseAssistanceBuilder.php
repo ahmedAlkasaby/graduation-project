@@ -27,7 +27,7 @@ class CaseAssistanceBuilder extends BaseBuilder
                 fn (Builder $case) => $case->where('category_id', $categoryId),
             ))
             ->when($filters['assistance_type'] ?? null, fn (Builder $query, $type) => $query->where('assistance_type', $type))
-            ->latest('id');
+            ->defaultOrder();
     }
 
     /** Installment counts and the next unpaid due date, for list rows. */

@@ -4,7 +4,6 @@ namespace App\Enums;
 
 use App\Enums\Concerns\HasOptions;
 
-
 enum UserCodeTypeEnum: string
 {
     use HasOptions;

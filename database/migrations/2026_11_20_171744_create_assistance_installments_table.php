@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * One due amount of an assistance. Its state is read from two timestamps:
- * both NULL = not yet paid, `paid_at` = paid (set later by the payments
- * module), `cancelled_at` = cancelled. Never both, which MySQL enforces with
- * a CHECK constraint; the model enforces it on every driver.
+ * both NULL = not yet paid, `paid_at` (+ `paid_by`) = paid, set later by the
+ * payments module, `cancelled_at` (+ `cancelled_by`) = cancelled. Never both,
+ * which MySQL enforces with a CHECK constraint; the model enforces it on
+ * every driver.
  */
 return new class extends Migration
 {
@@ -21,9 +22,12 @@ return new class extends Migration
             $table->date('due_at');
             $table->decimal('amount', 12, 2);
             $table->timestamp('paid_at')->nullable();
+            $table->foreignId('paid_by')->nullable()->constrained('users')->restrictOnDelete();
             $table->timestamp('cancelled_at')->nullable();
+            $table->foreignId('cancelled_by')->nullable()->constrained('users')->restrictOnDelete();
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['case_assistance_id', 'due_at'], 'uq_installments_assistance_due');
             $table->index('due_at', 'idx_installments_due_at');

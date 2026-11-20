@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Api\Profile;
 
 use App\Http\Requests\Api\BaseRequest;
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class ChangePasswordRequest extends BaseRequest
 {
@@ -18,7 +18,7 @@ class ChangePasswordRequest extends BaseRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -27,5 +27,4 @@ class ChangePasswordRequest extends BaseRequest
             'password' => 'required|min:8|same:confirm_password|different:password_old',
         ];
     }
-    
 }

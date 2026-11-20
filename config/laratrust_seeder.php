@@ -29,7 +29,7 @@ return [
             'cities' => $crud,
             'regions' => $crud,
             'charity_cases' => ['index', 'show', 'store', 'update'],
-            'case_assistances' => ['index', 'show', 'store', 'update', 'cancel_installment'],
+            'case_assistances' => ['index', 'show', 'store', 'update', 'status', 'cancel_installment'],
             'roles' => ['index', 'show', 'store', 'update', 'destroy'],
             'users' => [...$crud, 'restore'],
             'activity_logs' => ['index'],

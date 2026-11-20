@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class BuilderCommand extends Command
 {
@@ -20,8 +20,8 @@ class BuilderCommand extends Command
         $className = array_pop($parts);
         $subPath = implode('/', $parts);
 
-        $dirPath = app_path('Builders' . ($subPath ? '/' . $subPath : ''));
-        $path = $dirPath . '/' . $className . '.php';
+        $dirPath = app_path('Builders'.($subPath ? '/'.$subPath : ''));
+        $path = $dirPath.'/'.$className.'.php';
 
         if (File::exists($path)) {
             $this->error("Builder {$className} already exists.");
@@ -33,7 +33,7 @@ class BuilderCommand extends Command
             File::makeDirectory($dirPath, 0755, true);
         }
 
-        $namespace = 'App\\Builders' . ($subPath ? '\\' . implode('\\', $parts) : '');
+        $namespace = 'App\\Builders'.($subPath ? '\\'.implode('\\', $parts) : '');
         $model = Str::replaceLast('Builder', '', $className);
 
         $stub = <<<EOT
@@ -55,9 +55,9 @@ class BuilderCommand extends Command
         $this->info("Builder {$className} created successfully.");
         $this->line("Wire it up in App\\Models\\{$model}:");
         $this->line("    public function newEloquentBuilder(\$query): {$className}");
-        $this->line("    {");
+        $this->line('    {');
         $this->line("        return new {$className}(\$query);");
-        $this->line("    }");
+        $this->line('    }');
 
         return self::SUCCESS;
     }

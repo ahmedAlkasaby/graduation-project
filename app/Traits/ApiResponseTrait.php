@@ -2,20 +2,18 @@
 
 namespace App\Traits;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use App\Exceptions\SmsException;
 use App\Exceptions\UserFacingException;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
 
-
 trait ApiResponseTrait
 {
     use AdminHelperTrait, HelperTrait;
-
 
     protected function authUser($guard = null)
     {
@@ -41,7 +39,6 @@ trait ApiResponseTrait
         return (string) $this->authUser($guard)?->type;
     }
 
-
     // -------------------------------------------------------------------------
     // Responses
     // -------------------------------------------------------------------------
@@ -62,7 +59,6 @@ trait ApiResponseTrait
             'message' => $message,
         ], $statusCode);
     }
-
 
     protected function failedResponse(Throwable $e, ?string $fallback = null, $statusCode = Response::HTTP_BAD_REQUEST)
     {
@@ -86,8 +82,6 @@ trait ApiResponseTrait
         ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
-
-
     protected function resourceResponse(JsonResource $resource, $data_with = null, $statusCode = Response::HTTP_OK)
     {
         $data = ['data' => $resource];
@@ -99,7 +93,6 @@ trait ApiResponseTrait
         return $this->successResponse($data, 'Success', $statusCode);
     }
 
-   
     protected function collectionResponse(
         ResourceCollection $collection,
         $data_with = null,
@@ -156,7 +149,6 @@ trait ApiResponseTrait
     {
         return ['status' => $this->errorStatus, 'message' => $message];
     }
-
 
     protected function getSettingApi(): array
     {

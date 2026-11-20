@@ -63,17 +63,6 @@ class CharityCaseController extends ApiHomeController
         return $this->successResponse(['cases' => CharityCaseResource::collection($cases)]);
     }
 
-    /**
-     * Profiles the one being typed may duplicate. Only `national_id` blocks
-     * saving; `phone` and `similar_names` are warnings.
-     */
-    public function duplicates(CharityCaseLookupRequest $request): JsonResponse
-    {
-        $matches = $this->charityCaseService->duplicates($request->validated(), $request->validated('ignore_id'));
-
-        return $this->successResponse(array_map(fn ($cases) => CharityCaseResource::collection($cases), $matches));
-    }
-
     public function store(CharityCaseRequest $request): JsonResponse
     {
         $charityCase = $this->charityCaseService->create($request->validated());

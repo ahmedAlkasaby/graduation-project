@@ -35,12 +35,14 @@ class CaseAssistanceRequest extends FormRequest
         $amount = ['nullable', 'numeric', 'gt:0', 'decimal:0,2', 'max:9999999999.99'];
 
         return [
-            'case_id' => ['required', 'integer', 'exists:charity_cases,id'],
+            'case_id' => ['required', 'integer', Rule::exists('charity_cases', 'id')->whereNull('deleted_at')],
             'assistance_type' => ['required', Rule::enum(AssistanceTypeEnum::class)],
             'title' => ['required', 'array'],
             'title.en' => ['required', 'string', 'max:255'],
             'title.ar' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
+            'order_id' => ['nullable', 'integer', 'min:1', 'max:127'],
+            'active' => ['required', 'boolean'],
 
             'requested_amount' => ["required_if:assistance_type,{$oneTime}", "prohibited_unless:assistance_type,{$oneTime}", ...$amount],
             'due_at' => ["required_if:assistance_type,{$oneTime}", "prohibited_unless:assistance_type,{$oneTime}", 'nullable', 'date_format:Y-m-d'],

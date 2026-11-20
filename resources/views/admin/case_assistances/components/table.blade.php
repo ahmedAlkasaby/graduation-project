@@ -8,6 +8,7 @@
         <th>{{ __('Installments') }}</th>
         <th>{{ __('Next Due') }}</th>
         <th>{{ __('Status') }}</th>
+        <th>{{ __('Active') }}</th>
         <th>{{ __('Setting') }}</th>
     </tr>
 </thead>
@@ -26,6 +27,17 @@
         <td>@include('admin.case_assistances.components.next-due', ['assistance' => $model])</td>
         <td><span class="badge bg-label-{{ $model->status()->color() }}">{{ $model->status()->label() }}</span></td>
         <td>
+            @can('case_assistances.status')
+                @include('admin.layouts.tables.status', [
+                    'active' => $model->active,
+                    'ajax_class' => $model->getTable() . '-status',
+                    'id' => $model->id,
+                ])
+            @else
+                {{ statusName((int) $model->active) }}
+            @endcan
+        </td>
+        <td>
             @include('admin.layouts.forms.dropdowns.dropdown', [
                 'show' => true,
                 'showEdit' => true,
@@ -34,7 +46,7 @@
     </tr>
 @empty
     <tr>
-        <td colspan="9" class="text-center text-muted py-4">{{ __('No assistances found') }}</td>
+        <td colspan="10" class="text-center text-muted py-4">{{ __('No assistances found') }}</td>
     </tr>
 @endforelse
 </tbody>

@@ -10,6 +10,3 @@
     @include('admin.charity_cases.components.form')
     @include('admin.layouts.forms.close')
 @stop
-@section('after_foot')
-    @include('admin.charity_cases.components.duplicate-js')
-@stop

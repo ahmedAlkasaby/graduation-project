@@ -15,7 +15,9 @@ class AssistanceInstallmentResource extends MainResource
             'status' => $this->status()->value,
             'status_label' => $this->status()->label(),
             'paid_at' => $this->paid_at?->timezone(config('app.timezone'))->toDateTimeString(),
+            'paid_by' => $this->paid_by,
             'cancelled_at' => $this->cancelled_at?->timezone(config('app.timezone'))->toDateTimeString(),
+            'cancelled_by' => $this->cancelled_by,
             'notes' => $this->notes,
         ];
     }

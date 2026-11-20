@@ -7,7 +7,7 @@
 <div class="modal fade" id="quick-case-modal" tabindex="-1" aria-labelledby="quick-case-title" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            {{ html()->form('POST', route('admin.charity_cases.store'))->id('quick-case-form')->attributes(['data-duplicate-check' => '', 'data-ignore-id' => '', 'novalidate' => true])->open() }}
+            {{ html()->form('POST', route('admin.charity_cases.store'))->id('quick-case-form')->attribute('novalidate', true)->open() }}
                 <div class="modal-header">
                     <h5 class="modal-title" id="quick-case-title">{{ __('New Beneficiary') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>

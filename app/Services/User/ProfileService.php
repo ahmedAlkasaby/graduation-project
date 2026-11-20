@@ -6,7 +6,7 @@ use App\Models\User;
 
 class ProfileService
 {
-    public function updateProfile(User $user,array $input, $primaryLogin)
+    public function updateProfile(User $user, array $input, $primaryLogin)
     {
         if ($primaryLogin === 'email') {
             unset($input['email']);
@@ -23,9 +23,10 @@ class ProfileService
         return $user;
     }
 
-    public function updatePhone(User $user,string $phone)
+    public function updatePhone(User $user, string $phone)
     {
         $user->update(['phone' => $phone]);
+
         return $user;
     }
 }

@@ -11,7 +11,10 @@ return new class extends Migration
         Schema::create('case_categories', function (Blueprint $table) {
             $table->id();
             $table->mediumText('name');
+            $table->tinyInteger('order_id')->default(1);
+            $table->tinyInteger('active')->default(1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

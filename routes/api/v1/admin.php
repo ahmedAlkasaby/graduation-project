@@ -53,9 +53,6 @@ Route::get('charity-cases/form-options', [CharityCaseController::class, 'formOpt
 Route::get('charity-cases/lookup', [CharityCaseController::class, 'lookup'])
     ->name('charity_cases.lookup')
     ->permission('case_assistances.index', 'case_assistances.store');
-Route::get('charity-cases/duplicates', [CharityCaseController::class, 'duplicates'])
-    ->name('charity_cases.duplicates')
-    ->permission('charity_cases.store', 'charity_cases.update');
 Route::apiResource('charity-cases', CharityCaseController::class)
     ->except('destroy')
     ->names('charity_cases')
@@ -64,6 +61,7 @@ Route::apiResource('charity-cases', CharityCaseController::class)
 Route::get('case-assistances/form-options', [CaseAssistanceController::class, 'formOptions'])
     ->name('case_assistances.form-options')
     ->permission('case_assistances.index', 'case_assistances.store');
+Route::patch('case-assistances/{caseAssistance}/status', [CaseAssistanceController::class, 'status'])->name('case_assistances.status');
 Route::patch('case-assistances/{caseAssistance}/installments/{installment}/cancel', [CaseAssistanceController::class, 'cancelInstallment'])
     ->name('case_assistances.cancel_installment')
     ->scopeBindings();

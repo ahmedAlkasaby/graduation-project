@@ -15,6 +15,7 @@ use App\Models\CharityCase;
 use App\Services\CharityCase\CaseAssistanceService;
 use App\Services\CharityCase\CharityCaseService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -124,12 +125,24 @@ class CaseAssistanceController extends AdminController
         return redirect()->route('admin.case_assistances.show', $caseAssistance)->with('success', __('Updated successfully'));
     }
 
+    /** Flips the assistance between active and inactive. Only its visibility changes. */
+    public function status(Request $request, CaseAssistance $caseAssistance): JsonResponse|RedirectResponse
+    {
+        $caseAssistance->update(['active' => ! $caseAssistance->active]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'active' => (bool) $caseAssistance->active]);
+        }
+
+        return back()->with('success', __('Updated successfully'));
+    }
+
     public function cancelInstallment(
         CancelInstallmentRequest $request,
         CaseAssistance $caseAssistance,
         AssistanceInstallment $installment,
     ): RedirectResponse {
-        $this->assistanceService->cancelInstallment($installment, $request->validated('notes'));
+        $this->assistanceService->cancelInstallment($installment, $request->validated('notes'), $this->admin());
 
         return redirect()->route('admin.case_assistances.show', $caseAssistance)->with('success', __('Installment cancelled'));
     }

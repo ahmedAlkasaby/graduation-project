@@ -2,15 +2,16 @@
 
 namespace App\Http\Resources;
 
-
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
 
 class SettingCollection extends MainResourceCollection
 {
     /**
      * Transform the resource collection into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param  Request  $request
+     * @return array|Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {

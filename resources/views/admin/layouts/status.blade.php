@@ -8,6 +8,7 @@
             'users': "{{ route('admin.users.status', ':id') }}",
             'cities': "{{ route('admin.cities.status', ':id') }}",
             'regions': "{{ route('admin.regions.status', ':id') }}",
+            'case_assistances': "{{ route('admin.case_assistances.status', ':id') }}",
         };
 
         $.each(statusRoutes, function(table, url) {

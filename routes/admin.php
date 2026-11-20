@@ -65,14 +65,12 @@ Route::prefix('admin')->as('admin.')->group(function () {
             Route::get('charity-cases/lookup', [CharityCaseController::class, 'lookup'])
                 ->name('charity_cases.lookup')
                 ->permission('case_assistances.index', 'case_assistances.store');
-            Route::get('charity-cases/duplicates', [CharityCaseController::class, 'duplicates'])
-                ->name('charity_cases.duplicates')
-                ->permission('charity_cases.store', 'charity_cases.update');
             Route::resource('charity-cases', CharityCaseController::class)
                 ->except('destroy')
                 ->names('charity_cases')
                 ->parameters(['charity-cases' => 'charityCase']);
 
+            Route::patch('case-assistances/{caseAssistance}/status', [CaseAssistanceController::class, 'status'])->name('case_assistances.status');
             Route::patch('case-assistances/{caseAssistance}/installments/{installment}/cancel', [CaseAssistanceController::class, 'cancelInstallment'])
                 ->name('case_assistances.cancel_installment')
                 ->scopeBindings();

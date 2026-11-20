@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class ImageHandlerService
@@ -33,7 +34,7 @@ class ImageHandlerService
     }
 
     /** Store an uploaded image file and return its public path. */
-    public function storeFile(\Illuminate\Http\UploadedFile $file, string $folder, int $width = 800, int $height = 600): string
+    public function storeFile(UploadedFile $file, string $folder, int $width = 800, int $height = 600): string
     {
         $folder = $this->normaliseFolder($folder);
 
@@ -45,7 +46,7 @@ class ImageHandlerService
     }
 
     /** Store a raw file (svg, documents) without any processing. */
-    public function storeRaw(\Illuminate\Http\UploadedFile $file, string $folder): string
+    public function storeRaw(UploadedFile $file, string $folder): string
     {
         $folder = $this->normaliseFolder($folder);
 
@@ -73,7 +74,7 @@ class ImageHandlerService
         int $height = 600,
         string $fileName = 'image'
     ): ?string {
-        if (!$request->hasFile($fileName)) {
+        if (! $request->hasFile($fileName)) {
             return null;
         }
 
@@ -81,7 +82,7 @@ class ImageHandlerService
 
         $extension = $file->getClientOriginalExtension();
 
-        $imageName = uniqid() . '_' . time() . '.' . $extension;
+        $imageName = uniqid().'_'.time().'.'.$extension;
 
         $path = $this->disk()->putFileAs(
             $folder,
@@ -95,7 +96,7 @@ class ImageHandlerService
 
     public function deleteImage(array|string|null $path): void
     {
-        if (!$path) {
+        if (! $path) {
             return;
         }
 
@@ -112,13 +113,13 @@ class ImageHandlerService
 
     protected function deleteSingleImage(?string $imagePath): void
     {
-        if (!$imagePath) {
+        if (! $imagePath) {
             return;
         }
 
         $path = $this->extractStoragePath($imagePath);
 
-        if (!$path) {
+        if (! $path) {
             return;
         }
 
@@ -137,7 +138,7 @@ class ImageHandlerService
     ): ?string {
         $currentImage = $model->$field ?? null;
 
-        if (!$request->hasFile($field)) {
+        if (! $request->hasFile($field)) {
             return $currentImage;
         }
 
@@ -164,7 +165,7 @@ class ImageHandlerService
 
         if (
             $request->input("{$field}_removed") == '1'
-            && !$request->hasFile($field)
+            && ! $request->hasFile($field)
         ) {
             $this->deleteImage($currentImage);
 
@@ -200,7 +201,7 @@ class ImageHandlerService
             ->toArray();
 
         foreach ($existingModels as $model) {
-            if (!in_array($model->$column, $attachments)) {
+            if (! in_array($model->$column, $attachments)) {
                 $this->deleteImage($model->$column);
 
                 $model->forceDelete();
@@ -208,7 +209,7 @@ class ImageHandlerService
         }
 
         foreach ($attachments as $path) {
-            if (!in_array($path, $existingPaths)) {
+            if (! in_array($path, $existingPaths)) {
                 $relation->create([
                     $column => $path,
                 ]);
@@ -221,14 +222,14 @@ class ImageHandlerService
         string $folder,
         string $field
     ): ?array {
-        if (!$request->hasFile($field)) {
+        if (! $request->hasFile($field)) {
             return null;
         }
 
         $uploadedFiles = [];
 
         foreach ($request->file($field) as $file) {
-            $fileName = uniqid() . '_' . time() . '.' .
+            $fileName = uniqid().'_'.time().'.'.
                 $file->getClientOriginalExtension();
 
             $path = $this->disk()->putFileAs(
@@ -250,7 +251,7 @@ class ImageHandlerService
         string $field,
         ?array $existingFiles = null
     ): ?array {
-        if (!$request->hasFile($field)) {
+        if (! $request->hasFile($field)) {
             return $existingFiles;
         }
 
@@ -270,10 +271,10 @@ class ImageHandlerService
         $path = ltrim($path, '/');
 
         if (str_starts_with($path, 'uploads/')) {
-            return '/' . $path;
+            return '/'.$path;
         }
 
-        return '/uploads/' . $path;
+        return '/uploads/'.$path;
     }
 
     protected function extractStoragePath(string $url): string

@@ -46,6 +46,7 @@ class CharityCaseTest extends TestCase
             'national_id' => '29001011234567',
             'phone' => '01012345678',
             'category_id' => CaseCategory::factory()->create()->id,
+            'volunteer_id' => User::factory()->volunteer()->create()->id,
         ], $overrides);
     }
 

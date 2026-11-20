@@ -21,14 +21,16 @@ use Illuminate\Support\Facades\Log;
 class VonageSmsService implements SmsServiceInterface
 {
     protected string $apiKey;
+
     protected string $apiSecret;
+
     protected string $fromName;
 
     public function __construct()
     {
-        $this->apiKey    = (string) config('vonage.api_key');
+        $this->apiKey = (string) config('vonage.api_key');
         $this->apiSecret = (string) config('vonage.api_secret');
-        $this->fromName  = (string) config('vonage.from_name');
+        $this->fromName = (string) config('vonage.from_name');
     }
 
     public function send(string $mobile, string $message): SmsResponseDTO
@@ -38,21 +40,21 @@ class VonageSmsService implements SmsServiceInterface
                 ->timeout(15)
                 ->retry(2, 500)
                 ->post('https://rest.nexmo.com/sms/json', [
-                    'api_key'    => $this->apiKey,
+                    'api_key' => $this->apiKey,
                     'api_secret' => $this->apiSecret,
-                    'from'       => $this->fromName,
-                    'to'         => $mobile,
-                    'text'       => $message,
+                    'from' => $this->fromName,
+                    'to' => $mobile,
+                    'text' => $message,
                 ]);
 
             if ($response->successful()) {
                 $messages = $response->json('messages.0', []);
-                $status   = $messages['status'] ?? '99';
+                $status = $messages['status'] ?? '99';
 
                 // Vonage uses status "0" for success
                 if ($status === '0') {
                     Log::channel('sms')->info('Vonage SMS sent', [
-                        'mobile'     => $mobile,
+                        'mobile' => $mobile,
                         'message_id' => $messages['message-id'] ?? null,
                     ]);
 
@@ -70,7 +72,7 @@ class VonageSmsService implements SmsServiceInterface
                     ]);
 
                     throw new SmsAuthenticationException(
-                        'Vonage authentication failed: ' . ($messages['error-text'] ?? ''),
+                        'Vonage authentication failed: '.($messages['error-text'] ?? ''),
                         $this->getProviderKey(),
                         401
                     );
@@ -83,7 +85,7 @@ class VonageSmsService implements SmsServiceInterface
                     ]);
 
                     throw new SmsInvalidNumberException(
-                        'Invalid number for Vonage: ' . ($messages['error-text'] ?? ''),
+                        'Invalid number for Vonage: '.($messages['error-text'] ?? ''),
                         $this->getProviderKey(),
                         422,
                         ['mobile' => $mobile]
@@ -92,12 +94,12 @@ class VonageSmsService implements SmsServiceInterface
 
                 // Any other Vonage error
                 Log::channel('sms')->error('Vonage provider error', [
-                    'status'     => $status,
+                    'status' => $status,
                     'error_text' => $messages['error-text'] ?? '',
                 ]);
 
                 throw new SmsProviderException(
-                    'Vonage error: ' . ($messages['error-text'] ?? 'Unknown error'),
+                    'Vonage error: '.($messages['error-text'] ?? 'Unknown error'),
                     $this->getProviderKey(),
                     (int) $status,
                     ['response' => $messages]
@@ -106,11 +108,11 @@ class VonageSmsService implements SmsServiceInterface
 
             Log::channel('sms')->error('Vonage HTTP error', [
                 'status' => $response->status(),
-                'body'   => $response->body(),
+                'body' => $response->body(),
             ]);
 
             throw new SmsProviderException(
-                'Vonage HTTP error: ' . $response->status(),
+                'Vonage HTTP error: '.$response->status(),
                 $this->getProviderKey(),
                 $response->status()
             );
@@ -118,7 +120,7 @@ class VonageSmsService implements SmsServiceInterface
         } catch (ConnectionException $e) {
             Log::channel('sms')->critical('Vonage network failure', [
                 'mobile' => $mobile,
-                'error'  => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
 
             throw new SmsNetworkException(

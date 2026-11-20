@@ -11,9 +11,7 @@ class Permission extends LaratrustPermission
         'name', 'display_name', 'description',
     ];
 
-
     public const ROUTE_MAP_CACHE_KEY = 'permissions:route-map';
-
 
     protected static ?array $routeMap = null;
 
@@ -24,12 +22,10 @@ class Permission extends LaratrustPermission
         static::deleted(fn () => static::forgetRouteMap());
     }
 
-
     public static function nameForRoute(string $route): ?string
     {
         return static::routeMap()[$route] ?? null;
     }
-
 
     public static function forRoute(string $route): ?self
     {
@@ -37,7 +33,6 @@ class Permission extends LaratrustPermission
 
         return $name === null ? null : static::query()->where('name', $name)->first();
     }
-
 
     public static function routeMap(): array
     {

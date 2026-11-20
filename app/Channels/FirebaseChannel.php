@@ -10,7 +10,6 @@ use Kreait\Firebase\Messaging;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification as FirebaseNotification;
 
-
 class FirebaseChannel
 {
     protected Messaging $messaging;
@@ -29,7 +28,7 @@ class FirebaseChannel
 
     /**
      * @param  array<int, string>  $tokens
-     * @return int  tokens the message was accepted for
+     * @return int tokens the message was accepted for
      */
     public function send(array $tokens, NotificationMobileDTO $dto, DataBaseNotificationDTO $content): int
     {
@@ -65,7 +64,6 @@ class FirebaseChannel
 
         return $report->successes()->count();
     }
-
 
     protected function line(array|string|null $value): string
     {

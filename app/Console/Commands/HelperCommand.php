@@ -3,12 +3,13 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class HelperCommand extends Command
 {
     protected $signature = 'make:helper {name}';
+
     protected $description = 'Create a new helper class';
 
     public function handle()
@@ -19,16 +20,16 @@ class HelperCommand extends Command
         $className = array_pop($parts);
         $subPath = implode('/', $parts);
 
-        $dirPath = app_path('Helpers' . ($subPath ? '/' . $subPath : ''));
-        $path = $dirPath . '/' . $className . '.php';
+        $dirPath = app_path('Helpers'.($subPath ? '/'.$subPath : ''));
+        $path = $dirPath.'/'.$className.'.php';
 
-        if (!File::isDirectory($dirPath)) {
+        if (! File::isDirectory($dirPath)) {
             File::makeDirectory($dirPath, 0755, true);
         }
 
-        $namespace = 'App\\Helpers' . ($subPath ? '\\' . implode('\\', $parts) : '');
+        $namespace = 'App\\Helpers'.($subPath ? '\\'.implode('\\', $parts) : '');
 
-        $stub = <<<EOT
+        $stub = <<<'EOT'
 <?php
 
 

@@ -13,7 +13,6 @@
 @section('after_foot')
     @if ($canQuickCreateCase)
         @include('admin.case_assistances.components.quick-case-modal')
-        @include('admin.charity_cases.components.duplicate-js')
     @endif
     @include('admin.case_assistances.components.form-js')
 @stop

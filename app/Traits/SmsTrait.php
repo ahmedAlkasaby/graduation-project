@@ -3,17 +3,17 @@
 namespace App\Traits;
 
 use App\Models\Sms;
-use Carbon\Carbon;
 
 trait SmsTrait
 {
     public function formatMessage($otp)
     {
-        $message = $otp . ' ' . ('your verification code to') . ' ' . config('app.name');
-        return $message;    
+        $message = $otp.' '.('your verification code to').' '.config('app.name');
+
+        return $message;
     }
 
-    public function sendSms($phoneSms, $msg, $code = "20")
+    public function sendSms($phoneSms, $msg, $code = '20')
     {
         $key = Sms::where(['active' => 1])->first()->key ?? null;
         $phone = prefixPhoneWithCountryCode($phoneSms, $code);
@@ -47,7 +47,7 @@ trait SmsTrait
 
     public function jawaly($phone, $msg)
     {
-        $data = SMS::where(['key' => '4jawaly'])->first();
+        $data = Sms::where(['key' => '4jawaly'])->first();
         $username = $data->user_name;
         $password = $data->password;
         $text = urlencode($msg);
@@ -59,7 +59,7 @@ trait SmsTrait
 
     public function gateway($phone, $msg)
     {
-        $data = SMS::where(['key' => 'gateway'])->first();
+        $data = Sms::where(['key' => 'gateway'])->first();
         $username = $data->user_name;
         $password = $data->password;
         $uid = $data->uid;
@@ -69,7 +69,7 @@ trait SmsTrait
             $phone = implode(',', $phone);
         }
         // $url    = "www.sms.gateway.sa/api/sendsms.php?username=$username&password=$password&message=$text&numbers=$phone&sender=$sender&unicode=e&Rmduplicated=1&return=string";
-        $url = "http://rest.gateway.sa/api/SendSMS?api_id=" . $username . "&api_password=" . $password . "&sms_type=T&encoding=T&sender_id=" . $sender . "&phonenumber=$phone&textmessage=$text&uid=" . $uid;
+        $url = 'http://rest.gateway.sa/api/SendSMS?api_id='.$username.'&api_password='.$password.'&sms_type=T&encoding=T&sender_id='.$sender."&phonenumber=$phone&textmessage=$text&uid=".$uid;
         $result = file_get_contents($url, true);
         // $contextPostValues = http_build_query(array(
         //   'user'     => $username,
@@ -103,7 +103,7 @@ trait SmsTrait
     public function hisms($phone, $msg)
     {
 
-        $data = SMS::where(['key' => 'hisms'])->first();
+        $data = Sms::where(['key' => 'hisms'])->first();
         $username = $data->user_name;
         $password = $data->password;
         $sender = urlencode($data->sender_name);
@@ -111,7 +111,7 @@ trait SmsTrait
 
         $url = "https://www.hisms.ws/api.php?send_sms&username=$username&password=$password&numbers=$phone&sender=$sender&message=$msg";
         $result = file_get_contents($url, true);
-        if (false === $result) {
+        if ($result === false) {
             return false;
         } else {
             return true;
@@ -120,18 +120,18 @@ trait SmsTrait
 
     public function msegat($phone, $msg)
     {
-        $data = SMS::where(['key' => 'msegat'])->first();
+        $data = Sms::where(['key' => 'msegat'])->first();
         $username = $data->user_name;
         $password = $data->password;
         $sender = $data->sender_name;
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, "https://www.msegat.com/gw/sendsms.php");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HEADER, TRUE);
+        curl_setopt($ch, CURLOPT_URL, 'https://www.msegat.com/gw/sendsms.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
 
-        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POST, true);
 
         $fields = <<<EOT
         {
@@ -144,9 +144,9 @@ trait SmsTrait
         EOT;
         curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Content-Type: application/json",
-        ));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+        ]);
 
         $response = curl_exec($ch);
         $info = curl_getinfo($ch);
@@ -157,45 +157,45 @@ trait SmsTrait
 
     public function oursms($phone, $msg)
     {
-        $data = SMS::where(['key' => 'oursms'])->first();
+        $data = Sms::where(['key' => 'oursms'])->first();
         $username = $data->user_name;
         $password = $data->password;
         $sender = $data->sender_name;
 
         $text = urlencode($msg);
-        $to = '+' . $phone;
+        $to = '+'.$phone;
         // auth call
-        //$url = "http://www.oursms.net/api/sendsms.php?username=$user&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=full";
-        //لارجاع القيمه json
+        // $url = "http://www.oursms.net/api/sendsms.php?username=$user&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=full";
+        // لارجاع القيمه json
         $url = "http://www.oursms.net/api/sendsms.php?username=$username&password=$password&numbers=$to&message=$text&sender=$sender&unicode=E&return=json";
         // لارجاع القيمه xml
-        //$url = "http://www.oursms.net/api/sendsms.php?username=$user&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=xml";
+        // $url = "http://www.oursms.net/api/sendsms.php?username=$user&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=xml";
         // لارجاع القيمه string
-        //$url = "http://www.oursms.net/api/sendsms.php?username=$user&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E";
+        // $url = "http://www.oursms.net/api/sendsms.php?username=$user&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E";
 
         // Call API and get return message
-        //fopen($url,"r");
-        //return $url;
+        // fopen($url,"r");
+        // return $url;
         $ret = file_get_contents($url);
     }
 
     public function unifonic($phone, $msg)
     {
-        $data = SMS::where(['key' => 'unifonic'])->first();
+        $data = Sms::where(['key' => 'unifonic'])->first();
         $sender = $data->sender_name;
         $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL            => 'https://el.cloud.unifonic.com/rest/SMS/Messages/Send',
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://el.cloud.unifonic.com/rest/SMS/Messages/Send',
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING       => '',
-            CURLOPT_MAXREDIRS      => 10,
-            CURLOPT_TIMEOUT        => 0,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST  => 'POST',
-            CURLOPT_POSTFIELDS     => array('AppSid' => 'VMjM7E6Z6U4vO5pz728wLc9vCMHAEa', 'Recipient' => $phone, 'SenderID' => $sender, 'Body' => $msg),
-        ));
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => ['AppSid' => 'VMjM7E6Z6U4vO5pz728wLc9vCMHAEa', 'Recipient' => $phone, 'SenderID' => $sender, 'Body' => $msg],
+        ]);
 
         $response = curl_exec($curl);
 
@@ -214,21 +214,20 @@ trait SmsTrait
         }
     }
 
-
     //  public function unifonic($phone, $msg) {
     //    $data     = SMS::where(['key' => 'unifonic'])->first();
-    ////    $username = urlencode($data->user_name);
+    // //    $username = urlencode($data->user_name);
     //    $username = $data->user_name;
-    ////    $password = urlencode($data->password);
+    // //    $password = urlencode($data->password);
     //    $password = $data->password;
-    ////    $sender  = urlencode($data->sender_name);
+    // //    $sender  = urlencode($data->sender_name);
     //    $sender  = $data->sender_name;
     //    $numbers = is_array($phone)? implode(',', $phone) : $phone;
     //    $text    = urlencode($msg);
-    ////    $url     = "http://api.unifonic.com/wrapper/sendSMS.php?userid=$username&password=$password&msg=$text&sender=$sender&to=$numbers&encoding=UTF8";
-    ////    $url     = "https://basic.unifonic.com/rest/SMS/Messages/Send?userid=$username&password=$password&msg=$text&sender=$sender&to=$numbers&encoding=UTF8";
-    ////    $url     = "https://el.cloud.unifonic.com/rest/SMS/Messages/Send?userid=$username&password=$password&msg=$text&sender=$sender&to=$numbers&encoding=UTF8";
-    ////    $url     = "https://el.cloud.unifonic.com/rest/SMS/Messages/Send?AppSid=VMjM7E6Z6U4vO5pz728wLc9vCMHAEa&Body=$text&SenderID=$sender&Recipient=966502340048&encoding=UTF8";
+    // //    $url     = "http://api.unifonic.com/wrapper/sendSMS.php?userid=$username&password=$password&msg=$text&sender=$sender&to=$numbers&encoding=UTF8";
+    // //    $url     = "https://basic.unifonic.com/rest/SMS/Messages/Send?userid=$username&password=$password&msg=$text&sender=$sender&to=$numbers&encoding=UTF8";
+    // //    $url     = "https://el.cloud.unifonic.com/rest/SMS/Messages/Send?userid=$username&password=$password&msg=$text&sender=$sender&to=$numbers&encoding=UTF8";
+    // //    $url     = "https://el.cloud.unifonic.com/rest/SMS/Messages/Send?AppSid=VMjM7E6Z6U4vO5pz728wLc9vCMHAEa&Body=$text&SenderID=$sender&Recipient=966502340048&encoding=UTF8";
     //    $url     = "https://el.cloud.unifonic.com/rest/SMS/Messages/Send?AppSid=VMjM7E6Z6U4vO5pz728wLc9vCMHAEa&Body=$text&SenderID=$sender&Recipient=$numbers&encoding=UTF8";
     //    $result  = @file_get_contents($url, true);
     //    if (false === $result) {
@@ -240,21 +239,21 @@ trait SmsTrait
 
     public function zain($phone, $msg)
     {
-        $data = SMS::where(['key' => 'zain'])->first();
+        $data = Sms::where(['key' => 'zain'])->first();
         $username = $data->user_name;
         $password = $data->password;
         $sender = $data->sender_name;
 
         $to = $phone; // Should be like 966530007039
-        $text = urlencode($msg . '   ');
+        $text = urlencode($msg.'   ');
 
         $link = "https://www.zain.im/index.php/api/sendsms/?user=$username&pass=$password&to=$to&message=$text&sender=$sender";
 
         if (function_exists('curl_init')) {
             $curl = @curl_init($link);
-            @curl_setopt($curl, CURLOPT_HEADER, FALSE);
-            @curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-            @curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
+            @curl_setopt($curl, CURLOPT_HEADER, false);
+            @curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            @curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
             @curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
             $source = @curl_exec($curl);
             @curl_close($curl);
@@ -270,7 +269,7 @@ trait SmsTrait
 
     public function yamamah($phone, $msg)
     {
-        $data = SMS::where(['key' => 'yamamah'])->first();
+        $data = Sms::where(['key' => 'yamamah'])->first();
         $username = $data->user_name;
         $password = $data->password;
         $sender = $data->sender_name;
@@ -278,29 +277,29 @@ trait SmsTrait
         $url = 'api.yamamah.com/SendSMS';
         $to = $phone; // Should be like 966530007039
         $text = urlencode($msg);
-        $fields = array(
-            "Username"        => $username,
-            "Password"        => $password,
-            "Message"         => $text,
-            "RecepientNumber" => $to, //'00966'.ltrim($numbers,'0'),
-            "ReplacementList" => "",
-            "SendDateTime"    => "0",
-            "EnableDR"        => False,
-            "Tagname"         => $sender,
-            "VariableList"    => "0",
-        );
+        $fields = [
+            'Username' => $username,
+            'Password' => $password,
+            'Message' => $text,
+            'RecepientNumber' => $to, // '00966'.ltrim($numbers,'0'),
+            'ReplacementList' => '',
+            'SendDateTime' => '0',
+            'EnableDR' => false,
+            'Tagname' => $sender,
+            'VariableList' => '0',
+        ];
 
         $fields_string = json_encode($fields);
 
         $ch = curl_init($url);
-        curl_setopt_array($ch, array(
-            CURLOPT_POST           => TRUE,
-            CURLOPT_RETURNTRANSFER => TRUE,
-            CURLOPT_HTTPHEADER     => array(
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-            ),
-            CURLOPT_POSTFIELDS     => $fields_string,
-        ));
+            ],
+            CURLOPT_POSTFIELDS => $fields_string,
+        ]);
         $result = curl_exec($ch);
         curl_close($ch);
     }

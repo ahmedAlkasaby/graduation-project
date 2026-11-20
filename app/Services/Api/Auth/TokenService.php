@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
 
-
 class TokenService
 {
     public function issue(User $user): AuthenticatedUserDTO

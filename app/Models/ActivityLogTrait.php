@@ -9,4 +9,3 @@ trait ActivityLogTrait
         return $this->morphMany(ActivityLog::class, 'activityLoggable');
     }
 }
-

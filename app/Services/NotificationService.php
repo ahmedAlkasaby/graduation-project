@@ -9,7 +9,6 @@ use App\DTOs\NotificationMobileDTO;
 use App\Models\Device;
 use Illuminate\Notifications\DatabaseNotification;
 
-
 class NotificationService
 {
     public function __construct(
@@ -18,7 +17,6 @@ class NotificationService
     ) {
         //
     }
-
 
     public function sendToUsers(
         array $userIds,
@@ -66,7 +64,6 @@ class NotificationService
 
         return $sent;
     }
-
 
     protected function unreadCounts(array $userIds): array
     {

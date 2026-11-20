@@ -6,14 +6,12 @@ use App\Contracts\SmsServiceInterface;
 use App\Services\Sms\SmsManager;
 use Illuminate\Support\ServiceProvider;
 
-
 class SmsServiceProvider extends ServiceProvider
 {
-    
     public function register(): void
     {
         $this->app->singleton(SmsManager::class, function ($app) {
-            return new SmsManager();
+            return new SmsManager;
         });
 
         $this->app->bind(SmsServiceInterface::class, function ($app) {
@@ -21,9 +19,5 @@ class SmsServiceProvider extends ServiceProvider
         });
     }
 
-   
-    public function boot(): void
-    {
-        
-    }
+    public function boot(): void {}
 }

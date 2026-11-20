@@ -2,14 +2,10 @@
 
 namespace App\Http\Requests\Api;
 
-use App\Enums\UserTypeEnum;
-use App\Models\Country;
 use App\Services\AppSettingsService;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Propaganistas\LaravelPhone\Rules\Phone as PhoneRule;
-
 
 abstract class BaseRequest extends FormRequest
 {
@@ -26,11 +22,6 @@ abstract class BaseRequest extends FormRequest
             'errors' => $validator->errors(),
         ], 422));
     }
-
-   
-
-    
-   
 
     protected function prepareForValidation(): void
     {

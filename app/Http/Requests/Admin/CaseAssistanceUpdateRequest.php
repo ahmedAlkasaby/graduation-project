@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Editing an assistance: only its title and description. Everything that
+ * Editing an assistance: only its title, description, order and status. Everything that
  * makes up the financial commitment or the installment schedule is fixed
  * after creation, and sending it is an error, not something silently
  * dropped.
@@ -16,7 +16,7 @@ class CaseAssistanceUpdateRequest extends FormRequest
     public const LOCKED = [
         'case_id', 'assistance_type', 'requested_amount', 'amount_per_period',
         'due_at', 'start_month', 'end_month', 'installments', 'amount',
-        'created_by', 'finished_at', 'cancelled_at',
+        'created_by', 'finished_at', 'cancelled_at', 'cancelled_by', 'paid_at', 'paid_by',
     ];
 
     public function authorize(): bool
@@ -34,6 +34,8 @@ class CaseAssistanceUpdateRequest extends FormRequest
             'title.en' => ['required', 'string', 'max:255'],
             'title.ar' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
+            'order_id' => ['nullable', 'integer', 'min:1', 'max:127'],
+            'active' => ['required', 'boolean'],
         ];
 
         foreach (self::LOCKED as $field) {

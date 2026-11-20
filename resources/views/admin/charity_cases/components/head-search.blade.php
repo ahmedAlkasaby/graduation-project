@@ -1,5 +1,5 @@
 @include('admin.layouts.components.filter.header', [
-    'filterKeys' => ['search', 'category_id', 'volunteer_id', 'limit'],
+    'filterKeys' => ['search', 'category_id', 'volunteer_id'],
 ])
 
     <div class="col-sm-4">
@@ -43,4 +43,4 @@
         </div>
     </div>
 
-@include('admin.layouts.components.filter.footer')
+@include('admin.layouts.components.filter.footer', ['limit_filter' => true])

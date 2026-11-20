@@ -28,4 +28,5 @@
 @stop
 @section('after_foot')
     @include('admin.layouts.filter')
+    @include('admin.layouts.status')
 @stop

@@ -1,4 +1,4 @@
-{{-- The descriptive fields: the only ones an assistance keeps editable. --}}
+{{-- The descriptive fields, order and status: the only ones an assistance keeps editable. --}}
 <div class="card mb-4">
     <div class="card-header">
         <h5 class="card-title mb-0">{{ __('Details') }}</h5>
@@ -28,6 +28,24 @@
                     'text_name' => 'description',
                     'text_value' => $assistance->description ?? null,
                     'rows' => 3,
+                ])
+            </div>
+            <div class="col-sm-6">
+                @include('admin.layouts.forms.fields.number', [
+                    'not_req' => true,
+                    'label' => __('Order ID'),
+                    'number_name' => 'order_id',
+                    'number_value' => $assistance->order_id ?? null,
+                    'min' => 1,
+                    'max' => 127,
+                ])
+            </div>
+            <div class="col-sm-6">
+                @include('admin.layouts.forms.fields.select', [
+                    'label_req' => true,
+                    'label_name' => __('Status'),
+                    'select_name' => 'active',
+                    'select_value' => $assistance->active ?? 1,
                 ])
             </div>
         </div>

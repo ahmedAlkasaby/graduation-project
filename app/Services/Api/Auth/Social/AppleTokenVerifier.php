@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-
 class AppleTokenVerifier implements SocialTokenVerifierInterface
 {
     private const KEYS_URL = 'https://appleid.apple.com/auth/keys';

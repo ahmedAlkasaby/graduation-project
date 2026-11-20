@@ -9,14 +9,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-
 abstract class BaseAction
 {
     protected function withTransaction(Closure $callback): mixed
     {
         return DB::transaction($callback);
     }
-
 
     protected function withoutFailing(string $context, Closure $callback): void
     {

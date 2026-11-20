@@ -13,6 +13,7 @@ use Exception;
 class SmsException extends Exception
 {
     protected string $provider;
+
     protected array $context;
 
     public function __construct(string $message, string $provider = '', int $code = 0, array $context = [], ?Exception $previous = null)

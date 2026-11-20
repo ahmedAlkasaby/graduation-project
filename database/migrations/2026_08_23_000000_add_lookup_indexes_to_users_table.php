@@ -5,10 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-
 return new class extends Migration
 {
-
     protected array $searchable = ['full_name', 'email', 'phone'];
 
     public function up(): void
@@ -45,7 +43,6 @@ return new class extends Migration
             $table->dropIndex(['provider', 'provider_id']);
         });
     }
-
 
     protected function supportsFullText(): bool
     {

@@ -21,9 +21,9 @@ class CaseCategorySeeder extends Seeder
     {
         $existing = CaseCategory::query()->get()->map(fn (CaseCategory $category) => $category->nameLang('en'))->all();
 
-        foreach (self::CATEGORIES as $name) {
+        foreach (self::CATEGORIES as $index => $name) {
             if (! in_array($name['en'], $existing, true)) {
-                CaseCategory::create(['name' => $name]);
+                CaseCategory::create(['name' => $name, 'order_id' => $index + 1, 'active' => 1]);
             }
         }
     }

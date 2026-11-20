@@ -19,6 +19,8 @@ class CaseCategoryFactory extends Factory
 
         return [
             'name' => ['en' => $name, 'ar' => $name],
+            'order_id' => 1,
+            'active' => 1,
         ];
     }
 }

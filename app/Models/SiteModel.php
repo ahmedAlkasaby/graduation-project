@@ -4,6 +4,5 @@ namespace App\Models;
 
 class SiteModel extends SiteModelDefault
 {
-
-    use  LogTrait, ActivityLogTrait, AttachmentTrait;
+    use ActivityLogTrait, AttachmentTrait, LogTrait;
 }

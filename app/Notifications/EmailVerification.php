@@ -3,9 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class EmailVerification extends Notification implements ShouldQueue
 {
@@ -17,6 +17,7 @@ class EmailVerification extends Notification implements ShouldQueue
      * @return void
      */
     protected $otp;
+
     /**
      * Create a new notification instance.
      *
@@ -42,11 +43,10 @@ class EmailVerification extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
-
 
         // return (new MailMessage)
         //             ->line('The introduction to the notification.')

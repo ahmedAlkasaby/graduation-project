@@ -10,13 +10,14 @@ use LogicException;
 /**
  * One due amount of an assistance.
  *
- * `amount` and `due_at` are fixed once generated. `paid_at` and
- * `cancelled_at` are not mass assignable: cancelling goes through
- * CaseAssistanceService, and paying will be recorded by the payments module.
+ * `amount` and `due_at` are fixed once generated. `paid_at` / `paid_by` and
+ * `cancelled_at` / `cancelled_by` are not mass assignable: cancelling goes
+ * through CaseAssistanceService, and paying will be recorded by the payments
+ * module.
  * An installment is never both paid and cancelled, and a paid one is never
  * deleted.
  */
-class AssistanceInstallment extends SiteModel
+class AssistanceInstallment extends SiteModelSoftDelete
 {
     use HasFactory;
 
@@ -66,6 +67,16 @@ class AssistanceInstallment extends SiteModel
     public function assistance(): BelongsTo
     {
         return $this->belongsTo(CaseAssistance::class, 'case_assistance_id');
+    }
+
+    public function payer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'paid_by')->withTrashed();
+    }
+
+    public function canceller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by')->withTrashed();
     }
 
     public function isPaid(): bool

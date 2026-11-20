@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * A beneficiary's profile ("shared case"): who they are, not what they
  * receive. Their support plans are the assistances.
  */
-class CharityCase extends SiteModel
+class CharityCase extends SiteModelSoftDelete
 {
     use HasFactory;
 
@@ -43,10 +43,10 @@ class CharityCase extends SiteModel
         return $this->hasManyThrough(AssistanceInstallment::class, CaseAssistance::class, 'case_id', 'case_assistance_id');
     }
 
-    /** How the beneficiary is shown in a select: name, then national ID or phone. */
+    /** How the beneficiary is shown in a select: name, then national ID. */
     public function selectLabel(): string
     {
-        return trim($this->full_name.' — '.($this->national_id ?? $this->phone ?? ''), ' —');
+        return $this->full_name.' — '.$this->national_id;
     }
 
     public function newEloquentBuilder($query): CharityCaseBuilder

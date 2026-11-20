@@ -50,6 +50,7 @@ class AdminCaseAssistanceTest extends TestCase
             'title' => ['en' => 'Surgery', 'ar' => 'عملية جراحية'],
             'requested_amount' => '5000',
             'due_at' => '2026-12-01',
+            'active' => 1,
         ], $overrides);
     }
 
@@ -64,6 +65,7 @@ class AdminCaseAssistanceTest extends TestCase
             'title' => ['en' => 'Monthly support', 'ar' => 'دعم شهري'],
             'amount_per_period' => '1000',
             'start_month' => '2027-01',
+            'active' => 1,
         ], $overrides);
     }
 
@@ -176,7 +178,7 @@ class AdminCaseAssistanceTest extends TestCase
     }
 
     #[Test]
-    public function editing_changes_only_the_title_and_description(): void
+    public function editing_changes_the_title_description_order_and_status(): void
     {
         $this->signInAdmin(['case_assistances.store', 'case_assistances.update']);
         $assistance = $this->createAssistance($this->oneTime());
@@ -184,11 +186,28 @@ class AdminCaseAssistanceTest extends TestCase
         $this->put(route('admin.case_assistances.update', $assistance), [
             'title' => ['en' => 'Heart surgery', 'ar' => 'عملية قلب'],
             'description' => 'Updated notes',
+            'order_id' => 3,
+            'active' => 0,
         ])->assertRedirect(route('admin.case_assistances.show', $assistance))->assertSessionHasNoErrors();
 
         $assistance->refresh();
         $this->assertSame('Heart surgery', $assistance->titleLang('en'));
         $this->assertSame('Updated notes', $assistance->description);
+        $this->assertSame(3, (int) $assistance->order_id);
+        $this->assertSame(0, (int) $assistance->active);
+        $this->assertSame('5000.00', $assistance->requested_amount);
+    }
+
+    #[Test]
+    public function the_status_switch_flips_only_the_active_flag(): void
+    {
+        $this->signInAdmin(['case_assistances.store', 'case_assistances.status']);
+        $assistance = $this->createAssistance($this->recurring());
+
+        $this->patchJson(route('admin.case_assistances.status', $assistance))->assertOk()->assertJson(['active' => false]);
+
+        $this->assertSame(0, (int) $assistance->fresh()->active);
+        $this->assertSame(12, $assistance->installments()->count());
     }
 
     #[Test]
@@ -248,7 +267,9 @@ class AdminCaseAssistanceTest extends TestCase
 
         $installment->refresh();
         $this->assertNotNull($installment->cancelled_at);
+        $this->assertSame($this->admin->id, $installment->cancelled_by);
         $this->assertNull($installment->paid_at);
+        $this->assertNull($installment->paid_by);
         $this->assertSame('Family travelled', $installment->notes);
         $this->assertSame('1000.00', $installment->amount);
     }
@@ -288,7 +309,7 @@ class AdminCaseAssistanceTest extends TestCase
 
         $this->assertNotEmpty($routes);
         $this->assertEmpty($routes->filter(fn (string $name) => str_contains($name, 'pay')));
-        $this->assertNotContains('paid_at', (new AssistanceInstallment)->getFillable());
+        $this->assertEmpty(array_intersect(['paid_at', 'paid_by'], (new AssistanceInstallment)->getFillable()));
         $this->assertNull(AssistanceInstallment::make(['paid_at' => now()])->paid_at);
     }
 

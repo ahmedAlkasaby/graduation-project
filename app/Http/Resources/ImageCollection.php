@@ -14,7 +14,7 @@ class ImageCollection extends MainResourceCollection
     public function toArray(Request $request): array
     {
         return [
-            'data' => $this->collection
+            'data' => $this->collection,
         ];
     }
 }

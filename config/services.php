@@ -45,7 +45,6 @@ return [
         'client_id' => env('APPLE_CLIENT_ID'),
     ],
 
-
     'firebase' => [
         'credentials' => env('FIREBASE_CREDENTIALS', storage_path('firebase.json')),
     ],

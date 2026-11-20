@@ -30,6 +30,8 @@ class CaseAssistanceFactory extends Factory
             'description' => null,
             'requested_amount' => 5000,
             'amount_per_period' => null,
+            'order_id' => 1,
+            'active' => 1,
             'created_by' => User::factory()->admin(),
         ];
     }

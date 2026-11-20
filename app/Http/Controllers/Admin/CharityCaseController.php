@@ -104,7 +104,7 @@ class CharityCaseController extends AdminController
         return view('admin.charity_cases.edit', [
             'charityCase' => $charityCase,
             'returnTo' => null,
-        ] + $this->charityCaseService->formOptions($charityCase->volunteer_id));
+        ] + $this->charityCaseService->formOptions());
     }
 
     public function update(CharityCaseRequest $request, CharityCase $charityCase): RedirectResponse
@@ -124,22 +124,5 @@ class CharityCaseController extends AdminController
             ]);
 
         return response()->json(['results' => $results]);
-    }
-
-    /** Existing profiles the one being typed may duplicate, for the form's warnings. */
-    public function duplicates(CharityCaseLookupRequest $request): JsonResponse
-    {
-        $matches = $this->charityCaseService->duplicates($request->validated(), $request->validated('ignore_id'));
-
-        return response()->json(array_map(
-            fn ($cases) => $cases->map(fn (CharityCase $charityCase): array => [
-                'id' => $charityCase->id,
-                'full_name' => $charityCase->full_name,
-                'national_id' => $charityCase->national_id,
-                'phone' => $charityCase->phone,
-                'url' => route('admin.charity_cases.show', $charityCase),
-            ])->all(),
-            $matches,
-        ));
     }
 }

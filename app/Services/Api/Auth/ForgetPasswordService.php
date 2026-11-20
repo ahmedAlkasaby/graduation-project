@@ -10,7 +10,6 @@ use App\Notifications\PasswordResetSuccessNotification;
 use App\Traits\ResponseMessageTrait;
 use Illuminate\Support\Facades\DB;
 
-
 class ForgetPasswordService
 {
     use ResponseMessageTrait;
@@ -19,7 +18,6 @@ class ForgetPasswordService
         private UserCodeService $userCodes,
     ) {}
 
-   
     public function sendCode(string $email): void
     {
         $user = User::where('email', $email)->firstOrFail();
@@ -29,7 +27,6 @@ class ForgetPasswordService
         $user->notify(new PasswordResetRequestNotification($code));
     }
 
-    
     public function reset(string $email, string $code, string $password): User
     {
         $user = User::where('email', $email)->firstOrFail();

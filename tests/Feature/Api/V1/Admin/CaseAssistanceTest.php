@@ -27,14 +27,16 @@ class CaseAssistanceTest extends TestCase
     /**
      * @param  list<string>  $permissions
      */
+    private User $admin;
+
     private function actingAsAdmin(array $permissions = []): User
     {
-        $admin = User::factory()->admin()->create();
-        $admin->givePermissions($permissions);
+        $this->admin = User::factory()->admin()->create();
+        $this->admin->givePermissions($permissions);
 
-        Sanctum::actingAs($admin, [TokenAbilityEnum::AccessToken->value]);
+        Sanctum::actingAs($this->admin, [TokenAbilityEnum::AccessToken->value]);
 
-        return $admin;
+        return $this->admin;
     }
 
     private function createRecurring(): CaseAssistance
@@ -45,6 +47,7 @@ class CaseAssistanceTest extends TestCase
             'title' => ['en' => 'Monthly support', 'ar' => 'دعم شهري'],
             'amount_per_period' => '1000',
             'start_month' => '2027-01',
+            'active' => 1,
         ])->assertCreated();
 
         return CaseAssistance::latest('id')->firstOrFail();
@@ -69,6 +72,7 @@ class CaseAssistanceTest extends TestCase
             'title' => ['en' => 'Monthly support', 'ar' => 'دعم شهري'],
             'amount_per_period' => '1000',
             'start_month' => '2027-01',
+            'active' => 1,
         ])
             ->assertCreated()
             ->assertJsonPath('data.assistance.amount_per_period', '1000.00')
@@ -92,6 +96,7 @@ class CaseAssistanceTest extends TestCase
             'requested_amount' => '5000',
             'amount_per_period' => '500',
             'due_at' => '2026-12-01',
+            'active' => 1,
         ])->assertUnprocessable()->assertJsonValidationErrors('amount_per_period');
     }
 
@@ -109,7 +114,7 @@ class CaseAssistanceTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['assistance_type', 'requested_amount']);
 
-        $this->putJson(route('api.v1.admin.case_assistances.update', $assistance), ['title' => $title])
+        $this->putJson(route('api.v1.admin.case_assistances.update', $assistance), ['title' => $title, 'active' => 1])
             ->assertOk()
             ->assertJsonPath('data.assistance.title_translations.en', 'Renamed')
             ->assertJsonPath('data.assistance.amount_per_period', '1000.00')
@@ -127,10 +132,23 @@ class CaseAssistanceTest extends TestCase
         $this->patchJson($url, ['notes' => 'Not needed this month'])
             ->assertOk()
             ->assertJsonPath('data.installment.status', 'cancelled')
+            ->assertJsonPath('data.installment.cancelled_by', $this->admin->id)
             ->assertJsonPath('data.installment.paid_at', null)
             ->assertJsonPath('data.installment.notes', 'Not needed this month');
 
         $this->patchJson($url)->assertUnprocessable()->assertJsonValidationErrors('installment');
+    }
+
+    #[Test]
+    public function status_flips_the_active_flag(): void
+    {
+        $this->actingAsAdmin(['case_assistances.store', 'case_assistances.status']);
+        $assistance = $this->createRecurring();
+
+        $this->patchJson(route('api.v1.admin.case_assistances.status', $assistance))
+            ->assertOk()
+            ->assertJsonPath('data.assistance.active', 0)
+            ->assertJsonCount(12, 'data.assistance.installments');
     }
 
     #[Test]

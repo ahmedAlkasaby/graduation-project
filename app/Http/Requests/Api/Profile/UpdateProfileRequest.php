@@ -1,11 +1,8 @@
 <?php
 
-
 namespace App\Http\Requests\Api\Profile;
 
-use App\Models\Setting;
 use App\Http\Requests\Api\BaseRequest;
-use App\Http\Requests\Api\MainApiRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
@@ -71,10 +68,9 @@ class UpdateProfileRequest extends BaseRequest
         ];
     }
 
-
     protected function failedValidation(Validator $validator)
     {
-        $errors = $validator->errors()->all(); 
+        $errors = $validator->errors()->all();
 
         $response = response()->json([
             'status' => 'error',

@@ -43,7 +43,7 @@ class AdminCharityCaseTest extends TestCase
             'national_id' => '29001011234567',
             'phone' => '01012345678',
             'category_id' => CaseCategory::factory()->create()->id,
-            'volunteer_id' => null,
+            'volunteer_id' => User::factory()->volunteer()->create()->id,
         ], $overrides);
     }
 
@@ -84,14 +84,14 @@ class AdminCharityCaseTest extends TestCase
     }
 
     #[Test]
-    public function the_national_id_is_optional(): void
+    public function every_field_is_required(): void
     {
         $this->signInAdmin(['charity_cases.store']);
 
-        $this->post(route('admin.charity_cases.store'), $this->payload(['national_id' => null]))->assertSessionHasNoErrors();
-        $this->post(route('admin.charity_cases.store'), $this->payload(['national_id' => null, 'full_name' => 'Other Person']))->assertSessionHasNoErrors();
+        $this->post(route('admin.charity_cases.store'), [])
+            ->assertSessionHasErrors(['full_name', 'national_id', 'phone', 'category_id', 'volunteer_id']);
 
-        $this->assertSame(2, CharityCase::whereNull('national_id')->count());
+        $this->assertSame(0, CharityCase::count());
     }
 
     #[Test]
@@ -126,12 +126,14 @@ class AdminCharityCaseTest extends TestCase
     }
 
     #[Test]
-    public function the_volunteer_must_be_a_volunteer_user(): void
+    public function the_volunteer_must_be_an_active_volunteer_user(): void
     {
         $admin = $this->signInAdmin(['charity_cases.store']);
+        $inactiveVolunteer = User::factory()->volunteer()->inactive()->create();
         $volunteer = User::factory()->volunteer()->create();
 
         $this->post(route('admin.charity_cases.store'), $this->payload(['volunteer_id' => $admin->id]))->assertSessionHasErrors('volunteer_id');
+        $this->post(route('admin.charity_cases.store'), $this->payload(['volunteer_id' => $inactiveVolunteer->id]))->assertSessionHasErrors('volunteer_id');
         $this->post(route('admin.charity_cases.store'), $this->payload(['volunteer_id' => $volunteer->id]))->assertSessionHasNoErrors();
     }
 
@@ -167,19 +169,6 @@ class AdminCharityCaseTest extends TestCase
         $response = $this->post(route('admin.charity_cases.store'), $this->payload(['return_to' => 'assistance']));
 
         $response->assertRedirect(route('admin.case_assistances.create', ['case_id' => CharityCase::first()->id]));
-    }
-
-    #[Test]
-    public function duplicates_warns_about_a_shared_phone_and_a_similar_name(): void
-    {
-        $existing = CharityCase::factory()->create(['full_name' => 'Mona Ahmed Hassan', 'phone' => '01012345678']);
-        $this->signInAdmin(['charity_cases.store']);
-
-        $this->getJson(route('admin.charity_cases.duplicates', ['phone' => '01012345678', 'full_name' => 'Mona Ahmed']))
-            ->assertOk()
-            ->assertJsonPath('phone.0.id', $existing->id)
-            ->assertJsonPath('similar_names.0.id', $existing->id)
-            ->assertJsonCount(0, 'national_id');
     }
 
     #[Test]

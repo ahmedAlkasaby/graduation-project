@@ -9,7 +9,7 @@
 
     <div class="alert alert-info d-flex gap-2 mt-3" role="alert">
         <i class="ti ti-lock"></i>
-        <span>{{ __('The beneficiary, type, amount and installment schedule cannot be changed after an assistance is created. Only the title and description can be edited.') }}</span>
+        <span>{{ __('The beneficiary, type, amount and installment schedule cannot be changed after an assistance is created. Only the title, description, order and status can be edited.') }}</span>
     </div>
 
     {{-- The fixed financial setup, shown for reference only --}}

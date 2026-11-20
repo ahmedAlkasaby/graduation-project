@@ -1,8 +1,7 @@
 <?php
 
 use App\Services\AppSettingsService;
-
-
+use App\Services\ImageHandlerService;
 
 if (! function_exists('settings')) {
 
@@ -40,13 +39,13 @@ if (! function_exists('upload_url')) {
 
     function upload_url(?string $path): ?string
     {
-        return app(App\Services\ImageHandlerService::class)->url($path);
+        return app(ImageHandlerService::class)->url($path);
     }
 }
 
 if (! function_exists('upload_exists')) {
     function upload_exists(?string $path): bool
     {
-        return app(App\Services\ImageHandlerService::class)->exists($path);
+        return app(ImageHandlerService::class)->exists($path);
     }
 }

@@ -163,7 +163,6 @@
                     bootstrap.Modal.getOrCreateInstance(modal).hide();
                     quickForm.reset();
                     errorsBox.classList.add('d-none');
-                    quickForm.dispatchEvent(new Event('duplicate-check:reset'));
                 })
                 .catch(() => showErrors([strings.failed]))
                 .finally(() => (button.disabled = false));

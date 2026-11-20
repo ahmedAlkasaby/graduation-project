@@ -89,12 +89,20 @@ class CaseAssistanceController extends ApiHomeController
         return $this->successResponse(['assistance' => new CaseAssistanceResource($this->loadDetails($caseAssistance))]);
     }
 
+    /** Flips the assistance between active and inactive. Only its visibility changes. */
+    public function status(CaseAssistance $caseAssistance): JsonResponse
+    {
+        $caseAssistance->update(['active' => ! $caseAssistance->active]);
+
+        return $this->successResponse(['assistance' => new CaseAssistanceResource($this->loadDetails($caseAssistance))]);
+    }
+
     public function cancelInstallment(
         CancelInstallmentRequest $request,
         CaseAssistance $caseAssistance,
         AssistanceInstallment $installment,
     ): JsonResponse {
-        $installment = $this->assistanceService->cancelInstallment($installment, $request->validated('notes'));
+        $installment = $this->assistanceService->cancelInstallment($installment, $request->validated('notes'), $request->user());
 
         return $this->successResponse(['installment' => new AssistanceInstallmentResource($installment)]);
     }

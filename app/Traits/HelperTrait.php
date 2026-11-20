@@ -44,7 +44,6 @@ trait HelperTrait
         return app(ImageHandlerService::class);
     }
 
-
     public function uploadImage($image, $folder_path = '', $is_upload = 1)
     {
         if (! $image instanceof UploadedFile) {
@@ -73,6 +72,7 @@ trait HelperTrait
 
         return $this->imageHandler()->storeRaw($file, 'files'.($folder_path !== '' ? '/'.$folder_path : ''));
     }
+
     public function getImage($image)
     {
         if ($image != '' && $image != null) {

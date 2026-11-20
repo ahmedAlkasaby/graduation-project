@@ -19,7 +19,7 @@ use LogicException;
  * requests reject such changes, and this model refuses to save them as the
  * last line of defence.
  */
-class CaseAssistance extends SiteModel
+class CaseAssistance extends SiteModelSoftDelete
 {
     use HasFactory;
 
@@ -29,7 +29,8 @@ class CaseAssistance extends SiteModel
     protected $table = 'case_assistances';
 
     protected $fillable = [
-        'case_id', 'assistance_type', 'title', 'description', 'requested_amount', 'amount_per_period', 'created_by',
+        'case_id', 'assistance_type', 'title', 'description', 'requested_amount', 'amount_per_period',
+        'order_id', 'active', 'created_by',
     ];
 
     protected $searchable = ['title'];
@@ -64,6 +65,11 @@ class CaseAssistance extends SiteModel
     public function charityCase(): BelongsTo
     {
         return $this->belongsTo(CharityCase::class, 'case_id');
+    }
+
+    public function canceller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by')->withTrashed();
     }
 
     public function creator(): BelongsTo

@@ -22,7 +22,6 @@ return [
         'role' => 'default',
     ],
 
-
     'cache' => [
         'enabled' => env('LARATRUST_ENABLE_CACHE', true),
         'expiration_time' => 3600,
