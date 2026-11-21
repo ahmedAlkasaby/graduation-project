@@ -1,5 +1,5 @@
 @extends('admin.layouts.app', ['head' => 'headForm', 'foot' => 'footForm'])
-@section('title') {{ __('Shared Cases') }}
+@section('title') {{ __('Beneficiary Profiles') }}
 @stop
 @section('head_content')
 @stop
@@ -10,10 +10,10 @@
         <div class="card-header">
             <div class="row">
                 <div class="col-md-6 head-label">
-                    <h5 class="card-title">{{ __('Shared Cases') }}</h5>
+                    <h5 class="card-title">{{ __('Beneficiary Profiles') }}</h5>
                 </div>
                 <div class="col-md-6 dt-action-buttons text-end pt-3 pt-md-0">
-                    @include('admin.layouts.components.page-head', ['table' => 'charity_cases', 'create_label' => __('Create Shared Case')])
+                    @include('admin.layouts.components.page-head', ['table' => 'charity_cases', 'create_label' => __('Create Beneficiary Profile')])
                 </div>
             </div>
         </div>

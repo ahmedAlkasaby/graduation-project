@@ -14,5 +14,10 @@
     @if ($canQuickCreateCase)
         @include('admin.case_assistances.components.quick-case-modal')
     @endif
+    @if ($canQuickCreateCategory)
+        @include('admin.case_assistances.components.quick-category-modal')
+        @include('admin.case_assistances.components.category-js')
+    @endif
+    @include('admin.case_assistances.components.beneficiary-js')
     @include('admin.case_assistances.components.form-js')
 @stop

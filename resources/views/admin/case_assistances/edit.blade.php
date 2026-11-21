@@ -9,16 +9,13 @@
 
     <div class="alert alert-info d-flex gap-2 mt-3" role="alert">
         <i class="ti ti-lock"></i>
-        <span>{{ __('The beneficiary, type, amount and installment schedule cannot be changed after an assistance is created. Only the title, description, order and status can be edited.') }}</span>
+        <span>{{ __('The type, amount and installment schedule cannot be changed after an assistance is created. The beneficiary, category, title, description, order and status can be edited.') }}</span>
     </div>
 
     {{-- The fixed financial setup, shown for reference only --}}
     <div class="card mb-4">
         <div class="card-body">
             <dl class="row mb-0">
-                <dt class="col-sm-3">{{ __('Beneficiary') }}</dt>
-                <dd class="col-sm-9">{{ $assistance->charityCase?->selectLabel() }}</dd>
-
                 <dt class="col-sm-3">{{ __('Type') }}</dt>
                 <dd class="col-sm-9">@include('admin.case_assistances.components.type-badge')</dd>
 
@@ -32,9 +29,18 @@
     </div>
 
     @include('admin.layouts.forms.edit', ['model' => $assistance, 'table' => 'case_assistances'])
+    @include('admin.case_assistances.components.beneficiary-field')
+    @include('admin.case_assistances.components.category-field')
     @include('admin.case_assistances.components.details-fields')
     <div class="mb-4">
         @include('admin.layouts.forms.buttons.form-save')
     </div>
     @include('admin.layouts.forms.close')
+@stop
+@section('after_foot')
+    @if ($canQuickCreateCategory)
+        @include('admin.case_assistances.components.quick-category-modal')
+        @include('admin.case_assistances.components.category-js')
+    @endif
+    @include('admin.case_assistances.components.beneficiary-js')
 @stop

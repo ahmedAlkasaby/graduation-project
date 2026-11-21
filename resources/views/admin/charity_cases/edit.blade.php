@@ -1,5 +1,5 @@
 @extends('admin.layouts.app', ['head' => 'headForm', 'foot' => 'footForm'])
-@section('title') {{ __('Edit Shared Case') }}
+@section('title') {{ __('Edit Beneficiary Profile') }}
 @stop
 @section('head_content')
     @include('admin.layouts.components.head', ['back_url' => route('admin.charity_cases.show', $charityCase)])

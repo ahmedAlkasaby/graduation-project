@@ -34,7 +34,8 @@
     </div>
 </div>
 
-{{-- 3. Details --}}
+{{-- 3. Category and details --}}
+@include('admin.case_assistances.components.category-field')
 @include('admin.case_assistances.components.details-fields')
 
 {{-- 4. Amount and schedule --}}

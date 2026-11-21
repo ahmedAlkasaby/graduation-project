@@ -9,6 +9,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * Managing case categories from the Blade admin panel, the twin of
@@ -41,9 +42,18 @@ class CaseCategoryController extends AdminController
         return view('admin.case_categories.create');
     }
 
-    public function store(CaseCategoryRequest $request): RedirectResponse
+    /** Also answers the assistance form's quick-create dialog with JSON. */
+    public function store(CaseCategoryRequest $request): JsonResponse|RedirectResponse
     {
-        CaseCategory::create($request->validated());
+        $category = CaseCategory::create($request->validated());
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('Created successfully'),
+                'category' => ['id' => $category->id, 'text' => $category->nameLang(app()->getLocale())],
+            ], Response::HTTP_CREATED);
+        }
 
         return redirect()->route('admin.case_categories.index')->with('success', __('Created successfully'));
     }

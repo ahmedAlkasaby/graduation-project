@@ -38,7 +38,7 @@ class DashboardController extends AdminController
         $sections = [['title' => null, 'cards' => $cards]];
 
         if ($this->can('statistics')) {
-            $sections[] = ['title' => __('Shared Cases'), 'cards' => $this->caseCards($statistics->cases())];
+            $sections[] = ['title' => __('Beneficiary Profiles'), 'cards' => $this->caseCards($statistics->cases())];
             $sections[] = ['title' => __('Assistances'), 'cards' => $this->assistanceCards($statistics->assistances())];
         }
 

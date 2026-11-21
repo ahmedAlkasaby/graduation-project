@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title') {{ __('Show Shared Case') }}
+@section('title') {{ __('Show Beneficiary Profile') }}
 @stop
 @section('head_content')
     @include('admin.layouts.components.head', ['back_url' => route('admin.charity_cases.index')])

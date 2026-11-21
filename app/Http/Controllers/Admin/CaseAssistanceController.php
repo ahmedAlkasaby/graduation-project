@@ -69,6 +69,7 @@ class CaseAssistanceController extends AdminController
             'defaultInstallments' => CaseAssistanceService::DEFAULT_INSTALLMENTS,
             'maxInstallments' => CaseAssistanceService::MAX_INSTALLMENTS,
             'canQuickCreateCase' => $this->can('charity_cases.store'),
+            'canQuickCreateCategory' => $this->can('case_categories.store'),
             'currency' => $this->currency(),
         ] + $this->charityCaseService->formOptions());
     }
@@ -128,6 +129,7 @@ class CaseAssistanceController extends AdminController
             'selectedCase' => CharityCase::find($caseId),
             'categories' => CaseCategory::options(),
             'canQuickCreateCase' => false,
+            'canQuickCreateCategory' => $this->can('case_categories.store'),
             'currency' => $this->currency(),
         ]);
     }

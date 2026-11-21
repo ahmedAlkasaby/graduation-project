@@ -13,7 +13,7 @@
             <div class="flex-grow-1">
                 @include('admin.layouts.forms.fields.select', [
                     'label_req' => true,
-                    'label' => __('Shared Case'),
+                    'label' => __('Beneficiary Profile'),
                     'select_name' => 'case_id',
                     'select_id' => 'beneficiary-select',
                     'select_class' => 'form-select',

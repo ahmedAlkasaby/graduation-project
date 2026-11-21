@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
- * A beneficiary's profile ("shared case"): who they are, not what they
+ * A beneficiary's profile ("beneficiary profile"): who they are, not what they
  * receive. Their support plans are the assistances.
  */
 class CharityCase extends SiteModelSoftDelete

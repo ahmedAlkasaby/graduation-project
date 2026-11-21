@@ -1,5 +1,5 @@
 @extends('admin.layouts.app', ['head' => 'headForm', 'foot' => 'footForm'])
-@section('title') {{ __('Create Shared Case') }}
+@section('title') {{ __('Create Beneficiary Profile') }}
 @stop
 @section('head_content')
     @include('admin.layouts.components.head', [

@@ -131,7 +131,7 @@
                     @can('charity_cases.index')
                         <li class="menu-item @if ($activeClass == 'charity_case') active @endif">
                             <a href="{{ route('admin.charity_cases.index') }}" class="menu-link">
-                                <div>{{ __('Shared Cases') }}</div>
+                                <div>{{ __('Beneficiary Profiles') }}</div>
                             </a>
                         </li>
                     @endcan
