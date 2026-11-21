@@ -27,6 +27,7 @@ class CaseAssistanceFilterRequest extends FormRequest
             'case_id' => ['nullable', 'integer'],
             'category_id' => ['nullable', 'integer', 'exists:case_categories,id'],
             'assistance_type' => ['nullable', Rule::enum(AssistanceTypeEnum::class)],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:1000'],
             'page' => ['nullable', 'integer', 'min:1'],
         ];
     }

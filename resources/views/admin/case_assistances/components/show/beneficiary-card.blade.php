@@ -17,7 +17,7 @@
             <dd class="col-sm-7">{{ $assistance->charityCase?->phone }}</dd>
 
             <dt class="col-sm-5">{{ __('Category') }}</dt>
-            <dd class="col-sm-7">{{ $assistance->charityCase?->category?->nameLang($admin_language) }}</dd>
+            <dd class="col-sm-7">{{ $assistance->category?->nameLang($admin_language) }}</dd>
 
             <dt class="col-sm-5">{{ __('Volunteer') }}</dt>
             <dd class="col-sm-7 mb-0">{{ $assistance->charityCase?->volunteer?->full_name }}</dd>

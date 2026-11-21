@@ -20,6 +20,7 @@ class CharityCaseFilterRequest extends FormRequest
         return [
             'search' => ['nullable', 'string', 'max:255'],
             'volunteer_id' => ['nullable', 'integer'],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
         ];
     }

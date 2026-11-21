@@ -20,7 +20,7 @@
             <div>{{ $model->charityCase?->full_name }}</div>
             <small class="text-muted">{{ $model->charityCase?->national_id ?? $model->charityCase?->phone }}</small>
         </td>
-        <td><span class="badge bg-label-info">{{ $model->charityCase?->category?->nameLang($admin_language) }}</span></td>
+        <td><span class="badge bg-label-info">{{ $model->category?->nameLang($admin_language) }}</span></td>
         <td>@include('admin.case_assistances.components.type-badge', ['assistance' => $model])</td>
         <td>@include('admin.case_assistances.components.amount', ['assistance' => $model])</td>
         <td>{{ $model->paid_installments_count }} / {{ $model->installments_count }} {{ __('paid') }}</td>

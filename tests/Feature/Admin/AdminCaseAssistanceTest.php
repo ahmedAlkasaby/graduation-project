@@ -287,6 +287,23 @@ class AdminCaseAssistanceTest extends TestCase
     }
 
     #[Test]
+    public function the_index_shows_the_assistance_category_and_honours_the_per_page_limit(): void
+    {
+        $this->signInAdmin(['case_assistances.index', 'case_assistances.store']);
+        $category = CaseCategory::factory()->create(['name' => ['en' => 'Medical care', 'ar' => 'رعاية طبية']]);
+        $this->createAssistance($this->oneTime(['category_id' => $category->id, 'title' => ['en' => 'First plan', 'ar' => 'الأولى']]));
+        $this->createAssistance($this->oneTime(['title' => ['en' => 'Second plan', 'ar' => 'الثانية']]));
+
+        $this->get(route('admin.case_assistances.index'))->assertOk()->assertSee('Medical care')->assertSee('Per Page');
+
+        $this->get(route('admin.case_assistances.index', ['limit' => 1]))
+            ->assertOk()
+            ->assertViewHas('data', fn ($data) => $data->perPage() === 1 && $data->count() === 1);
+
+        $this->get(route('admin.case_assistances.index', ['limit' => 1000]))->assertSessionHasErrors('limit');
+    }
+
+    #[Test]
     public function the_details_page_shows_a_single_payment_or_a_schedule_by_type(): void
     {
         $this->signInAdmin(['case_assistances.store', 'case_assistances.show']);
