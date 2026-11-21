@@ -66,6 +66,7 @@ Route::get('case_assistances/form-options', [CaseAssistanceController::class, 'f
     ->name('case_assistances.form-options')
     ->permission('case_assistances.index', 'case_assistances.store');
 Route::patch('case_assistances/{caseAssistance}/status', [CaseAssistanceController::class, 'status'])->name('case_assistances.status');
+Route::patch('case_assistances/{caseAssistance}/cancel', [CaseAssistanceController::class, 'cancel'])->name('case_assistances.cancel');
 Route::patch('case_assistances/{caseAssistance}/installments/{installment}/cancel', [CaseAssistanceController::class, 'cancelInstallment'])
     ->name('case_assistances.cancel_installment')
     ->scopeBindings();

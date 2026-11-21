@@ -92,7 +92,7 @@
                     <th>{{ __('Paid At') }}</th>
                     <th>{{ __('Cancelled At') }}</th>
                     <th>{{ __('Notes') }}</th>
-                    @if ($canCancelInstallment)
+                    @if ($canCancelInstallment && ! $assistance->cancelled_at)
                         <th>{{ __('Setting') }}</th>
                     @endif
                 </tr>
@@ -107,7 +107,7 @@
                         <td>{{ $row->paid_at?->toDateTimeString() ?? '—' }}</td>
                         <td>{{ $row->cancelled_at?->toDateTimeString() ?? '—' }}</td>
                         <td class="text-wrap">{{ $row->notes ?? '—' }}</td>
-                        @if ($canCancelInstallment)
+                        @if ($canCancelInstallment && ! $assistance->cancelled_at)
                             <td>
                                 @if ($row->isPending())
                                     <button type="button" class="btn btn-sm btn-label-danger waves-effect"

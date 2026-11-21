@@ -41,15 +41,6 @@
                         <div class="text-wrap">{{ $installment->notes }}</div>
                     @endif
 
-                    @if ($canCancelInstallment && $installment->isPending())
-                        <button type="button" class="btn btn-label-danger waves-effect w-100 mt-4"
-                            data-bs-toggle="modal" data-bs-target="#cancel-installment-modal"
-                            data-cancel-url="{{ route('admin.case_assistances.cancel_installment', [$assistance, $installment]) }}"
-                            data-cancel-label="{{ $installment->due_at->toDateString() }}">
-                            <i class="ti ti-ban me-1"></i>{{ __('Cancel Payment') }}
-                        </button>
-                    @endif
-
                     <small class="text-muted d-block mt-3">{{ __('Payments are recorded by the payments module, not here.') }}</small>
                 @else
                     <span class="text-muted">—</span>

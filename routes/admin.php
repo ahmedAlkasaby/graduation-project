@@ -75,6 +75,7 @@ Route::prefix('admin')->as('admin.')->group(function () {
                 ->parameters(['charity_cases' => 'charityCase']);
 
             Route::patch('case_assistances/{caseAssistance}/status', [CaseAssistanceController::class, 'status'])->name('case_assistances.status');
+            Route::patch('case_assistances/{caseAssistance}/cancel', [CaseAssistanceController::class, 'cancel'])->name('case_assistances.cancel');
             Route::patch('case_assistances/{caseAssistance}/installments/{installment}/cancel', [CaseAssistanceController::class, 'cancelInstallment'])
                 ->name('case_assistances.cancel_installment')
                 ->scopeBindings();

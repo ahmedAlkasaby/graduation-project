@@ -113,14 +113,67 @@ class CaseAssistanceService
     }
 
     /**
-     * Cancels one installment that is neither paid nor already cancelled.
-     * The row is locked first, so a payment recorded at the same moment can
-     * never end up on a cancelled installment.
+     * Cancels the whole assistance, whatever its type: every installment that
+     * is neither paid nor cancelled is cancelled with the same note, and the
+     * assistance itself is marked cancelled. Paid installments stay as they
+     * are. The rows are locked first, so a payment recorded at the same moment
+     * can never end up on a cancelled installment.
+     *
+     * @return int how many installments were cancelled
+     */
+    public function cancel(CaseAssistance $assistance, ?string $notes, User $cancelledBy): int
+    {
+        return DB::transaction(function () use ($assistance, $notes, $cancelledBy): int {
+            $locked = CaseAssistance::query()->lockForUpdate()->findOrFail($assistance->id);
+
+            if ($locked->cancelled_at !== null) {
+                throw ValidationException::withMessages(['assistance' => __('This assistance is already cancelled.')]);
+            }
+
+            $pending = $locked->installments()->lockForUpdate()->get()
+                ->filter(fn (AssistanceInstallment $installment): bool => $installment->isPending());
+
+            if ($pending->isEmpty()) {
+                throw ValidationException::withMessages(['assistance' => __('This assistance has no unpaid installments left to cancel.')]);
+            }
+
+            $now = now();
+
+            foreach ($pending as $installment) {
+                $installment->forceFill([
+                    'cancelled_at' => $now,
+                    'cancelled_by' => $cancelledBy->id,
+                    'notes' => $notes,
+                ])->save();
+            }
+
+            $locked->forceFill(['cancelled_at' => $now, 'cancelled_by' => $cancelledBy->id])->save();
+            $assistance->setRawAttributes($locked->getAttributes(), true);
+
+            return $pending->count();
+        });
+    }
+
+    /**
+     * Cancels one installment of a recurring assistance that is neither paid
+     * nor already cancelled. A one-time assistance has a single payment, so it
+     * is cancelled as a whole with cancel() instead. When no unpaid installment
+     * is left afterwards, the assistance itself is cancelled too. The row is locked first,
+     * so a payment recorded at the same moment can never end up on a cancelled
+     * installment.
      */
     public function cancelInstallment(AssistanceInstallment $installment, ?string $notes, User $cancelledBy): AssistanceInstallment
     {
         return DB::transaction(function () use ($installment, $notes, $cancelledBy): AssistanceInstallment {
             $locked = AssistanceInstallment::query()->lockForUpdate()->findOrFail($installment->id);
+
+            $assistance = $locked->assistance()->lockForUpdate()->firstOrFail();
+
+            if (! $assistance->isRecurring()) {
+                throw ValidationException::withMessages([
+                    'installment' => __('A one-time assistance has a single payment: cancel the assistance instead.'),
+                ]);
+            }
 
             if (! $locked->isPending()) {
                 throw ValidationException::withMessages([
@@ -133,6 +186,12 @@ class CaseAssistanceService
                 'cancelled_by' => $cancelledBy->id,
                 'notes' => $notes,
             ])->save();
+
+            $hasInstallmentsLeft = $assistance->installments()->whereNull('paid_at')->whereNull('cancelled_at')->exists();
+
+            if (! $hasInstallmentsLeft && $assistance->cancelled_at === null) {
+                $assistance->forceFill(['cancelled_at' => $locked->cancelled_at, 'cancelled_by' => $cancelledBy->id])->save();
+            }
 
             return $locked;
         });

@@ -103,6 +103,15 @@ class CaseAssistanceController extends ApiHomeController
         return $this->successResponse(['assistance' => new CaseAssistanceResource($this->loadDetails($caseAssistance))]);
     }
 
+    /** Cancels the assistance, one-time or recurring, with every installment that is not paid yet. */
+    public function cancel(CancelInstallmentRequest $request, CaseAssistance $caseAssistance): JsonResponse
+    {
+        $this->assistanceService->cancel($caseAssistance, $request->validated('notes'), $request->user());
+
+        return $this->successResponse(['assistance' => new CaseAssistanceResource($this->loadDetails($caseAssistance))]);
+    }
+
+    /** Cancels one installment of a recurring assistance. */
     public function cancelInstallment(
         CancelInstallmentRequest $request,
         CaseAssistance $caseAssistance,

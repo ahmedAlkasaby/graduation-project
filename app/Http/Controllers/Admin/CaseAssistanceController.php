@@ -87,6 +87,7 @@ class CaseAssistanceController extends AdminController
             'category',
             'charityCase.volunteer',
             'creator',
+            'canceller',
             'installments' => fn ($query) => $query->orderBy('due_at'),
         ]);
 
@@ -94,6 +95,7 @@ class CaseAssistanceController extends AdminController
         $statuses = $installments->map(fn (AssistanceInstallment $installment) => $installment->status());
         $countOf = fn (InstallmentStatusEnum $status): int => $statuses->filter(fn ($value) => $value === $status)->count();
         $paid = $countOf(InstallmentStatusEnum::Paid);
+        $unpaid = $installments->filter(fn (AssistanceInstallment $installment): bool => $installment->isPending());
 
         return view('admin.case_assistances.show', [
             'assistance' => $caseAssistance,
@@ -107,6 +109,8 @@ class CaseAssistanceController extends AdminController
                 'pending' => $countOf(InstallmentStatusEnum::Pending),
                 'overdue' => $countOf(InstallmentStatusEnum::Overdue),
                 'cancelled' => $countOf(InstallmentStatusEnum::Cancelled),
+                'unpaid' => $unpaid->count(),
+                'unpaid_amount' => $unpaid->sum('amount'),
                 'planned_amount' => $installments->whereNull('cancelled_at')->sum('amount'),
                 'paid_amount' => $installments->whereNotNull('paid_at')->sum('amount'),
                 'paid_percent' => $installments->isEmpty() ? 0 : (int) round($paid / $installments->count() * 100),
@@ -115,6 +119,7 @@ class CaseAssistanceController extends AdminController
             ],
             'canEdit' => $this->can('case_assistances.update'),
             'canCancelInstallment' => $this->can('case_assistances.cancel_installment'),
+            'canCancelAssistance' => $this->can('case_assistances.cancel') && $caseAssistance->cancelled_at === null && $unpaid->isNotEmpty(),
             'canShowCase' => $this->can('charity_cases.show'),
         ]);
     }
@@ -153,6 +158,17 @@ class CaseAssistanceController extends AdminController
         return back()->with('success', __('Updated successfully'));
     }
 
+    /** Cancels the assistance, one-time or recurring, with every installment that is not paid yet. */
+    public function cancel(CancelInstallmentRequest $request, CaseAssistance $caseAssistance): RedirectResponse
+    {
+        $count = $this->assistanceService->cancel($caseAssistance, $request->validated('notes'), $this->admin());
+
+        return redirect()
+            ->route('admin.case_assistances.show', $caseAssistance)
+            ->with('success', trans_choice('Assistance cancelled: :count installment cancelled|Assistance cancelled: :count installments cancelled', $count, ['count' => $count]));
+    }
+
+    /** Cancels one installment of a recurring assistance. */
     public function cancelInstallment(
         CancelInstallmentRequest $request,
         CaseAssistance $caseAssistance,

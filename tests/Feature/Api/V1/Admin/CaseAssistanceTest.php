@@ -154,6 +154,21 @@ class CaseAssistanceTest extends TestCase
     }
 
     #[Test]
+    public function cancelling_an_assistance_cancels_all_its_unpaid_installments(): void
+    {
+        $this->actingAsAdmin(['case_assistances.store', 'case_assistances.cancel']);
+        $assistance = $this->createRecurring();
+        $url = route('api.v1.admin.case_assistances.cancel', $assistance);
+
+        $this->patchJson($url, ['notes' => 'Stopped'])
+            ->assertOk()
+            ->assertJsonPath('data.assistance.cancelled_by', $this->admin->id);
+
+        $this->assertSame(12, $assistance->installments()->whereNotNull('cancelled_at')->count());
+        $this->patchJson($url)->assertUnprocessable()->assertJsonValidationErrors('assistance');
+    }
+
+    #[Test]
     public function status_flips_the_active_flag(): void
     {
         $this->actingAsAdmin(['case_assistances.store', 'case_assistances.status']);

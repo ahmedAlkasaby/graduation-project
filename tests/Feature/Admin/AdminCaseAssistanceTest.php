@@ -328,6 +328,21 @@ class AdminCaseAssistanceTest extends TestCase
     }
 
     #[Test]
+    public function cancelling_the_last_unpaid_installment_cancels_the_assistance(): void
+    {
+        $this->signInAdmin(['case_assistances.store', 'case_assistances.cancel_installment']);
+        $assistance = $this->createAssistance($this->recurring(['end_month' => '2027-02']));
+        [$first, $second] = $assistance->installments()->orderBy('due_at')->get()->all();
+
+        $this->patch(route('admin.case_assistances.cancel_installment', [$assistance, $first]));
+        $this->assertNull($assistance->fresh()->cancelled_at);
+
+        $this->patch(route('admin.case_assistances.cancel_installment', [$assistance, $second]));
+        $this->assertNotNull($assistance->fresh()->cancelled_at);
+        $this->assertSame($this->admin->id, $assistance->fresh()->cancelled_by);
+    }
+
+    #[Test]
     public function a_paid_or_already_cancelled_installment_cannot_be_cancelled(): void
     {
         $this->signInAdmin(['case_assistances.store', 'case_assistances.cancel_installment']);
@@ -341,6 +356,66 @@ class AdminCaseAssistanceTest extends TestCase
 
         $this->assertNull($paid->fresh()->cancelled_at);
         $this->assertNotNull($paid->fresh()->paid_at);
+    }
+
+    #[Test]
+    public function a_one_time_assistance_cannot_cancel_its_installment_only_the_assistance(): void
+    {
+        $this->signInAdmin(['case_assistances.store', 'case_assistances.cancel_installment', 'case_assistances.cancel']);
+        $assistance = $this->createAssistance($this->oneTime());
+        $installment = $assistance->installments()->first();
+
+        $this->patch(route('admin.case_assistances.cancel_installment', [$assistance, $installment]))->assertSessionHasErrors('installment');
+        $this->assertNull($installment->fresh()->cancelled_at);
+
+        $this->patch(route('admin.case_assistances.cancel', $assistance), ['notes' => 'No longer needed'])
+            ->assertRedirect(route('admin.case_assistances.show', $assistance))
+            ->assertSessionHas('success');
+
+        $assistance->refresh();
+        $this->assertNotNull($assistance->cancelled_at);
+        $this->assertSame($this->admin->id, $assistance->cancelled_by);
+        $this->assertNotNull($installment->fresh()->cancelled_at);
+        $this->assertSame('No longer needed', $installment->fresh()->notes);
+    }
+
+    #[Test]
+    public function cancelling_a_recurring_assistance_cancels_every_unpaid_installment_and_keeps_paid_ones(): void
+    {
+        $this->signInAdmin(['case_assistances.store', 'case_assistances.cancel']);
+        $assistance = $this->createAssistance($this->recurring());
+        $paid = $assistance->installments()->orderBy('due_at')->first();
+        $paid->forceFill(['paid_at' => now()])->save();
+
+        $this->patch(route('admin.case_assistances.cancel', $assistance))->assertSessionHas('success');
+
+        $this->assertNotNull($assistance->fresh()->cancelled_at);
+        $this->assertNull($paid->fresh()->cancelled_at);
+        $this->assertSame(11, $assistance->installments()->whereNotNull('cancelled_at')->count());
+        $this->assertSame(0, $assistance->installments()->whereNull('paid_at')->whereNull('cancelled_at')->count());
+    }
+
+    #[Test]
+    public function an_assistance_cannot_be_cancelled_twice(): void
+    {
+        $this->signInAdmin(['case_assistances.store', 'case_assistances.show', 'case_assistances.cancel']);
+        $assistance = $this->createAssistance($this->oneTime());
+
+        $this->patch(route('admin.case_assistances.cancel', $assistance));
+        $this->patch(route('admin.case_assistances.cancel', $assistance))->assertSessionHasErrors('assistance');
+
+        $this->get(route('admin.case_assistances.show', $assistance))->assertOk()->assertSee('This assistance was cancelled on');
+    }
+
+    #[Test]
+    public function an_admin_without_the_permission_cannot_cancel_an_assistance(): void
+    {
+        $assistance = CaseAssistance::factory()->create();
+        $this->signInAdmin(['case_assistances.index', 'case_assistances.show', 'case_assistances.cancel_installment']);
+
+        $this->patch(route('admin.case_assistances.cancel', $assistance))->assertRedirect(route('admin.unauthorized'));
+
+        $this->assertNull($assistance->fresh()->cancelled_at);
     }
 
     #[Test]
