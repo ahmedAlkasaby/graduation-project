@@ -72,33 +72,58 @@ class CharityCaseService
     }
 
     /**
-     * What the profile form's selects offer: the active volunteers.
+     * Everything the profile form's selects offer: the active volunteers, the
+     * active cities, and the active regions of each city in display order
+     * (so the region select can follow the city).
      *
-     * @return array{volunteers: array<int, string>}
+     * @return array{
+     *     volunteers: array<int, string>,
+     *     cities: array<int, string>,
+     *     regionsByCity: array<int, list<array{id: int, name: string|null}>>
+     * }
      */
     public function formOptions(): array
     {
-        $volunteers = User::query()
-            ->ofType(UserTypeEnum::Volunteer->value)
-            ->where('active', true)
-            ->orderBy('full_name')
-            ->get(['id', 'full_name', 'phone'])
-            ->mapWithKeys(fn (User $user): array => [$user->id => trim($user->full_name.' '.$user->phone)])
-            ->all();
-
-        return ['volunteers' => $volunteers];
+        return [
+            'volunteers' => $this->volunteerOptions(),
+            'cities' => $this->cityOptions(),
+            'regionsByCity' => $this->regionsByCity(),
+        ];
     }
 
     /**
-     * What the address part of the Blade form offers: the active cities, and
-     * the active regions of each city, in display order, so the region select
-     * can follow the city.
+     * What the list filter's selects offer: the same volunteers, cities and
+     * regions as the form (see formOptions()).
      *
-     * @return array{cities: array<int, string>, regionsByCity: array<int, list<array{id: int, name: string|null}>>}
+     * @return array{
+     *     volunteers: array<int, string>,
+     *     cities: array<int, string>,
+     *     regionsByCity: array<int, list<array{id: int, name: string|null}>>
+     * }
      */
-    public function addressOptions(): array
+    public function filterOptions(): array
     {
-        $regionsByCity = Region::query()
+        return $this->formOptions();
+    }
+
+    /**
+     * The active cities as `id => name`, in display order.
+     *
+     * @return array<int, string>
+     */
+    private function cityOptions(): array
+    {
+        return City::listForSelect(queryBuilder: City::query()->defaultOrder());
+    }
+
+    /**
+     * The active regions of each city, in display order, so a region select can follow the city.
+     *
+     * @return array<int, list<array{id: int, name: string|null}>>
+     */
+    private function regionsByCity(): array
+    {
+        return Region::query()
             ->active()
             ->defaultOrder()
             ->get(['id', 'name', 'city_id'])
@@ -107,11 +132,22 @@ class CharityCaseService
                 ->map(fn (Region $region): array => ['id' => $region->id, 'name' => $region->nameLang()])
                 ->all())
             ->all();
+    }
 
-        return [
-            'cities' => City::listForSelect(queryBuilder: City::query()->defaultOrder()),
-            'regionsByCity' => $regionsByCity,
-        ];
+    /**
+     * The active volunteers as `id => "name phone"`, for the profile form and the list filter.
+     *
+     * @return array<int, string>
+     */
+    private function volunteerOptions(): array
+    {
+        return User::query()
+            ->ofType(UserTypeEnum::Volunteer->value)
+            ->where('active', true)
+            ->orderBy('full_name')
+            ->get(['id', 'full_name', 'phone'])
+            ->mapWithKeys(fn (User $user): array => [$user->id => trim($user->full_name.' '.$user->phone)])
+            ->all();
     }
 
     /**

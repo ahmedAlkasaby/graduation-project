@@ -44,14 +44,18 @@ class CharityCaseController extends AdminController
             ->paginate($this->perPage($filters))
             ->withQueryString();
 
+        $options = $this->charityCaseService->filterOptions();
+
         return $this->listView('admin.charity_cases.index', $cases, 'charity_cases', [
-            'volunteers' => ['' => __('All')] + $this->charityCaseService->formOptions()['volunteers'],
+            'volunteers' => ['' => __('All')] + $options['volunteers'],
+            'cities' => ['' => __('All')] + $options['cities'],
+            'regionsByCity' => $options['regionsByCity'],
         ]);
     }
 
     public function create(Request $request): View
     {
-        return view('admin.charity_cases.create', $this->charityCaseService->formOptions() + $this->charityCaseService->addressOptions() + [
+        return view('admin.charity_cases.create', $this->charityCaseService->formOptions() + [
             'returnTo' => $request->query('return_to') === self::RETURN_TO_ASSISTANCE ? self::RETURN_TO_ASSISTANCE : null,
         ]);
     }
@@ -102,7 +106,7 @@ class CharityCaseController extends AdminController
         return view('admin.charity_cases.edit', [
             'charityCase' => $charityCase->load('address'),
             'returnTo' => null,
-        ] + $this->charityCaseService->formOptions() + $this->charityCaseService->addressOptions());
+        ] + $this->charityCaseService->formOptions());
     }
 
     public function update(CharityCaseRequest $request, CharityCase $charityCase): RedirectResponse

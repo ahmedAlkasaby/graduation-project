@@ -270,6 +270,67 @@ class CharityCaseTest extends TestCase
     }
 
     #[Test]
+    public function admin_filters_the_list_by_city_and_region(): void
+    {
+        $region = Region::factory()->create();
+        $inRegion = CharityCase::factory()->withAddress(['city_id' => $region->city_id, 'region_id' => $region->id])->create();
+        CharityCase::factory()->withAddress(['city_id' => $region->city_id])->create();
+        CharityCase::factory()->withAddress()->create();
+        CharityCase::factory()->create();
+        $this->actingAsAdmin(['charity_cases.index']);
+
+        $this->getJson(route('api.v1.admin.charity_cases.index', ['city_id' => $region->city_id]))
+            ->assertOk()
+            ->assertJsonCount(2, 'data.data');
+
+        $this->getJson(route('api.v1.admin.charity_cases.index', ['city_id' => $region->city_id, 'region_id' => $region->id]))
+            ->assertOk()
+            ->assertJsonCount(1, 'data.data')
+            ->assertJsonPath('data.data.0.id', $inRegion->id);
+    }
+
+    #[Test]
+    public function filter_options_list_the_active_volunteers_cities_and_regions_for_the_list_permission(): void
+    {
+        $region = Region::factory()->create();
+        User::factory()->volunteer()->create();
+        User::factory()->volunteer()->inactive()->create();
+        $this->actingAsAdmin(['charity_cases.index']);
+
+        $this->getJson(route('api.v1.admin.charity_cases.filter-options'))
+            ->assertOk()
+            ->assertJsonCount(1, 'data.volunteers')
+            ->assertJsonPath('data.cities.0.value', $region->city_id)
+            ->assertJsonPath('data.regions.0.value', $region->id)
+            ->assertJsonPath('data.regions.0.city_id', $region->city_id);
+    }
+
+    #[Test]
+    public function filter_options_need_the_list_permission(): void
+    {
+        $this->actingAsAdmin(['charity_cases.store']);
+
+        $this->getJson(route('api.v1.admin.charity_cases.filter-options'))->assertForbidden();
+    }
+
+    #[Test]
+    public function form_options_list_the_active_cities_and_regions_with_their_city(): void
+    {
+        $region = Region::factory()->create();
+        Region::factory()->inactive()->create(['city_id' => $region->city_id]);
+        City::factory()->inactive()->create();
+        $this->actingAsAdmin(['charity_cases.store']);
+
+        $this->getJson(route('api.v1.admin.charity_cases.form-options'))
+            ->assertOk()
+            ->assertJsonCount(1, 'data.cities')
+            ->assertJsonPath('data.cities.0.value', $region->city_id)
+            ->assertJsonCount(1, 'data.regions')
+            ->assertJsonPath('data.regions.0.value', $region->id)
+            ->assertJsonPath('data.regions.0.city_id', $region->city_id);
+    }
+
+    #[Test]
     public function show_includes_the_cases_assistances(): void
     {
         $charityCase = CharityCase::factory()->create();

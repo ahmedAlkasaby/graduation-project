@@ -55,6 +55,9 @@ Route::apiResource('case_categories', CaseCategoryController::class)
 Route::get('charity_cases/form-options', [CharityCaseController::class, 'formOptions'])
     ->name('charity_cases.form-options')
     ->permission('charity_cases.store', 'charity_cases.update');
+Route::get('charity_cases/filter-options', [CharityCaseController::class, 'filterOptions'])
+    ->name('charity_cases.filter-options')
+    ->permission('charity_cases.index');
 Route::get('charity_cases/lookup', [CharityCaseController::class, 'lookup'])
     ->name('charity_cases.lookup')
     ->permission('case_assistances.index', 'case_assistances.store');

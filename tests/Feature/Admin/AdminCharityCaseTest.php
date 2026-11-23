@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\CharityCase;
 use App\Models\City;
+use App\Models\Region;
 use App\Models\User;
 use Database\Seeders\LaratrustSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,6 +55,29 @@ class AdminCharityCaseTest extends TestCase
         $this->signInAdmin(['charity_cases.index']);
 
         $this->get(route('admin.charity_cases.index', ['search' => '29001011234567']))
+            ->assertOk()
+            ->assertSee('Mona Ahmed')
+            ->assertDontSee('Karim Adel');
+    }
+
+    #[Test]
+    public function list_filters_by_the_city_and_region_of_the_address(): void
+    {
+        $region = Region::factory()->create();
+        CharityCase::factory()->withAddress(['city_id' => $region->city_id, 'region_id' => $region->id])->create(['full_name' => 'Mona Ahmed']);
+        CharityCase::factory()->withAddress(['city_id' => $region->city_id])->create(['full_name' => 'Karim Adel']);
+        CharityCase::factory()->withAddress()->create(['full_name' => 'Other City Person']);
+        CharityCase::factory()->create(['full_name' => 'No Address Person']);
+        $this->signInAdmin(['charity_cases.index']);
+
+        $this->get(route('admin.charity_cases.index', ['city_id' => $region->city_id]))
+            ->assertOk()
+            ->assertSee('Mona Ahmed')
+            ->assertSee('Karim Adel')
+            ->assertDontSee('Other City Person')
+            ->assertDontSee('No Address Person');
+
+        $this->get(route('admin.charity_cases.index', ['city_id' => $region->city_id, 'region_id' => $region->id]))
             ->assertOk()
             ->assertSee('Mona Ahmed')
             ->assertDontSee('Karim Adel');

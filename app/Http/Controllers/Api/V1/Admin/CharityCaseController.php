@@ -47,14 +47,16 @@ class CharityCaseController extends ApiHomeController
         );
     }
 
-    /** The volunteer list the profile form needs. */
+    /** The volunteer, city and region lists the profile form needs. Each region carries its `city_id`. */
     public function formOptions(): JsonResponse
     {
-        $options = $this->charityCaseService->formOptions();
+        return $this->successResponse($this->optionLists($this->charityCaseService->formOptions()));
+    }
 
-        return $this->successResponse([
-            'volunteers' => $this->asOptions($options['volunteers']),
-        ]);
+    /** The volunteer, city and region lists the list filter needs. Each region carries its `city_id`. */
+    public function filterOptions(): JsonResponse
+    {
+        return $this->successResponse($this->optionLists($this->charityCaseService->filterOptions()));
     }
 
     /** Beneficiaries matching `search` (name, national ID or phone), for a searchable select. */
@@ -91,6 +93,27 @@ class CharityCaseController extends ApiHomeController
         $this->charityCaseService->update($charityCase, $request->validated());
 
         return $this->successResponse(['case' => new CharityCaseResource($charityCase->load(self::DETAIL_RELATIONS))]);
+    }
+
+    /**
+     * @param  array{volunteers: array<int, string>, cities: array<int, string>, regionsByCity: array<int, list<array{id: int, name: string|null}>>}  $options
+     * @return array{volunteers: list<array{value: int|string, label: string}>, cities: list<array{value: int|string, label: string}>, regions: list<array{value: int, label: string|null, city_id: int}>}
+     */
+    private function optionLists(array $options): array
+    {
+        $regions = collect($options['regionsByCity'])
+            ->flatMap(fn (array $cityRegions, int $cityId): array => array_map(
+                fn (array $region): array => ['value' => $region['id'], 'label' => $region['name'], 'city_id' => $cityId],
+                $cityRegions,
+            ))
+            ->values()
+            ->all();
+
+        return [
+            'volunteers' => $this->asOptions($options['volunteers']),
+            'cities' => $this->asOptions($options['cities']),
+            'regions' => $regions,
+        ];
     }
 
     /**
