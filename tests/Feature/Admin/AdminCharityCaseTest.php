@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\CharityCase;
+use App\Models\City;
 use App\Models\User;
 use Database\Seeders\LaratrustSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -82,14 +83,90 @@ class AdminCharityCaseTest extends TestCase
     }
 
     #[Test]
-    public function every_field_is_required(): void
+    public function only_the_name_national_id_and_phone_are_required(): void
     {
         $this->signInAdmin(['charity_cases.store']);
 
         $this->post(route('admin.charity_cases.store'), [])
-            ->assertSessionHasErrors(['full_name', 'national_id', 'phone', 'volunteer_id']);
+            ->assertSessionHasErrors(['full_name', 'national_id', 'phone'])
+            ->assertSessionDoesntHaveErrors(['volunteer_id', 'address.city_id']);
 
         $this->assertSame(0, CharityCase::count());
+    }
+
+    #[Test]
+    public function a_case_is_saved_without_a_volunteer_and_without_an_address(): void
+    {
+        $this->signInAdmin(['charity_cases.store']);
+
+        $this->post(route('admin.charity_cases.store'), $this->payload(['volunteer_id' => null]))->assertSessionHasNoErrors();
+
+        $charityCase = CharityCase::firstWhere('national_id', '29001011234567');
+        $this->assertNull($charityCase->volunteer_id);
+        $this->assertNull($charityCase->address);
+    }
+
+    #[Test]
+    public function the_untouched_address_fields_of_the_form_save_no_address(): void
+    {
+        $this->signInAdmin(['charity_cases.store']);
+
+        $emptyAddress = ['city_id' => '', 'region_id' => '', 'address' => '', 'latitude' => '', 'longitude' => ''];
+
+        $this->post(route('admin.charity_cases.store'), $this->payload(['address' => $emptyAddress]))->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('addresses', 0);
+    }
+
+    #[Test]
+    public function an_address_with_only_the_city_is_saved(): void
+    {
+        $city = City::factory()->create();
+        $this->signInAdmin(['charity_cases.store']);
+
+        $this->post(route('admin.charity_cases.store'), $this->payload(['address' => ['city_id' => $city->id, 'region_id' => '']]))
+            ->assertSessionHasNoErrors();
+
+        $address = CharityCase::firstWhere('national_id', '29001011234567')->address;
+        $this->assertSame($city->id, $address->city_id);
+        $this->assertNull($address->region_id);
+        $this->assertNull($address->latitude);
+    }
+
+    #[Test]
+    public function an_address_without_its_city_is_rejected(): void
+    {
+        $this->signInAdmin(['charity_cases.store']);
+
+        $this->post(route('admin.charity_cases.store'), $this->payload(['address' => ['address' => '12 Nile St', 'city_id' => '']]))
+            ->assertSessionHasErrors('address.city_id');
+
+        $this->assertSame(0, CharityCase::count());
+    }
+
+    #[Test]
+    public function create_edit_and_show_screens_render_the_address(): void
+    {
+        $charityCase = CharityCase::factory()->withAddress(['address' => '12 Nile Street'])->create();
+        $this->signInAdmin(['charity_cases.show', 'charity_cases.store', 'charity_cases.update']);
+
+        $this->get(route('admin.charity_cases.create'))->assertOk()->assertSee('address[city_id]', false);
+        $this->get(route('admin.charity_cases.edit', $charityCase))->assertOk()->assertSee('12 Nile Street');
+        $this->get(route('admin.charity_cases.show', $charityCase))->assertOk()->assertSee('12 Nile Street');
+    }
+
+    #[Test]
+    public function clearing_the_city_on_the_edit_form_removes_the_address(): void
+    {
+        $charityCase = CharityCase::factory()->withAddress()->create();
+        $this->signInAdmin(['charity_cases.update']);
+
+        $emptyAddress = ['city_id' => '', 'region_id' => '', 'address' => '', 'latitude' => '', 'longitude' => ''];
+
+        $this->put(route('admin.charity_cases.update', $charityCase), $this->payload(['address' => $emptyAddress]))
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('addresses', 0);
     }
 
     #[Test]

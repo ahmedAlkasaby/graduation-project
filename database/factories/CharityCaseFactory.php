@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Address;
 use App\Models\CharityCase;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,5 +23,19 @@ class CharityCaseFactory extends Factory
             'phone' => '010'.fake()->numerify('########'),
             'volunteer_id' => User::factory()->volunteer(),
         ];
+    }
+
+    /** A beneficiary no volunteer follows yet. */
+    public function unassigned(): static
+    {
+        return $this->state(fn (): array => ['volunteer_id' => null]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes  overrides for the address
+     */
+    public function withAddress(array $attributes = []): static
+    {
+        return $this->has(Address::factory()->state($attributes), 'address');
     }
 }

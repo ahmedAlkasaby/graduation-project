@@ -29,6 +29,20 @@
                     <dt class="col-sm-3">{{ __('Volunteer') }}</dt>
                     <dd class="col-sm-9">{{ $charityCase->volunteer?->full_name ?? __('Unassigned') }}</dd>
 
+                    <dt class="col-sm-3">{{ __('Address') }}</dt>
+                    <dd class="col-sm-9">
+                        @if ($charityCase->address)
+                            {{ collect([$charityCase->address->city?->nameLang(), $charityCase->address->region?->nameLang(), $charityCase->address->address])->filter()->implode(' - ') }}
+                            @if ($charityCase->address->latitude !== null && $charityCase->address->longitude !== null)
+                                <a href="https://www.google.com/maps?q={{ $charityCase->address->latitude }},{{ $charityCase->address->longitude }}" target="_blank" rel="noopener" class="ms-1">
+                                    <i class="ti ti-map-pin"></i>
+                                </a>
+                            @endif
+                        @else
+                            —
+                        @endif
+                    </dd>
+
                     <dt class="col-sm-3">{{ __('Created At') }}</dt>
                     <dd class="col-sm-9">{{ $charityCase->created_at?->toDateString() }}</dd>
                 </dl>

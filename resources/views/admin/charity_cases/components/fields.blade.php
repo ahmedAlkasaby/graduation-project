@@ -1,7 +1,8 @@
 {{--
     The beneficiary profile fields, shared by the create / edit form and the
-    assistance form's quick-create dialog. Every field is required. Pass
-    $plainSelects inside a modal, where select2 dropdowns do not work.
+    assistance form's quick-create dialog. The name, national ID and phone are
+    required; the volunteer and the address are optional. Pass $plainSelects
+    inside a modal, where select2 dropdowns do not work.
 --}}
 <div class="row g-3">
     <div class="col-sm-6">
@@ -33,12 +34,14 @@
     </div>
     <div class="col-sm-6">
         @include('admin.layouts.forms.fields.select', [
-            'label_req' => true,
+            'not_req' => true,
             'label' => __('Volunteer'),
             'select_name' => 'volunteer_id',
             'select_value' => $charityCase->volunteer_id ?? null,
-            'select_function' => ['' => __('Choose')] + $volunteers,
+            'select_function' => ['' => __('Unassigned')] + $volunteers,
             'select_class' => ($plainSelects ?? false) ? 'form-select' : 'form-select form-control select2',
         ])
     </div>
 </div>
+<div class="content-header mb-3"></div>
+@include('admin.charity_cases.components.address-fields')

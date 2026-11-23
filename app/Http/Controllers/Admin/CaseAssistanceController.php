@@ -71,7 +71,7 @@ class CaseAssistanceController extends AdminController
             'canQuickCreateCase' => $this->can('charity_cases.store'),
             'canQuickCreateCategory' => $this->can('case_categories.store'),
             'currency' => $this->currency(),
-        ] + $this->charityCaseService->formOptions());
+        ] + $this->charityCaseService->formOptions() + $this->charityCaseService->addressOptions());
     }
 
     public function store(CaseAssistanceRequest $request): RedirectResponse

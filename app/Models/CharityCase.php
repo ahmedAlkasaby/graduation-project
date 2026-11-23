@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  */
 class CharityCase extends SiteModelSoftDelete
 {
-    use HasFactory;
+    use AddressTrait, HasFactory;
 
     protected $table = 'charity_cases';
 
@@ -22,7 +22,7 @@ class CharityCase extends SiteModelSoftDelete
 
     protected $searchable = ['full_name', 'national_id', 'phone'];
 
-    /** A soft deleted volunteer is still shown on the cases they followed. */
+    /** The volunteer is optional. A soft deleted one is still shown on the cases they followed. */
     public function volunteer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'volunteer_id')->withTrashed();

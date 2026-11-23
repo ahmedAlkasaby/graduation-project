@@ -21,6 +21,7 @@ class CharityCaseResource extends MainResource
                 'full_name' => $this->volunteer->full_name,
                 'phone' => $this->volunteer->phone,
             ] : null),
+            'address' => $this->whenLoaded('address', fn () => $this->address ? new AddressResource($this->address) : null),
             'assistances' => CaseAssistanceResource::collection($this->whenLoaded('assistances')),
         ];
     }

@@ -22,6 +22,9 @@ use Illuminate\Http\Response;
  */
 class CharityCaseController extends ApiHomeController
 {
+    /** What a single profile answers with: its volunteer and address, both optional. */
+    private const DETAIL_RELATIONS = ['volunteer', 'address.city', 'address.region'];
+
     public function __construct(private readonly CharityCaseService $charityCaseService)
     {
         parent::__construct();
@@ -30,7 +33,7 @@ class CharityCaseController extends ApiHomeController
     public function index(CharityCaseFilterRequest $request): JsonResponse
     {
         $query = CharityCase::query()
-            ->with('volunteer')
+            ->with(self::DETAIL_RELATIONS)
             ->withCount('assistances')
             ->filter($request->validated());
 
@@ -67,7 +70,7 @@ class CharityCaseController extends ApiHomeController
         $charityCase = $this->charityCaseService->create($request->validated());
 
         return $this->successResponse(
-            ['case' => new CharityCaseResource($charityCase->load('volunteer'))],
+            ['case' => new CharityCaseResource($charityCase->load(self::DETAIL_RELATIONS))],
             'Success',
             Response::HTTP_CREATED,
         );
@@ -76,7 +79,7 @@ class CharityCaseController extends ApiHomeController
     public function show(CharityCase $charityCase): JsonResponse
     {
         $charityCase->load([
-            'volunteer',
+            ...self::DETAIL_RELATIONS,
             'assistances' => fn ($query) => $query->with('category')->withInstallmentSummary()->latest('id'),
         ]);
 
@@ -87,7 +90,7 @@ class CharityCaseController extends ApiHomeController
     {
         $this->charityCaseService->update($charityCase, $request->validated());
 
-        return $this->successResponse(['case' => new CharityCaseResource($charityCase->load('volunteer'))]);
+        return $this->successResponse(['case' => new CharityCaseResource($charityCase->load(self::DETAIL_RELATIONS))]);
     }
 
     /**

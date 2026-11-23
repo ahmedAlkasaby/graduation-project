@@ -2832,5 +2832,10 @@
     "Total Assistances": "إجمالي المساعدات",
     "Active Assistances": "المساعدات المفعلة",
     "Remaining Amount": "المبلغ المتبقي",
-    "Overdue Installments": "الأقساط المتأخرة"
+    "Overdue Installments": "الأقساط المتأخرة",
+    "Optional. Choose the city to save an address.": "اختياري. اختر المدينة لحفظ العنوان.",
+    "The city is required when an address is entered.": "المدينة مطلوبة عند إدخال عنوان.",
+    "The selected city is not available.": "المدينة المختارة غير متاحة.",
+    "The selected region is not an active region of the selected city.": "المنطقة المختارة ليست منطقة نشطة في المدينة المختارة.",
+    "Latitude and longitude must be entered together.": "يجب إدخال خط العرض وخط الطول معًا."
 }
