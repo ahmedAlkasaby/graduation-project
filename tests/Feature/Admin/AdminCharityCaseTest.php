@@ -61,6 +61,19 @@ class AdminCharityCaseTest extends TestCase
     }
 
     #[Test]
+    public function list_shows_the_address_of_each_case(): void
+    {
+        $region = Region::factory()->create(['name' => ['en' => 'Nasr City', 'ar' => 'مدينة نصر']]);
+        CharityCase::factory()->withAddress(['city_id' => $region->city_id, 'region_id' => $region->id, 'address' => '12 Nile Street'])->create();
+        $this->signInAdmin(['charity_cases.index']);
+
+        $this->get(route('admin.charity_cases.index'))
+            ->assertOk()
+            ->assertSee('Nasr City')
+            ->assertSee('12 Nile Street');
+    }
+
+    #[Test]
     public function list_filters_by_the_city_and_region_of_the_address(): void
     {
         $region = Region::factory()->create();

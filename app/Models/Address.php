@@ -31,6 +31,12 @@ class Address extends SiteModel
         ];
     }
 
+    /** The address on one line: city, region, then the free text (load `city` and `region` first). */
+    public function label(): string
+    {
+        return collect([$this->city?->nameLang(), $this->region?->nameLang(), $this->address])->filter()->implode(' - ');
+    }
+
     public function model(): MorphTo
     {
         return $this->morphTo();

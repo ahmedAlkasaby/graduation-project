@@ -32,7 +32,7 @@
                     <dt class="col-sm-3">{{ __('Address') }}</dt>
                     <dd class="col-sm-9">
                         @if ($charityCase->address)
-                            {{ collect([$charityCase->address->city?->nameLang(), $charityCase->address->region?->nameLang(), $charityCase->address->address])->filter()->implode(' - ') }}
+                            {{ $charityCase->address->label() }}
                             @if ($charityCase->address->latitude !== null && $charityCase->address->longitude !== null)
                                 <a href="https://www.google.com/maps?q={{ $charityCase->address->latitude }},{{ $charityCase->address->longitude }}" target="_blank" rel="noopener" class="ms-1">
                                     <i class="ti ti-map-pin"></i>

@@ -38,7 +38,7 @@ class CharityCaseController extends AdminController
         $filters = $request->validated();
 
         $cases = CharityCase::query()
-            ->with('volunteer')
+            ->with(['volunteer', 'address.city', 'address.region'])
             ->withCount('assistances')
             ->filter($filters)
             ->paginate($this->perPage($filters))
